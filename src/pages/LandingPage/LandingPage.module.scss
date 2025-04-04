@@ -1,0 +1,121 @@
+@import '@/styles/mixins.scss';
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: white;
+    min-height: 100vh;
+
+    @include laptop {
+        flex-direction: row-reverse;
+        justify-content: center;
+        gap: 2rem;
+        position: relative;
+    }
+  }
+  
+  .logoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  
+    .vfjcLogo {
+      max-width: 200px;
+      height: auto;
+
+      @include laptop {
+        max-width: 400px;
+      }
+    }
+  
+    .atriaLogo {
+      max-width: 80px;
+      height: auto;
+      margin-top: 3rem;
+
+      @include laptop {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .card {
+    background-color: white;
+    border: 1px solid #f1c40f;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+
+    @include tablet {
+        width: 50%;
+    }
+
+    @include laptop {
+        width: 25%;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.75rem;
+    }
+  
+    p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      margin-top: 1rem;
+    }
+  
+    input {
+      width: 100%;
+      display: block;
+      box-sizing: border-box;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .signupButton {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 1rem;
+      background-color: #015e22;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  
+    .loginText {
+      text-align: center;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+      color: #444;
+  
+      span {
+        color: #015e22;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+  }
+  

@@ -1,5 +1,8 @@
-// src/pages/index.js
+import Landing from "./LandingPage/LandingPage";
+
 export default function Home() {
-    return <h1>Fresh Next.js start 🚀</h1>;
+    return (
+      <Landing />
+    )
   }
   

@@ -1,0 +1,52 @@
+// styles/mixins.scss
+
+$sm: 320px;
+$md: 375px;
+$lg: 425px;
+$tablet: 768px;
+$laptop: 1024px;
+$desktop: 1440px;
+$xl: 2560px;
+
+@mixin sm {
+  @media (min-width: #{$sm}) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: #{$md}) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: #{$lg}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$tablet}) {
+    @content;
+  }
+}
+
+@mixin laptop {
+    @media (min-width: #{$laptop}) {
+      @content;
+    }
+  }
+  
+  @mixin desktop {
+    @media (min-width: #{$desktop}) {
+      @content;
+    }
+  }
+  
+  @mixin xl {
+    @media (min-width: #{$xl}) {
+      @content;
+    }
+  }
+  
