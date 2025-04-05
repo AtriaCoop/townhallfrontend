@@ -122,5 +122,26 @@
         cursor: pointer;
       }
     }
+
+    .forgotPassword {
+      text-align: center;
+      margin-top: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    
+      a {
+        color: #015e22;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+
+    .error {
+      color: #e74c3c; // red
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
   }
   
