@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import styles from './LandingPage.module.scss';
 import { registerUser } from '@/utils/authHelpers';
+import { useRouter } from 'next/router';
 
 export default function LandingPage() {
+
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
   const [message, setMessage] = useState('');
   const [logIn, setLogIn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,6 +54,7 @@ export default function LandingPage() {
 
         if (response.ok) {
             localStorage.setItem("user", JSON.stringify(data.user));  // Store user data
+            router.push("/HomePage")
 
         } else {
             setLoading(false)
