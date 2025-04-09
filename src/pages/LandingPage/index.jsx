@@ -32,11 +32,14 @@ export default function LandingPage() {
       setMessage(result.error);
     } else {
       setMessage(result.success);
+      setTimeout(() => {
+        router.push('/SetUpPage')
+      }, 1000)
     }
   };
 
   // SIGN IN
-  const handleSignIn = async (event) => {
+  const handleLogIn = async (event) => {
     event.preventDefault();
     
     const { email, password } = formData;
@@ -93,7 +96,7 @@ export default function LandingPage() {
           onChange={handleChange}
         />
 
-        <button className={styles.signupButton} onClick={logIn ? handleSignIn : handleSignUp}>
+        <button className={styles.signupButton} onClick={logIn ? handleLogIn : handleSignUp}>
           {logIn ? 'LOGIN' : 'SIGN UP'}
         </button>
 
