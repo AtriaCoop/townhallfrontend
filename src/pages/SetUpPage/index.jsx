@@ -1,7 +1,10 @@
 import styles from '@/pages/SetUpPage/SetUpPage.module.scss'
 import { useRef } from 'react'
+import { useRouter } from 'next/router'
 
 export default function SetUpPage() {
+
+    const router = useRouter();
 
     const profilePicRef = useRef(null)
     const headerPicRef = useRef(null)
@@ -23,6 +26,10 @@ export default function SetUpPage() {
             console.log('Selected header picture:', file)
         }
     }
+
+    const handleCompleteClick = async () => (
+        router.push('/HomePage')
+    )
 
     return (
         <div>
@@ -85,7 +92,7 @@ export default function SetUpPage() {
                             style={{ display: 'none '}}
                         />
                     
-                    <button className={styles.completeButton}>Complete</button>
+                    <button className={styles.completeButton} onClick={handleCompleteClick}>Complete</button>
                 </div>
             </div>
 
