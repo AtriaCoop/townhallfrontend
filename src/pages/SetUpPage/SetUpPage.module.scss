@@ -52,6 +52,14 @@
         margin: 8px 64px;
     }
 
+    @include laptop {
+        margin: 8px 128px;
+    }
+
+    @include desktop {
+        margin: 8px 256px;
+    }
+
     input {
         padding: 8px;
         border-radius: 4.5px;
