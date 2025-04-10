@@ -1,0 +1,89 @@
+@import '@/styles/mixins.scss';
+
+.navigationContainer {
+    display: flex;
+    justify-content: space-evenly;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px;
+    padding: 1rem;
+
+    img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        margin-left: 1rem;
+    }
+}
+
+.navigation {
+    display: flex;
+    gap: 1rem;
+}
+
+.setUpContainer {
+    margin: 2rem 1rem 2rem 1rem;
+    border-radius: 12.5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(0, 75, 20);
+    background-color: rgb(0, 75, 20);
+    inset: 0px;
+
+    @include tablet {
+        margin: 2rem 6rem;
+    }
+}
+
+.title {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inputs {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    margin: 8px;
+
+    @include tablet {
+        margin: 8px 64px;
+    }
+
+    @include laptop {
+        margin: 8px 128px;
+    }
+
+    @include desktop {
+        margin: 8px 256px;
+    }
+
+    input {
+        padding: 8px;
+        border-radius: 4.5px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: rgb(221, 221, 221);
+        background-color: rgb(255, 255, 255);
+    }
+}
+
+.uploadButton {
+    padding: 6rem;
+    text-align: center;
+    border: 1px solid white;
+    color: rgb(255, 196, 0);;
+    cursor: pointer;
+}
+
+.completeButton {
+    color: white;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    background-color: rgb(36, 120, 61);
+    border-radius: 9px;
+    border-width: 0px;
+    padding: 8px;
+}
