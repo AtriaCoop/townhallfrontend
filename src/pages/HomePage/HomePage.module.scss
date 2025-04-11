@@ -1,0 +1,14 @@
+@import '@/styles/mixins.scss';
+
+.homeContainer {
+    padding: 0 1rem 0 1rem;
+
+    @include tablet {
+        margin-left: 89px;
+        padding: 0 2rem 0 2rem;
+    }
+
+    @include laptop {
+        margin-left: 289px;
+    }
+}

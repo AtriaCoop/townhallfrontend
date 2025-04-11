@@ -1,0 +1,97 @@
+@import '@/styles/mixins.scss';
+
+.homeContainer {
+    padding: 0 1rem 0 1rem;
+
+    @include tablet {
+        margin-left: 89px;
+        padding: 0 2rem 0 2rem;
+    }
+
+    @include laptop {
+        margin-left: 289px;
+    }
+}
+
+.post {
+  background-color: white;
+  border: 2px solid #f9b233; // your yellow border
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: sans-serif;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.profilePic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.75rem;
+}
+
+.postInfo {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.userName {
+  font-weight: bold;
+  color: #222;
+}
+
+.organizationName {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.date {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.postContent {
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333;
+
+  a {
+    color: #0066cc;
+    text-decoration: underline;
+    word-break: break-word;
+    display: block;
+    margin-top: 0.5rem;
+  }
+}
+
+.postFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reactions {
+  display: flex;
+  gap: 0.75rem;
+
+  img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+}
+
+.likesComments {
+  font-size: 0.85rem;
+  color: #666;
+}
