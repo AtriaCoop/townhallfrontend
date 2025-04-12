@@ -1,0 +1,53 @@
+@import '@/styles/mixins.scss';
+
+.homeContainer {
+    padding: 0 1rem 0 1rem;
+
+    @include tablet {
+        margin-left: 89px;
+        padding: 0 6rem 0 6rem;
+    }
+
+    @include laptop {
+        margin-left: 289px;
+        padding: 0 8rem 0 8rem;
+    }
+
+    @include desktop {
+        padding: 0 12rem 0 12rem;
+    }
+}
+
+.title {
+
+    p {
+        color: rgb(117, 117, 117);
+    }
+}
+
+.searchBar {
+    width: 100%;
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    font-weight: 400;
+    height: 33px;
+    padding: 0px 8px;
+    line-height: 20px;
+    border-radius: 4.5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(189, 189, 189);
+
+    @include tablet {
+        width: 70%;
+    }
+
+    @include laptop {
+        width: 50%;
+    }
+
+    @include desktop {
+        width: 30%;
+    }
+}
+
