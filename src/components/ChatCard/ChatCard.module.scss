@@ -1,0 +1,50 @@
+.card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.profilePic {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.textInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.time,
+.title {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+}
+
+.button {
+    padding: 8px;
+    border-radius: 8px;
+    border-width: 0px;
+    background-color: rgb(36, 120, 61);
+    inset: 0px;
+    color: white;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgb(30, 100, 50);
+      }     
+}
