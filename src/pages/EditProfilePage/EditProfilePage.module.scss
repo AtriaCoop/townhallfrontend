@@ -1,0 +1,86 @@
+@import '@/styles/mixins.scss';
+
+.container {
+
+    @include tablet {
+        margin-left: 89px;
+    }
+
+    @include laptop {
+        margin-left: 289px;
+    }
+}
+
+.editProfileContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.profilePic {
+    width: 149px;
+    height: 149px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+
+    @include tablet {
+        margin: 8px 64px;
+    }
+
+    @include laptop {
+        margin: 8px 128px;
+    }
+
+    @include desktop {
+        margin: 8px 256px;
+    }
+
+    input {
+        padding: 8px;
+        border-radius: 4.5px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: rgb(221, 221, 221);
+        background-color: rgb(255, 255, 255);
+    }
+}
+
+.profileImageInput,
+.profileHeaderInput {
+    padding: 6rem;
+    text-align: center;
+    border: 1px solid white;
+    color: rgb(255, 196, 0);;
+    cursor: pointer;
+}
+
+.saveButton {
+    background-color: #24873d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-top: 2rem;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      background-color: rgb(30, 100, 50);
+    }  
+}
+
+.deleteButton {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    color: #ddd;
+    cursor: pointer;
+}
