@@ -36,15 +36,16 @@
 }
 
 .button {
-    padding: 8px;
-    border-radius: 8px;
-    border-width: 0px;
-    background-color: rgb(36, 120, 61);
-    inset: 0px;
+    background-color: #24873d;
     color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
     cursor: pointer;
+    font-weight: bold;
 
     &:hover {
-        background-color: rgb(30, 100, 50);
-      }     
+      background-color: rgb(30, 100, 50);
+    }   
 }

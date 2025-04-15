@@ -1,0 +1,79 @@
+@import '@/styles/mixins.scss';
+
+.container {
+
+    @include tablet {
+        margin-left: 89px;
+    }
+
+    @include laptop {
+        margin-left: 289px;
+    }
+}
+
+.profileContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.profilePic {
+    width: 149px;
+    height: 149px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.name {
+    font-size: -webkit-xxx-large;
+}
+
+.dateJoined {
+    color: #555;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.editButton {
+    background-color: #24873d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      background-color: rgb(30, 100, 50);
+    }  
+}
+
+.signoutContainer {
+    background-color: rgba(0, 168, 152, 0.1);
+    border-radius: 12px;
+    padding: 1rem 4rem 1rem 4rem;
+    color: rgb(0, 75, 20);
+}
+
+.signoutButton {
+    background-color: #cc0829;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      background-color: #88071c;
+    }  
+}
