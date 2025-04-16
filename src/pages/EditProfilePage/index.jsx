@@ -1,13 +1,31 @@
 import styles from '@/pages/EditProfilePage/EditProfilePage.module.scss'
 import Navigation from '@/components/Navigation/Navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/router';
 
 export default function EditProfilePage() {
+
+    const router = useRouter();
+
+    const [showModal, setShowModal] = useState(false);
+
+    const handleDeleteClick = () => {
+        setShowModal(true);
+    }
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
+
     return (
         <div className={styles.container}>
             <Navigation />
 
             <div className={styles.editProfileContainer}>
-                <h1>Account Settings</h1>
+                <div className={styles.title}>
+                    <img src="/assets/test.png" alt="Back" onClick={() => (router.push('/ProfilePage'))}/>
+                    <h1>Account Settings</h1>
+                </div>
                 <img className={styles.profilePic} src="/assets/test.png" alt="Profile Image" />
                 <h3 className={styles.name}>Ryan Yee</h3>
             </div>
@@ -45,7 +63,21 @@ export default function EditProfilePage() {
                     <button className={styles.saveButton}>SAVE</button>
                 </div>
 
-                <div className={styles.deleteButton}>
+                {/* Delete account modal */}
+                {showModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <h1>Delete Account?</h1>
+                        <p>Are you sure you want to delete your account? You can't undo this.</p>
+                        <div className={styles.modalButton}>
+                            <button className={styles.delete}>DELETE MY ACCOUNT</button>
+                            <button className={styles.cancel} onClick={closeModal}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                )}
+
+                <div className={styles.deleteButton} onClick={handleDeleteClick}>
                     <p>DELETE ACCOUNT</p>
                 </div>
 
