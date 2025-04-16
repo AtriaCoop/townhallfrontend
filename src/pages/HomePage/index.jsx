@@ -1,8 +1,31 @@
 import Navigation from '@/components/Navigation/Navigation'
 import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
+import { useRef, useState } from 'react';
 
 export default function HomePage() {
+
+    const [showModal, setShowModal] = useState(false);
+    
+    const handlePostClick = () => {
+        setShowModal(true);
+    }
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
+
+    const postImageRef = useRef(null);
+
+    const handlePostImageClick = () => postImageRef.current.click()
+
+    const handlePostImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            console.log('Selected post image', file)
+        }
+    }
+
     return (
         <div className={styles.container}>
             <Navigation />
@@ -66,6 +89,39 @@ export default function HomePage() {
                     likes={4}
                     comments={1}
                 />
+
+                {/* New Post Modal */}
+                {showModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.closeButton} onClick={closeModal}>×</button>
+                        <h1>New Post</h1>
+                        <p>Text</p>
+                            <input type="text" placeholder='Enter text...' className={styles.textInput}/>
+                            <p>Profile Picture</p>
+                        <div className={styles.imageInput} onClick={handlePostImageClick}>
+                            Choose Photo
+                        </div>
+                        <input 
+                            type="file" 
+                            accept="image/*"
+                            ref={postImageRef}
+                            onChange={handlePostImageChange}
+                            style={{ display: 'none '}}
+                        />
+                        <div className={styles.modalButton}>
+                            <button className={styles.postButton}>POST</button>
+                        </div>
+                    </div>
+                </div>
+                )}
+
+                {!showModal && (
+                <div className={styles.newPostButton} onClick={handlePostClick}>
+                    NEW POST
+                </div>
+                )}
+                
             </div>
 
         </div>
