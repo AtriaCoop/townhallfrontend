@@ -11,6 +11,9 @@ export default function Navigation() {
 
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
   useEffect (() => {
     async function fetchProfile() {
@@ -36,7 +39,7 @@ export default function Navigation() {
     <div className={styles.nav}>
 
       {/* Mobile burger menu */}
-      <div className={styles.menu}><Menu /></div>
+      <div className={styles.menu} onClick={toggleSidebar}><Menu /></div>
 
       {/* Desktop logo */}
       <img src="/assets/VFJC.png" alt="VFJC Logo" className={styles.logo} />
@@ -64,6 +67,33 @@ export default function Navigation() {
           )}
         </span>
       </div>
+
+      {/* Sidebar navigation modal in mobile */}
+      <div className={`${styles.sidebarModal} ${isSidebarOpen ? styles.open : ''}`}>
+        <div className={styles.closeIcon} onClick={() => setIsSidebarOpen(false)}>✕</div>
+
+        <img src="/assets/VFJC.png" alt="VFJC Logo" className={styles.logo} />
+        <div className={styles.separator}></div>
+
+        <div className={styles.logos}>
+          <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Home /><span className={styles.linkText}>Home</span></div>
+          <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
+          <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
+          <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
+        </div>
+
+        <div className={styles.modalProfile} onClick={() => router.push('/ProfilePage')}>
+          <img src="/assets/test.png" alt="Profile" />
+          <span className={styles.modalProfileName}>
+            {profileData ? (
+              <div>{profileData.first_name} {profileData.last_name}</div>
+            ) : (
+              <p>loading...</p>
+            )}
+          </span>
+        </div>
+      </div>
+      
     </div>
   );
 }

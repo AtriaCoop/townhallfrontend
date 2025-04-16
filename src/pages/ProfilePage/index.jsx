@@ -16,7 +16,7 @@ export default function ProfilePage() {
                 <span className={styles.dateJoined}>Date Joined: 2 weeks ago</span>
                 <div className={styles.profileInfo}>
                     <span>Title: Volunteer</span>
-                    <span>spanrimary Organization: Atria</span>
+                    <span>Primary Organization: Atria</span>
                     <span>Other Organizations: other</span>
                     <span>Other Networks: other</span>
                     <span>About Me: other</span>
