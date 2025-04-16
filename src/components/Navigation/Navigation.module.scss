@@ -23,7 +23,7 @@
   }
 
   .logo {
-    flex: 1;
+    // flex: 1;
     display: block;
     text-align: center;
     height: 40px;
@@ -165,7 +165,7 @@
     }
 
     .active {
-      background-color: rgba(0, 168, 152, 0.15);;
+      background-color: rgba(0, 168, 152, 0.15);
     }
 
     .profile {
@@ -175,5 +175,135 @@
     .profileName {
       display: block;
     }
+  }
+}
+
+// Sidebar modal in mobile responsiveness
+.sidebarModal {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  width: 259px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  padding: 2rem 0rem;
+
+  @include tablet {
+    display: none;
+  }
+
+  .separator {
+    width: 90%;
+    height: 1px;
+    background-color: #ddd;
+    margin: 0 auto 20px auto;
+  }
+
+  .logo {
+    display: block;
+    flex: 0;
+    margin-bottom: 16px;
+    height: 80px;
+  }
+
+  .logos {
+    align-items: start;
+    font-weight: 600;
+    color: rgb(0, 75, 20);
+    height: 424px;
+    padding: 1rem;
+
+    svg {
+      margin-left: 16px;
+    }
+
+    .link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 229px;
+      min-height: 48px;
+      border-radius: 8px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+
+    .active {
+      background-color: rgba(0, 168, 152, 0.15);
+    }
+    
+    .profile {
+      gap: 1rem;
+    }
+    
+    .profileName {
+      display: block;
+    }
+  }
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  color: rgb(0, 75, 20);
+  font-weight: 600;
+  gap: 32px;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.closeIcon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+  }
+}
+
+.sidebarModal.open {
+  transform: translateX(0);
+}
+
+.overlayOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modalProfile {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0 3rem 0;
+  gap: 1rem;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
+
+  img {
+    width: 48px;
+    height: 48px;
+    margin-left: 1rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
   }
 }
