@@ -280,6 +280,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  padding: 1rem 0 calc(1rem + env(safe-area-inset-bottom)) 0; // 👈🔥 Respects phone's safe area on the bottom
   padding: 1rem 0 1rem 0;
   gap: 1rem;
   border-top: 1px solid #ddd;
