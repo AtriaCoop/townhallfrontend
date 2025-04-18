@@ -192,7 +192,6 @@
   background-color: white;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
   z-index: 2000;
-  padding: 2rem 0rem;
 
   @include tablet {
     display: none;
@@ -208,15 +207,16 @@
   .logo {
     display: block;
     flex: 0;
-    margin-bottom: 16px;
+    margin: 16px 0 16px 0;
     height: 80px;
   }
 
   .logos {
+    display: flex;
+    flex-direction: column;
     align-items: start;
     font-weight: 600;
     color: rgb(0, 75, 20);
-    height: 424px;
     padding: 1rem;
 
     svg {
@@ -254,22 +254,9 @@
 .modalContent {
   display: flex;
   flex-direction: column;
+  flex: 1;
   color: rgb(0, 75, 20);
   font-weight: 600;
-  gap: 32px;
-
-  div {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.1rem;
-    cursor: pointer;
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
 }
 
 .closeIcon {
@@ -293,7 +280,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 1rem 0 3rem 0;
+  padding: 1rem 0 1rem 0;
   gap: 1rem;
   border-top: 1px solid #ddd;
   cursor: pointer;
