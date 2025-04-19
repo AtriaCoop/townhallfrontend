@@ -8,6 +8,7 @@ export default function Navigation() {
 
   const pathname = usePathname();
   const router = useRouter();
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState(null);
@@ -23,7 +24,7 @@ export default function Navigation() {
           console.error("No user found in localStorage.");
           return;
         }
-        const response = await fetch (`http://127.0.0.1:8000/volunteer/${user.id}/`);
+        const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
         const data = await response.json();
         setProfileData(data.volunteer);
         setLoading(false)

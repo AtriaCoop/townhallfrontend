@@ -1,3 +1,5 @@
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+
 export const validatePassword = (password, confirmPassword) => {
     if (password.length < 5) {
         return "Password must be at least 11 characters long";
@@ -13,7 +15,7 @@ export const validatePassword = (password, confirmPassword) => {
 
 export const registerUser = async (formData) => {
     try {
-        const response = await fetch("http://127.0.0.1:8000/volunteer/", {
+        const response = await fetch(`${BASE_URL}/volunteer`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
