@@ -29,15 +29,21 @@ export default function LandingPage() {
   // SIGN UP
   const handleSignUp = async () => {
     const result = await registerUser(formData);
+  
     if (result.error) {
       setMessage(result.error);
     } else {
       setMessage(result.success);
+  
+      // 🧠 FIX: Save the created volunteer to localStorage
+      localStorage.setItem("user", JSON.stringify(result.data.volunteer));
+  
       setTimeout(() => {
-        router.push('/SetUpPage')
-      }, 1000)
+        router.push('/SetUpPage');
+      }, 1000);
     }
   };
+  
 
   // SIGN IN
   const handleLogIn = async (event) => {

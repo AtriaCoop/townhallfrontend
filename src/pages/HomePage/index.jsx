@@ -1,11 +1,52 @@
 import Navigation from '@/components/Navigation/Navigation'
 import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function HomePage() {
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
     const [showModal, setShowModal] = useState(false);
+    const [posts, setPosts] = useState([
+        {
+            id: 1,
+            userName: "Ryan Yee (This is hard-coded)",
+            organization: "Atria",
+            date: "2025-03-14 1:03 p.m.",
+            content: [
+              "Hi all, really enjoyed being at the meeting this week, connecting & re-connecting, thank you for the welcome and the work.",
+              "I wanted to share some links to some of the resources I mentioned..."
+            ],
+            links: [
+              { text: "https://cfccanada.ca/en/News/...", href: "https://cfccanada.ca/en/News/Publications/Reports/Our-Food-Our-Future" },
+              { text: "Beyond Hunger", href: "https://drive.google.com/..." },
+              { text: "Sounding the Alarm", href: "https://drive.google.com/..." }
+            ],
+            likes: 4,
+            comments: 1
+        }
+    ]);
+    const [newText, setNewText] = useState("")
+    const [newImage, setNewImage] = useState(null)
+    const [profileData, setProfileData] = useState(null)
+
+    useEffect (() => {
+        async function fetchProfile() {
+          try {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user.id) {
+              console.error("No user found in localStorage.");
+              return;
+            }
+            const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+            const data = await response.json();
+            setProfileData(data.volunteer);
+          } catch(error) {
+            console.error("Error fetching profile data:", error);
+          }
+        }
+        fetchProfile();
+      }, [])
     
     const handlePostClick = () => {
         setShowModal(true);
@@ -41,54 +82,18 @@ export default function HomePage() {
                 </div>
 
                 {/* Post component */}
-                <Post
-                    userName="Ryan Yee"
-                    organization="Atria"
-                    date="2025-03-14 1:03 p.m."
-                    content={[
-                        "Hi all, really enjoyed being at the meeting this week, connecting & re-connecting, thank you for the welcome and the work.",
-                        "I wanted to share some links to some of the resources I mentioned..."
-                    ]}
-                    links={[
-                        { text: "https://cfccanada.ca/en/News/...", href: "https://cfccanada.ca/en/News/Publications/Reports/Our-Food-Our-Future" },
-                        { text: "Beyond Hunger", href: "https://drive.google.com/..." },
-                        { text: "Sounding the Alarm", href: "https://drive.google.com/..." }
-                    ]}
-                    likes={4}
-                    comments={1}
-                />
-                <Post
-                    userName="Ryan Yee"
-                    organization="Atria"
-                    date="2025-03-14 1:03 p.m."
-                    content={[
-                        "Hi all, really enjoyed being at the meeting this week, connecting & re-connecting, thank you for the welcome and the work.",
-                        "I wanted to share some links to some of the resources I mentioned..."
-                    ]}
-                    links={[
-                        { text: "https://cfccanada.ca/en/News/...", href: "https://cfccanada.ca/en/News/Publications/Reports/Our-Food-Our-Future" },
-                        { text: "Beyond Hunger", href: "https://drive.google.com/..." },
-                        { text: "Sounding the Alarm", href: "https://drive.google.com/..." }
-                    ]}
-                    likes={4}
-                    comments={1}
-                />
-                    <Post
-                    userName="Ryan Yee"
-                    organization="Atria"
-                    date="2025-03-14 1:03 p.m."
-                    content={[
-                        "Hi all, really enjoyed being at the meeting this week, connecting & re-connecting, thank you for the welcome and the work.",
-                        "I wanted to share some links to some of the resources I mentioned..."
-                    ]}
-                    links={[
-                        { text: "https://cfccanada.ca/en/News/...", href: "https://cfccanada.ca/en/News/Publications/Reports/Our-Food-Our-Future" },
-                        { text: "Beyond Hunger", href: "https://drive.google.com/..." },
-                        { text: "Sounding the Alarm", href: "https://drive.google.com/..." }
-                    ]}
-                    likes={4}
-                    comments={1}
-                />
+                {posts.map((post) => (
+                    <Post 
+                        key={post.id}
+                        userName={post.userName}
+                        organization={post.organization}
+                        date={post.date}
+                        content={post.content}
+                        links={post.links}
+                        likes={post.likes}
+                        comments={post.comments}
+                    />
+                ))}
 
                 {/* New Post Modal */}
                 {showModal && (
@@ -97,7 +102,13 @@ export default function HomePage() {
                         <button className={styles.closeButton} onClick={closeModal}>×</button>
                         <h1>New Post</h1>
                         <p>Text</p>
-                            <input type="text" placeholder='Enter text...' className={styles.textInput}/>
+                            <input 
+                                type="text" 
+                                placeholder='Enter text...' 
+                                className={styles.textInput} 
+                                value={newText} 
+                                onChange={(e) => setNewText(e.target.value)}
+                            />
                             <p>Profile Picture</p>
                         <div className={styles.imageInput} onClick={handlePostImageClick}>
                             Choose Photo
@@ -110,7 +121,28 @@ export default function HomePage() {
                             style={{ display: 'none '}}
                         />
                         <div className={styles.modalButton}>
-                            <button className={styles.postButton}>POST</button>
+                            <button 
+                                className={styles.postButton}
+                                onClick={() => {
+                                    const newPost = {
+                                        id: posts.length + 1,
+                                        userName: `${profileData.first_name} ${profileData.last_name}`,
+                                        organization: "Atria",
+                                        date: new Date().toLocaleString(),
+                                        content: [newText],
+                                        links: [],
+                                        likes: 0,
+                                        comments: 0
+                                    };
+
+                                    setPosts([newPost, ...posts]);
+                                    setShowModal(false);
+                                    setNewText("")
+                                    setNewImage(null)
+                                }}
+                                >
+                                    POST
+                            </button>
                         </div>
                     </div>
                 </div>

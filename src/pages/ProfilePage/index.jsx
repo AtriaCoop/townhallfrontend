@@ -1,10 +1,36 @@
 import styles from '@/pages/ProfilePage/ProfilePage.module.scss'
 import Navigation from '@/components/Navigation/Navigation'
 import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 
 export default function ProfilePage() {
 
     const router = useRouter();
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+
+    const [profileData, setProfileData] = useState(null)
+
+    useEffect (() => {
+        async function fetchProfile() {
+          try {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user.id) {
+              console.error("No user found in localStorage.");
+              return;
+            }
+            const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+            const data = await response.json();
+            setProfileData(data.volunteer);
+          } catch {
+            console.error("Error fetching profile data:", error);
+          }
+        }
+        fetchProfile();
+      }, []);
+
+      if (!profileData) {
+        return null;
+      }
 
     return (
         <div className={styles.container}>
@@ -12,15 +38,15 @@ export default function ProfilePage() {
 
             <div className={styles.profileContainer}>
                 <img className={styles.profilePic} src="/assets/test.png" alt="Profile Image" />
-                <span className={styles.name}>Ryan Yee</span>
+                <span className={styles.name}>{profileData.first_name} {profileData.last_name}</span>
                 <span className={styles.dateJoined}>Date Joined: 2 weeks ago</span>
                 <div className={styles.profileInfo}>
-                    <span>Title: Volunteer</span>
-                    <span>Primary Organization: Atria</span>
-                    <span>Other Organizations: other</span>
-                    <span>Other Networks: other</span>
-                    <span>About Me: other</span>
-                    <span>My Skills & Interests: other</span>
+                    <span>Title: {profileData.title}</span>
+                    <span>Primary Organization: {profileData.primary_organization}</span>
+                    <span>Other Organizations: {profileData.other_organizations}</span>
+                    <span>Other Networks: {profileData.other_networks}</span>
+                    <span>About Me: {profileData.about_me}</span>
+                    <span>My Skills & Interests: {profileData.skills_interests}</span>
                 </div>
                 <button onClick={() => router.push('/EditProfilePage')} className={styles.editButton}>EDIT MY PROFILE</button>
                 
