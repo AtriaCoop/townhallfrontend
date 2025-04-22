@@ -33,8 +33,10 @@ export default function EditProfilePage() {
             <div className={styles.inputs}>
                     <p>Email</p>
                         <input type="text" placeholder='Enter email...'/>
-                    <p>Full Name</p>
-                        <input type="text" placeholder='Enter full name...'/>
+                    <p>First Name</p>
+                        <input type="text" placeholder='Enter first name...'/>
+                    <p>Last Name</p>
+                        <input type="text" placeholder='Enter last name...'/>
                     <p>Preferred Pronouns</p>
                         <input type="text" placeholder='Share your pronouns (Optional)'/>
                     <p>Title</p>
