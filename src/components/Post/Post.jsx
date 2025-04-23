@@ -1,6 +1,9 @@
 import styles from './Post.module.scss';
 
 export default function Post({ userName, organization, date, content, links, likes, comments }) {
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>

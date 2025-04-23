@@ -7,25 +7,7 @@ export default function HomePage() {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
     const [showModal, setShowModal] = useState(false);
-    const [posts, setPosts] = useState([
-        {
-            id: 1,
-            userName: "Ryan Yee (This is hard-coded)",
-            organization: "Atria",
-            date: "2025-03-14 1:03 p.m.",
-            content: [
-              "Hi all, really enjoyed being at the meeting this week, connecting & re-connecting, thank you for the welcome and the work.",
-              "I wanted to share some links to some of the resources I mentioned..."
-            ],
-            links: [
-              { text: "https://cfccanada.ca/en/News/...", href: "https://cfccanada.ca/en/News/Publications/Reports/Our-Food-Our-Future" },
-              { text: "Beyond Hunger", href: "https://drive.google.com/..." },
-              { text: "Sounding the Alarm", href: "https://drive.google.com/..." }
-            ],
-            likes: 4,
-            comments: 1
-        }
-    ]);
+    const [posts, setPosts] = useState([]);
     const [newText, setNewText] = useState("")
     const [newImage, setNewImage] = useState(null)
     const [profileData, setProfileData] = useState(null)
@@ -47,6 +29,35 @@ export default function HomePage() {
         }
         fetchProfile();
       }, [])
+
+      useEffect(() => {
+        async function fetchPosts() {
+          try {
+            const res = await fetch(`${BASE_URL}/post/`);
+            const data = await res.json();
+      
+            const formattedPosts = data.posts.map((p) => ({
+              id: p.id,
+              userName: `${profileData.first_name} ${profileData.last_name}`,
+              organization: profileData.primary_organization,
+              date: new Date(p.created_at).toLocaleString(),
+              content: [p.content],
+              links: [],
+              likes: 0,
+              comments: 0,
+            }))
+            .reverse();
+      
+            setPosts(formattedPosts);
+          } catch (err) {
+            console.error("Failed to fetch posts", err);
+          }
+        }
+      
+        if (profileData) {
+          fetchPosts();
+        }
+      }, [profileData]);      
     
     const handlePostClick = () => {
         setShowModal(true);
@@ -61,9 +72,11 @@ export default function HomePage() {
     const handlePostImageClick = () => postImageRef.current.click()
 
     const handlePostImageChange = (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            console.log('Selected post image', file)
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          setNewImage(file);
+        } else {
+          alert("Please upload a valid image file.");
         }
     }
 
@@ -123,23 +136,46 @@ export default function HomePage() {
                         <div className={styles.modalButton}>
                             <button 
                                 className={styles.postButton}
-                                onClick={() => {
-                                    const newPost = {
-                                        id: posts.length + 1,
+                                onClick={async () => {
+                                    if (!profileData || !newText) return;
+                                  
+                                    const formData = new FormData();
+                                    formData.append("volunteer", profileData.id); // the volunteer ID
+                                    formData.append("content", newText);
+                                    if (newImage) {
+                                      formData.append("image", newImage);
+                                    }
+                                  
+                                    try {
+                                      const response = await fetch(`${BASE_URL}/post/`, {
+                                        method: "POST",
+                                        body: formData,
+                                      });
+                                  
+                                      if (!response.ok) {
+                                        throw new Error("Failed to create post");
+                                      }
+                                  
+                                      const data = await response.json();
+                                      const newPost = {
+                                        id: data.post.id,
                                         userName: `${profileData.first_name} ${profileData.last_name}`,
-                                        organization: "Atria",
-                                        date: new Date().toLocaleString(),
-                                        content: [newText],
+                                        organization: profileData.primary_organization,
+                                        date: new Date(data.post.created_at).toLocaleString(),
+                                        content: [data.post.content],
                                         links: [],
                                         likes: 0,
-                                        comments: 0
-                                    };
-
-                                    setPosts([newPost, ...posts]);
-                                    setShowModal(false);
-                                    setNewText("")
-                                    setNewImage(null)
-                                }}
+                                        comments: 0,
+                                      };
+                                  
+                                      setPosts([newPost, ...posts]);
+                                      setShowModal(false);
+                                      setNewText("");
+                                      setNewImage(null);
+                                    } catch (error) {
+                                      console.error("Error posting:", error);
+                                    }
+                                  }}                                  
                                 >
                                     POST
                             </button>
