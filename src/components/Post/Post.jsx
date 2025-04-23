@@ -1,8 +1,35 @@
 import styles from './Post.module.scss';
+import { useState, useEffect, useRef } from 'react';
 
-export default function Post({ userName, organization, date, content, links, likes, comments }) {
+export default function Post({ userName, organization, date, content, links, likes, comments, userId, currentUserId }) {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const optionsRef = useRef(null);
+
+  const [showOptions, setShowOptions] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editText, setEditText] = useState(content.join('\n'));
+  const [editImage, setEditImage] = useState(null);
+
+  const handleOptionsClick = () => {
+    setShowOptions(prev => !prev);
+  };
+
+  // Handle outside click to close edit/delete modal
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
+        setShowOptions(false);
+      }
+    }
+    if (showOptions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showOptions]);
 
   return (
     <div className={styles.post}>
@@ -13,6 +40,72 @@ export default function Post({ userName, organization, date, content, links, lik
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
         </div>
+        {userId === currentUserId && (
+          <div className={styles.moreOptions} onClick={handleOptionsClick}>
+            ⋯
+          </div>
+        )}
+        {/* Edit Post Modal */}
+        {showOptions && (
+          <div className={styles.optionsMenu} ref={optionsRef}>
+            <button onClick={() => setShowEditModal(true)}>Edit</button>
+            <button onClick={() => setShowDeleteModal(true)}>Delete</button>
+          </div>
+        )}
+        {/* Show Edit Modal */}
+        {showEditModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContentEdit}>
+            <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
+            <h1>Edit Post</h1>
+
+            <p>Text</p>
+            <input
+              type="text"
+              placeholder="Enter text..."
+              className={styles.textInput}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+            />
+
+            <div className={styles.imageInput} onClick={() => document.getElementById(`editImg-${userId}`).click()}>
+              Image
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              id={`editImg-${userId}`}
+              onChange={(e) => setEditImage(e.target.files[0])}
+              style={{ display: 'none' }}
+            />
+
+            <div className={styles.modalButton}>
+              <button className={styles.postButton} onClick={() => {
+                // Placeholder for PATCH logic
+                setShowEditModal(false);
+              }}>
+                Choose Photo
+              </button>
+              <button className={styles.updateButton} onClick={() => {
+                // Placeholder for DELETE logic
+                setShowEditModal(false);
+              }}>
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+        {/* Show Delete Modal */}
+        {showDeleteModal && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContentDelete}>
+              <button className={styles.closeButton} onClick={() => setShowDeleteModal(false)}>×</button>
+              <h1>Are you sure?</h1>
+              <button className={styles.deleteButton}>Delete</button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className={styles.postContent}>
