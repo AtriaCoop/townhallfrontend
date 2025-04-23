@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation/Navigation'
 import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
+import PostModal from '@/components/PostModal/PostModal';
 import { useEffect, useRef, useState } from 'react';
 
 export default function HomePage() {
@@ -8,8 +9,6 @@ export default function HomePage() {
 
     const [showModal, setShowModal] = useState(false);
     const [posts, setPosts] = useState([]);
-    const [newText, setNewText] = useState("")
-    const [newImage, setNewImage] = useState(null)
     const [profileData, setProfileData] = useState(null)
 
     useEffect (() => {
@@ -38,6 +37,7 @@ export default function HomePage() {
       
             const formattedPosts = data.posts.map((p) => ({
               id: p.id,
+              userId: p.volunteer,
               userName: `${profileData.first_name} ${profileData.last_name}`,
               organization: profileData.primary_organization,
               date: new Date(p.created_at).toLocaleString(),
@@ -61,23 +61,6 @@ export default function HomePage() {
     
     const handlePostClick = () => {
         setShowModal(true);
-    }
-
-    const closeModal = () => {
-        setShowModal(false);
-    }
-
-    const postImageRef = useRef(null);
-
-    const handlePostImageClick = () => postImageRef.current.click()
-
-    const handlePostImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith("image/")) {
-          setNewImage(file);
-        } else {
-          alert("Please upload a valid image file.");
-        }
     }
 
     return (
@@ -105,85 +88,23 @@ export default function HomePage() {
                         links={post.links}
                         likes={post.likes}
                         comments={post.comments}
+                        userId={post.userId}
+                        currentUserId={profileData?.id}
                     />
                 ))}
 
                 {/* New Post Modal */}
                 {showModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <button className={styles.closeButton} onClick={closeModal}>×</button>
-                        <h1>New Post</h1>
-                        <p>Text</p>
-                            <input 
-                                type="text" 
-                                placeholder='Enter text...' 
-                                className={styles.textInput} 
-                                value={newText} 
-                                onChange={(e) => setNewText(e.target.value)}
-                            />
-                            <p>Profile Picture</p>
-                        <div className={styles.imageInput} onClick={handlePostImageClick}>
-                            Choose Photo
-                        </div>
-                        <input 
-                            type="file" 
-                            accept="image/*"
-                            ref={postImageRef}
-                            onChange={handlePostImageChange}
-                            style={{ display: 'none '}}
-                        />
-                        <div className={styles.modalButton}>
-                            <button 
-                                className={styles.postButton}
-                                onClick={async () => {
-                                    if (!profileData || !newText) return;
-                                  
-                                    const formData = new FormData();
-                                    formData.append("volunteer", profileData.id); // the volunteer ID
-                                    formData.append("content", newText);
-                                    if (newImage) {
-                                      formData.append("image", newImage);
-                                    }
-                                  
-                                    try {
-                                      const response = await fetch(`${BASE_URL}/post/`, {
-                                        method: "POST",
-                                        body: formData,
-                                      });
-                                  
-                                      if (!response.ok) {
-                                        throw new Error("Failed to create post");
-                                      }
-                                  
-                                      const data = await response.json();
-                                      const newPost = {
-                                        id: data.post.id,
-                                        userName: `${profileData.first_name} ${profileData.last_name}`,
-                                        organization: profileData.primary_organization,
-                                        date: new Date(data.post.created_at).toLocaleString(),
-                                        content: [data.post.content],
-                                        links: [],
-                                        likes: 0,
-                                        comments: 0,
-                                      };
-                                  
-                                      setPosts([newPost, ...posts]);
-                                      setShowModal(false);
-                                      setNewText("");
-                                      setNewImage(null);
-                                    } catch (error) {
-                                      console.error("Error posting:", error);
-                                    }
-                                  }}                                  
-                                >
-                                    POST
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <PostModal
+                    title="New Post"
+                    buttonText="POST"
+                    onClose={() => setShowModal(false)}
+                    profileData={profileData}
+                    BASE_URL={BASE_URL}
+                    posts={posts}
+                    setPosts={setPosts}
+                />
                 )}
-
                 {!showModal && (
                 <div className={styles.newPostButton} onClick={handlePostClick}>
                     NEW POST
