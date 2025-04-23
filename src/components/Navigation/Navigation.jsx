@@ -59,7 +59,7 @@ export default function Navigation() {
       </div>
 
       <div className={styles.profile} onClick={() => router.push('/ProfilePage')}>
-        <img src="/assets/test.png" alt="Profile" />
+        <img src={`${BASE_URL}${profileData?.profile_image}`} alt="Profile" />
         <span className={styles.profileName}>
           {profileData ? (
             <div>{profileData.first_name} {profileData.last_name}</div>

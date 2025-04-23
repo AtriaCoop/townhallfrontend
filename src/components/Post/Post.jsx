@@ -1,7 +1,18 @@
 import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
 
-export default function Post({ userName, organization, date, content, links, likes, comments, userId, currentUserId }) {
+export default function Post({ 
+  userName,
+  organization,
+  date,
+  content,
+  links,
+  likes,
+  comments,
+  userId,
+  currentUserId,
+  userImage
+}) {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
   const optionsRef = useRef(null);
@@ -11,6 +22,25 @@ export default function Post({ userName, organization, date, content, links, lik
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
+  const [profileData, setProfileData] = useState(null)
+
+  useEffect (() => {
+    async function fetchProfile() {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || !user.id) {
+          console.error("No user found in localStorage.");
+          return;
+        }
+        const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+        const data = await response.json();
+        setProfileData(data.volunteer);
+      } catch(error) {
+        console.error("Error fetching profile data:", error);
+      }
+    }
+    fetchProfile();
+  }, [])
 
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
@@ -34,7 +64,7 @@ export default function Post({ userName, organization, date, content, links, lik
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>
-        <img src="/assets/test.png" alt="User profile" className={styles.profilePic} />
+        <img src={`${BASE_URL}${userImage}`} alt="User profile" className={styles.profilePic} />
         <div className={styles.postInfo}>
           <div className={styles.userName}>{userName}</div>
           <div className={styles.organizationName}>{organization}</div>

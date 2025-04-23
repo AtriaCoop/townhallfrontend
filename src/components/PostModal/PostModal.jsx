@@ -36,7 +36,7 @@ export default function Modal({
     }
 
     const formData = new FormData();
-    formData.append("volunteer", profileData.id);
+    formData.append("volunteer_id", profileData.id);
     formData.append("content", text);
     if (image) {
       formData.append("image", image);
@@ -53,14 +53,15 @@ export default function Modal({
       const data = await response.json();
       const newPost = {
         id: data.post.id,
-        userName: `${profileData.first_name} ${profileData.last_name}`,
-        organization: profileData.primary_organization,
+        userId: data.post.volunteer.id,
+        userName: `${data.post.volunteer.first_name} ${data.post.volunteer.last_name}`,
+        organization: data.post.volunteer.primary_organization,
+        userImage: data.post.volunteer.profile_image,
         date: new Date(data.post.created_at).toLocaleString(),
         content: [data.post.content],
         links: [],
         likes: 0,
         comments: 0,
-        userId: profileData.id,
       };
 
       setPosts([newPost, ...posts]);

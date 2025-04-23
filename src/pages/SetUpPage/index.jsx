@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 export default function SetUpPage() {
 
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+    const form = new FormData();
+
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -16,6 +19,7 @@ export default function SetUpPage() {
         about_me: '',
         skills_interests: ''
     });
+    const [profilePreview, setProfilePreview] = useState(null)
 
     const router = useRouter();
 
@@ -29,6 +33,7 @@ export default function SetUpPage() {
     const handleProfilePicChange = (e) => {
         const file = e.target.files[0]
         if (file) {
+            setProfilePreview(URL.createObjectURL(file));
             console.log('Selected profile picture:', file)
         }
     }
@@ -46,22 +51,27 @@ export default function SetUpPage() {
             console.error("No user found in localStorage.");
             return;
         }
-    
-        const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+
+        // Append all text fields
+        for (const key in formData) {
+            form.append(key, formData[key]);
+        }
+
+        // Append profile image if selected
+        if (profilePicRef.current.files[0]) {
+            form.append("profile_image", profilePicRef.current.files[0]);
+        }
 
         console.log("📦 Sending PATCH to backend with:", formData);
     
         try {
             const response = await fetch(`${BASE_URL}/volunteer/${user.id}/complete_profile/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+                body: form,
             });
     
             if (response.ok) {
-                console.log("Profile updated!");
+                console.log("Profile updated with image!");
                 router.push('/HomePage');
             } else {
                 const data = await response.json();
@@ -113,9 +123,13 @@ export default function SetUpPage() {
                     <p>Skills & Interests</p>
                         <input type="text" placeholder='Are there specific ways you’d like to contribute to the coalition?' value={formData.skills_interests} onChange={(e) => setFormData(prev => ({ ...prev, skills_interests: e.target.value }))}/>
                     <p>Profile Picture</p>
-                        <div className={styles.uploadButton} onClick={handleProfileUploadClick}>
-                            Upload Photo
-                        </div>
+                    <div className={styles.uploadButton} onClick={handleProfileUploadClick}>
+                        {profilePreview ? (
+                            <img src={profilePreview} alt="Preview" className={styles.previewImage} />
+                        ) : (
+                            <span>Upload Photo</span>
+                        )}
+                    </div>
                         <input 
                             type="file" 
                             accept="image/*" 

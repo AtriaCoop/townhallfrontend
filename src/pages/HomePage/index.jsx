@@ -37,9 +37,10 @@ export default function HomePage() {
       
             const formattedPosts = data.posts.map((p) => ({
               id: p.id,
-              userId: p.volunteer,
-              userName: `${profileData.first_name} ${profileData.last_name}`,
-              organization: profileData.primary_organization,
+              userId: p.volunteer.id,
+              userName: `${p.volunteer.first_name} ${p.volunteer.last_name}`,
+              organization: p.volunteer.primary_organization,
+              userImage: p.volunteer.profile_image,
               date: new Date(p.created_at).toLocaleString(),
               content: [p.content],
               links: [],
@@ -90,6 +91,7 @@ export default function HomePage() {
                         comments={post.comments}
                         userId={post.userId}
                         currentUserId={profileData?.id}
+                        userImage={post.userImage}
                     />
                 ))}
 

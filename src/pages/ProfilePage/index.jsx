@@ -37,7 +37,7 @@ export default function ProfilePage() {
             <Navigation />
 
             <div className={styles.profileContainer}>
-                <img className={styles.profilePic} src="/assets/test.png" alt="Profile Image" />
+                <img className={styles.profilePic} src={`${BASE_URL}${profileData?.profile_image}`} alt="Profile Image" />
                 <span className={styles.name}>{profileData.first_name} {profileData.last_name}</span>
                 <span className={styles.dateJoined}>Date Joined: 2 weeks ago</span>
                 <div className={styles.profileInfo}>
