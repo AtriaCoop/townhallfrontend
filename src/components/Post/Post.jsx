@@ -1,5 +1,6 @@
 import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Post({ 
   userName,
@@ -16,6 +17,7 @@ export default function Post({
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
   const optionsRef = useRef(null);
+  const router = useRouter();
 
   const [showOptions, setShowOptions] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -64,8 +66,8 @@ export default function Post({
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>
-        <img src={`${BASE_URL}${userImage}`} alt="User profile" className={styles.profilePic} />
-        <div className={styles.postInfo}>
+        <img src={`${BASE_URL}${userImage}`} alt="User profile" className={styles.profilePic} onClick={() => router.push('/ProfilePage')} />
+        <div className={styles.postInfo} onClick={() => router.push('/ProfilePage')}>
           <div className={styles.userName}>{userName}</div>
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>

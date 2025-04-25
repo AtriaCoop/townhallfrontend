@@ -36,13 +36,15 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 0.75rem;
-  border: 2px solid #ddd;;
+  border: 2px solid #ddd;
+  cursor: pointer;
 }
 
 .postInfo {
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .userName {
