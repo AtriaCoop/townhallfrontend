@@ -66,8 +66,16 @@ export default function Post({
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>
-        <img src={`${BASE_URL}${userImage}`} alt="User profile" className={styles.profilePic} onClick={() => router.push('/ProfilePage')} />
-        <div className={styles.postInfo} onClick={() => router.push('/ProfilePage')}>
+        <img src={`${BASE_URL}${userImage}`}
+          alt="User profile"
+          className={styles.profilePic}
+          onClick={() => router.push('/ProfilePage')}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/assets/ProfileImage.jpg'
+          }}
+        />
+        <div className={styles.postInfo} onClick={() => router.push(`/ProfilePage/${userId}`)}>
           <div className={styles.userName}>{userName}</div>
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
@@ -149,8 +157,8 @@ export default function Post({
 
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <img src="/assets/like.svg" alt="like" />
-          <img src="/assets/comment.svg" alt="comment" />
+          <img src="/assets/like.png" alt="like" />
+          <img src="/assets/comment.png" alt="comment" />
         </div>
         <div className={styles.likesComments}>
           {likes} Likes · {comments} Comment{comments !== 1 && 's'}

@@ -58,8 +58,14 @@ export default function Navigation() {
         <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
       </div>
 
-      <div className={styles.profile} onClick={() => router.push('/ProfilePage')}>
-        <img src={`${BASE_URL}${profileData?.profile_image}`} alt="Profile" />
+      <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
+        <img src={`${BASE_URL}${profileData?.profile_image}`}
+          alt="Profile"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/assets/ProfileImage.jpg';
+          }}
+        />
         <span className={styles.profileName}>
           {profileData ? (
             <div>{profileData.first_name} {profileData.last_name}</div>

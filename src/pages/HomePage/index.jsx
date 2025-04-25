@@ -3,6 +3,7 @@ import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
 import PostModal from '@/components/PostModal/PostModal';
 import { useEffect, useRef, useState } from 'react';
+import { formatDistance } from 'date-fns';
 
 export default function HomePage() {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
@@ -41,7 +42,7 @@ export default function HomePage() {
               userName: `${p.volunteer.first_name} ${p.volunteer.last_name}`,
               organization: p.volunteer.primary_organization,
               userImage: p.volunteer.profile_image,
-              date: new Date(p.created_at).toLocaleString(),
+              date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
               content: [p.content],
               links: [],
               likes: 0,

@@ -1,5 +1,6 @@
 import styles from './PostModal.module.scss';
 import { useRef, useState } from 'react';
+import { formatDistance, subDays } from 'date-fns';
 
 export default function Modal({
   title,
@@ -57,7 +58,7 @@ export default function Modal({
         userName: `${data.post.volunteer.first_name} ${data.post.volunteer.last_name}`,
         organization: data.post.volunteer.primary_organization,
         userImage: data.post.volunteer.profile_image,
-        date: new Date(data.post.created_at).toLocaleString(),
+        date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         links: [],
         likes: 0,
