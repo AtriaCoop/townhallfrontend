@@ -93,6 +93,8 @@ export default function HomePage() {
                         userId={post.userId}
                         currentUserId={profileData?.id}
                         userImage={post.userImage}
+                        postId={post.id}
+                        setPosts={setPosts}
                     />
                 ))}
 

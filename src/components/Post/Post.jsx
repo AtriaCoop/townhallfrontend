@@ -12,7 +12,10 @@ export default function Post({
   comments,
   userId,
   currentUserId,
-  userImage
+  userImage,
+  postId,
+  posts,
+  setPosts,
 }) {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
@@ -24,25 +27,59 @@ export default function Post({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
-  const [profileData, setProfileData] = useState(null)
 
-  useEffect (() => {
-    async function fetchProfile() {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user || !user.id) {
-          console.error("No user found in localStorage.");
-          return;
-        }
-        const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
-        const data = await response.json();
-        setProfileData(data.volunteer);
-      } catch(error) {
-        console.error("Error fetching profile data:", error);
+  async function handleUpdatePost() {
+    try {
+      const updatedData = {
+        content: editText,
+      };
+  
+      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update post");
       }
+  
+      const result = await response.json();
+      console.log("Post updated successfully:", result);
+  
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId ? { ...post, content: [editText] } : post
+        )
+      );
+  
+      setShowEditModal(false);
+    } catch (error) {
+      console.error("Error updating post:", error);
     }
-    fetchProfile();
-  }, [])
+  }
+  
+  async function handleDeletePost() {
+    try {
+      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete post");
+      }
+  
+      // Update local posts state to remove the deleted post
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+  
+      // Close the delete modal
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  }  
 
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
@@ -100,8 +137,7 @@ export default function Post({
             <h1>Edit Post</h1>
 
             <p>Text</p>
-            <input
-              type="text"
+            <textarea
               placeholder="Enter text..."
               className={styles.textInput}
               value={editText}
@@ -121,15 +157,11 @@ export default function Post({
 
             <div className={styles.modalButton}>
               <button className={styles.postButton} onClick={() => {
-                // Placeholder for PATCH logic
                 setShowEditModal(false);
               }}>
                 Choose Photo
               </button>
-              <button className={styles.updateButton} onClick={() => {
-                // Placeholder for DELETE logic
-                setShowEditModal(false);
-              }}>
+              <button className={styles.updateButton} onClick={handleUpdatePost}>
                 Update
               </button>
             </div>
@@ -142,7 +174,7 @@ export default function Post({
             <div className={styles.modalContentDelete}>
               <button className={styles.closeButton} onClick={() => setShowDeleteModal(false)}>×</button>
               <h1>Are you sure?</h1>
-              <button className={styles.deleteButton}>Delete</button>
+              <button className={styles.deleteButton} onClick={handleDeletePost}>Delete</button>
             </div>
           </div>
         )}

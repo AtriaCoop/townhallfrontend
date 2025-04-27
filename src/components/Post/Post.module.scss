@@ -68,6 +68,9 @@
   font-size: 0.95rem;
   line-height: 1.5;
   color: #333;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 
   a {
     color: #0066cc;
