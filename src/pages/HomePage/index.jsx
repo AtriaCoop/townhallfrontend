@@ -44,6 +44,7 @@ export default function HomePage() {
               userImage: p.volunteer.profile_image,
               date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
               content: [p.content],
+              postImage: p.image,
               links: [],
               likes: 0,
               comments: 0,
@@ -87,6 +88,7 @@ export default function HomePage() {
                         organization={post.organization}
                         date={post.date}
                         content={post.content}
+                        postImage={post.postImage}
                         links={post.links}
                         likes={post.likes}
                         comments={post.comments}

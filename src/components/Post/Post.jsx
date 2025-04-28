@@ -7,6 +7,7 @@ export default function Post({
   organization,
   date,
   content,
+  postImage,
   links,
   likes,
   comments,
@@ -100,6 +101,10 @@ export default function Post({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showOptions]);
 
+  function isValidImage(img) {
+    return img && img !== 'null' && img !== '';
+  }
+
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>
@@ -185,6 +190,13 @@ export default function Post({
         {links.map((link, i) => (
           <a href={link.href} target="_blank" key={i}>{link.text}</a>
         ))}
+        {isValidImage(postImage) && (
+          <img
+            src={`${BASE_URL}${postImage}`}
+            alt="Post content"
+            className={styles.postImage}
+          />
+        )}
       </div>
 
       <div className={styles.postFooter}>

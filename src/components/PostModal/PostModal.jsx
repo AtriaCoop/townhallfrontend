@@ -14,7 +14,8 @@ export default function Modal({
 }) {
   const [text, setText] = useState('');
   const [image, setImage] = useState(null);
-  const [error, setError] = useState('')
+  const [error, setError] = useState('');
+  const [profilePreview, setProfilePreview] = useState(null);
   const postImageRef = useRef(null);
 
   const handlePostImageClick = () => postImageRef.current.click();
@@ -23,6 +24,8 @@ export default function Modal({
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
       setImage(file);
+      setProfilePreview(URL.createObjectURL(file));
+      console.log('Selected profile picture:', file)
     } else {
       alert("Please upload a valid image file.");
     }
@@ -60,6 +63,7 @@ export default function Modal({
         userImage: data.post.volunteer.profile_image,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
+        postImage: data.post.image,
         links: [],
         likes: 0,
         comments: 0,
@@ -93,7 +97,11 @@ export default function Modal({
 
         <p>Profile Picture</p>
         <div className={styles.imageInput} onClick={handlePostImageClick}>
-          Choose Photo
+          {profilePreview ? (
+            <img src={profilePreview} alt="Preview" className={styles.previewImage} />
+          ) : (
+            <span>Choose Photo</span>
+          )}
         </div>
         <input
           type="file"
