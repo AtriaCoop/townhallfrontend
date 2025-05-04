@@ -54,6 +54,7 @@ export default function LandingPage() {
     try {
         const response = await fetch(`${BASE_URL}/auth/login/`, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },

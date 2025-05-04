@@ -51,7 +51,7 @@ export default function ProfilePage() {
         <span className={styles.name}>
           {profileData.first_name} {profileData.last_name}
         </span>
-        <span className={styles.dateJoined}>Date Joined: 2 weeks ago</span>
+        <span className={styles.dateJoined}>Date Joined: 2 weeks ago (hardcoded)</span>
 
         <div className={styles.profileInfo}>
           <span>Title: {profileData.title}</span>

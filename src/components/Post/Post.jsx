@@ -1,6 +1,8 @@
 import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
+import CommentModal from '@/components/CommentModal/CommentModal'
+import LikeModal from '@/components/LikeModal/LikeModal';
 
 export default function Post({ 
   userName,
@@ -10,12 +12,12 @@ export default function Post({
   postImage,
   links,
   likes,
+  liked_by,
   comments,
   userId,
   currentUserId,
   userImage,
   postId,
-  posts,
   setPosts,
 }) {
 
@@ -28,7 +30,10 @@ export default function Post({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
+  const [commentModal, setCommentModal] = useState(false);
+  const [likeModal, setLikeModal] = useState(false);
 
+  // UPDATE POST
   async function handleUpdatePost() {
     try {
       const updatedData = {
@@ -62,6 +67,7 @@ export default function Post({
     }
   }
   
+  // DELETE POST
   async function handleDeletePost() {
     try {
       const response = await fetch(`${BASE_URL}/post/${postId}/`, {
@@ -80,11 +86,51 @@ export default function Post({
     } catch (error) {
       console.error("Error deleting post:", error);
     }
-  }  
+  }
+
+  // LIKE POST
+  async function handleLikePost() {
+    try {
+      const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to like post");
+      }
+
+      const result = await response.json();
+
+      // Update local post state
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { 
+                ...post,
+                likes: result.likes,
+              }
+            : post
+        )
+      );
+    } catch(error) {
+      console.error("Error like post:", error)
+    }
+  }
 
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
   };
+
+  const handleCommentClick = () => {
+    console.log("Comment clicked!")
+    setCommentModal(true);
+  }
+
+  const handleLikeClick = () => {
+    console.log("Likes clicked!")
+    setLikeModal(true);
+  }
 
   // Handle outside click to close edit/delete modal
   useEffect(() => {
@@ -107,6 +153,7 @@ export default function Post({
 
   return (
     <div className={styles.post}>
+
       <div className={styles.postHeader}>
         <img src={`${BASE_URL}${userImage}`}
           alt="User profile"
@@ -199,15 +246,36 @@ export default function Post({
         )}
       </div>
 
+      {commentModal && (
+        <CommentModal
+          onClose={() => setCommentModal(false)}
+          comments={[...comments].reverse()}
+          currentUserId={currentUserId}
+          date={date}
+          postId={postId}
+          BASE_URL={BASE_URL}
+          setPosts={setPosts}
+        />
+      )}
+
+      {likeModal && (
+        <LikeModal
+          onClose={() => setLikeModal(false)}
+          liked_by={liked_by}
+          BASE_URL={BASE_URL}
+        />
+      )}
+
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <img src="/assets/like.png" alt="like" />
-          <img src="/assets/comment.png" alt="comment" />
+          <img src={"/assets/like.png"} alt="like" onClick={handleLikePost}/>
+          <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
         </div>
-        <div className={styles.likesComments}>
-          {likes} Likes · {comments} Comment{comments !== 1 && 's'}
+        <div className={styles.likesComments} onClick={handleLikeClick}>
+          {likes} Likes · {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
         </div>
       </div>
+
     </div>
   );
 }

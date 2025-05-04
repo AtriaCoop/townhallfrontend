@@ -46,8 +46,10 @@ export default function HomePage() {
               content: [p.content],
               postImage: p.image,
               links: [],
-              likes: 0,
-              comments: 0,
+              likes: p.likes,
+              liked_by: p.liked_by,
+              isLiked: false,
+              comments: p.comments,
             }))
             .reverse();
       
@@ -91,6 +93,8 @@ export default function HomePage() {
                         postImage={post.postImage}
                         links={post.links}
                         likes={post.likes}
+                        liked_by={post.liked_by}
+                        isLiked={post.isLiked}
                         comments={post.comments}
                         userId={post.userId}
                         currentUserId={profileData?.id}

@@ -65,8 +65,6 @@ export default function Modal({
         content: [data.post.content],
         postImage: data.post.image,
         links: [],
-        likes: 0,
-        comments: 0,
       };
 
       setPosts([newPost, ...posts]);
@@ -86,7 +84,7 @@ export default function Modal({
         <h1>{title}</h1>
 
         <p>Text</p>
-        <input
+        <textarea
           type="text"
           placeholder="Enter text..."
           className={styles.textInput}
