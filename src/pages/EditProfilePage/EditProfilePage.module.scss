@@ -83,6 +83,19 @@
     border: 1px solid #ddd;
     color: rgb(255, 196, 0);;
     cursor: pointer;
+
+    img {
+        width: 100%;
+        border-radius: 100%;
+    }
+}
+
+.clickableImage {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.clickableImage:hover {
+  opacity: 0.8;
 }
 
 .saveButton {

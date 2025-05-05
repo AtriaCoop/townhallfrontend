@@ -74,7 +74,10 @@ export default function ProfilePage() {
             <div className={styles.signoutContainer}>
               <p>Time to go?</p>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => {
+                  localStorage.removeItem('user');
+                  router.push('/')
+                }}
                 className={styles.signoutButton}
               >
                 SIGN OUT

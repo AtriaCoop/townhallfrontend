@@ -269,10 +269,9 @@ export default function Post({
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
           <img src={"/assets/like.png"} alt="like" onClick={handleLikePost}/>
+          <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
-        </div>
-        <div className={styles.likesComments} onClick={handleLikeClick}>
-          {likes} Likes · {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
+          <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
 

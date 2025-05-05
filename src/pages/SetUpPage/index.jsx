@@ -72,7 +72,7 @@ export default function SetUpPage() {
     
             if (response.ok) {
                 console.log("Profile updated with image!");
-                router.push('/HomePage');
+                router.push('/');
             } else {
                 const data = await response.json();
                 console.error("Error updating profile:", data);

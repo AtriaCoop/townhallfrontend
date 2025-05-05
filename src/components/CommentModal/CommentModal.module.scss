@@ -119,3 +119,34 @@
     }
   }
 }
+
+.commentContentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+
+  div {
+    flex: 1;
+  }
+}
+
+.deleteButton {
+  background: transparent;
+  color: crimson;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -37,6 +37,33 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
     }
   }
 
+  async function handleDeleteComment(commentId) {
+    try {
+      const response = await fetch(`${BASE_URL}/comment/${commentId}/`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete comment");
+      }
+  
+      // Remove comment from the state
+      setPosts(prev =>
+        prev.map(post =>
+          post.id === postId
+            ? {
+                ...post,
+                comments: post.comments.filter(c => c.id !== commentId),
+              }
+            : post
+        )
+      );
+    } catch (err) {
+      console.error("Failed to delete comment:", err);
+    }
+  }  
+
   return (
     <div className={styles.modalOverlay}>
 
@@ -60,24 +87,39 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
         {/* Show existing comments */}
         <div className={styles.commentList}>
+            
           {comments.map((comment, idx) => (
             <div className={styles.commentItem} key={idx}>
-              <img
-                src={`${BASE_URL}${comment.user?.profile_image || '/assets/ProfileImage.jpg'}`}
-                alt="user"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/assets/ProfileImage.jpg';
-                }}
-              />
-              <div>
-                <strong>{comment.user?.first_name} {comment.user?.last_name}</strong> - {
-                    comment.created_at ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true })
-                    : ''
-                }
-                <p>{comment.content}</p>
+            <img
+              src={`${BASE_URL}${comment.user?.profile_image || '/assets/ProfileImage.jpg'}`}
+              alt="user"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/assets/ProfileImage.jpg';
+              }}
+            />
+
+            <div className={styles.commentContentWrapper}>
+              <div className={styles.commentHeader}>
+                <div>
+                  <strong>{comment.user?.first_name} {comment.user?.last_name}</strong> – {
+                    comment.created_at ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true }) : ''
+                  }
+                  <p>{comment.content}</p>
+                </div>
+
+                {comment.user?.id === currentUserId && (
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    Delete
+                  </button>
+                )}
+
               </div>
             </div>
+          </div>          
           ))}
         </div>
       </div>
