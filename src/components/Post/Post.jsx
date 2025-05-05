@@ -158,7 +158,7 @@ export default function Post({
         <img src={`${BASE_URL}${userImage}`}
           alt="User profile"
           className={styles.profilePic}
-          onClick={() => router.push('/ProfilePage')}
+          onClick={() => router.push(`/ProfilePage/${userId}`)}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = '/assets/ProfileImage.jpg'
