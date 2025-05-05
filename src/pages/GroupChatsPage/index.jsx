@@ -40,7 +40,7 @@ export default function GroupChatsPage() {
                     <h2 className={styles.chatTitle}>#ATRIA Questions and Support</h2>
                     <div className={styles.chatIcons}>
                     <img src="/assets/search.svg" alt="Search" />
-                    <img src="/assets/expand.svg" alt="Expand" />
+                    <img src="/assets/leaveGroup.svg" alt="leaveGroup" />
                     </div>
                 </div>
 
