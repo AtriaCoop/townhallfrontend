@@ -233,6 +233,30 @@
   }
 }
 
+.imageInput {
+  padding: 4rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  color: rgb(255, 196, 0);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    border: 2px dashed #f9b233;
+    opacity: 0.8;
+  }
+}
+
+.previewImage {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .updateButton {
   width: 100%;
   background-color: #24873d;

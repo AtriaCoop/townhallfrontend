@@ -36,28 +36,31 @@ export default function Post({
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const updatedData = {
-        content: editText,
-      };
+      const formData = new FormData();
+      formData.append("content", editText);
+      if (editImage) {
+        formData.append("image", editImage);
+      }
   
       const response = await fetch(`${BASE_URL}/post/${postId}/`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
+        body: formData,
       });
   
-      if (!response.ok) {
-        throw new Error("Failed to update post");
-      }
+      if (!response.ok) throw new Error("Failed to update post");
   
       const result = await response.json();
       console.log("Post updated successfully:", result);
   
-      setPosts(prevPosts =>
-        prevPosts.map(post =>
-          post.id === postId ? { ...post, content: [editText] } : post
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                content: [editText],
+                postImage: result.post?.image || post.postImage, // updated image
+              }
+            : post
         )
       );
   
@@ -65,7 +68,7 @@ export default function Post({
     } catch (error) {
       console.error("Error updating post:", error);
     }
-  }
+  }  
   
   // DELETE POST
   async function handleDeletePost() {
@@ -196,15 +199,38 @@ export default function Post({
               onChange={(e) => setEditText(e.target.value)}
             />
 
-            <div className={styles.imageInput} onClick={() => document.getElementById(`editImg-${userId}`).click()}>
-              Image
+            <div
+              className={styles.imageInput}
+              onClick={() => document.getElementById(`editImg-${postId}`).click()}
+            >
+              {editImage ? (
+                <img
+                  src={URL.createObjectURL(editImage)}
+                  alt="Preview"
+                  className={styles.previewImage}
+                />
+              ) : isValidImage(postImage) ? (
+                <img
+                  src={`${BASE_URL}${postImage}`}
+                  alt="Current Post Image"
+                  className={styles.previewImage}
+                />
+              ) : (
+                <span>Choose Photo</span>
+              )}
             </div>
+
             <input
               type="file"
               accept="image/*"
-              id={`editImg-${userId}`}
-              onChange={(e) => setEditImage(e.target.files[0])}
-              style={{ display: 'none' }}
+              id={`editImg-${postId}`}
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith("image/")) {
+                  setEditImage(file);
+                }
+              }}
             />
 
             <div className={styles.modalButton}>
