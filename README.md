@@ -25,13 +25,13 @@ pnpm install
 
 ### 3. Add environment variables
 
-Create a `.env.local` file in the root directory with the following:
+Create a `.env` file in the root directory with the following:
 
 ```
 NEXT_PUBLIC_API_BASE=http://localhost:8000
 ```
 
-✅ Make sure .env.local is listed in your .gitignore so it doesn't get committed.
+✅ Make sure .env is listed in your .gitignore so it doesn't get committed.
 
 Ask a lead dev if you're unsure what the correct API URL is (e.g. staging vs. production).
 
