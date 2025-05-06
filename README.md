@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Atria Frontend
 
-## Getting Started
+Welcome to the Atria Frontend repository! This project powers the web interface of the Atria platform — a tool for community members to connect, share updates, and collaborate through posts, group chats, and more.
 
-First, run the development server:
+Built with Next.js and styled using SCSS, this app follows a mobile-first, component-driven architecture.
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone [REPO_URL]
+cd atria-frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 3. Add environment variables
+
+Create a `.env.local` file in the root directory with the following:
+
+```
+NEXT_PUBLIC_API_BASE=http://localhost:8000
+```
+
+✅ Make sure .env.local is listed in your .gitignore so it doesn't get committed.
+
+Ask a lead dev if you're unsure what the correct API URL is (e.g. staging vs. production).
+
+## 💻 Run the development server
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Once running, go to http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+🔌 Backend Dependency
+This project requires the Atria backend (Django) to be running locally or remotely. Without the backend API running, most pages like the homepage, login, and data views will not load properly.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🔐 Accessing the App
+You’ll need to create **a dummy user account** to log in and access the platform. Once registered, you’ll be redirected to the homepage and other core features.
 
-## Learn More
+Ask Ryan, Gagenvir, or Ansel for help setting up the backend if needed.
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+/components         → Reusable UI components (Navigation, Post, MessageBubble, etc.)  
+/pages              → Route-based pages (Home, GroupChatsPage, ProfilePage, etc.)  
+/styles             → Global styles and SCSS modules  
+/public             → Static files (images, logos, icons)  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 UI & Styling Guidelines
 
-## Deploy on Vercel
+- SCSS is used for styling (see `/styles/mixins.scss` for breakpoints)
+- Layouts follow a mobile-first design
+- Use `lucide-react` for icons (already included)
+- Match the Figma design when implementing new components
+- Keep styling consistent across breakpoints — especially for 1024px and below
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ✅ Best Practices
+
+- Use consistent class and component naming
+- Keep components modular and reusable
+- Avoid unnecessary duplication
+- Test across devices and resolutions
+- Use meaningful commit messages
+
+
+## 🚀 Deployment
+
+The app is optimized for deployment on Vercel, but other platforms like Netlify or AWS Amplify also work.
+
+
+## 📚 Learn More
+
+- https://nextjs.org/docs  
+- https://sass-lang.com/documentation/  
+- https://lucide.dev/  
+- https://reactjs.org/docs/getting-started.html  
+
+## 👋 Questions?
+
+Reach out to **Ryan Yee** or **Ansel Hartanto** if you're stuck or unsure about anything.
+
+© Atria Community — All rights reserved.
