@@ -52,7 +52,7 @@ export default function LandingPage() {
     const { email, password } = formData;
 
     try {
-        const response = await fetch(`${BASE_URL}/volunteer/login/`, {
+        const response = await fetch(`${BASE_URL}/auth/login/`, {
             method: "POST",
             credentials: "include",
             headers: {
