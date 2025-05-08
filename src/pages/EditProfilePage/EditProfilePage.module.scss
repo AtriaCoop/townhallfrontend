@@ -26,12 +26,6 @@
   justify-content: center;
   margin-bottom: 2rem;
 
-  img {
-    position: absolute;
-    height: 24px;
-    cursor: pointer;
-  }
-
   h1 {
     font-size: 1.75rem;
     font-weight: bold;
@@ -177,6 +171,8 @@
 }
 
 .backBox {
+    position: absolute;
+    left: 0;
     width: 3rem;
     height: 3rem;
     border: 1px solid #C5C5C5;
@@ -185,5 +181,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-}
 
+    img {
+        position: absolute;
+        height: 24px;
+        cursor: pointer;
+      }
+  }
