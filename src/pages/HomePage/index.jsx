@@ -118,7 +118,7 @@ export default function HomePage() {
                 )}
                 {!showModal && (
                 <div className={styles.newPostButton} onClick={handlePostClick}>
-                    NEW POST
+                   <img src={"/assets/pencilIcon.png"} alt="Pencil Icon" className={styles.pencilImage} /> NEW POST
                 </div>
                 )}
                 
