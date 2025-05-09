@@ -99,7 +99,9 @@ export default function EditProfilePage() {
 
             <div className={styles.editProfileContainer}>
                 <div className={styles.title}>
-                    <img src="/assets/test.png" alt="Back" onClick={() => (router.push(`/ProfilePage/${profileData.id}`))}/>
+                    <div className={styles.backBox} onClick={() => (router.push(`/ProfilePage/${profileData.id}`))}>
+                        <img src="/assets/leftArrow.png" alt="arrow"></img>
+                    </div>
                     <h1>Account Settings</h1>
                 </div>
                 <img className={styles.profilePic} src={`${BASE_URL}${profileData?.profile_image}`}
