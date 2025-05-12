@@ -15,19 +15,19 @@ export default function MembersPage() {
 
     const filteredMembers = members
     .filter((member) =>
-      `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchMember.toLowerCase())
+      `${member.full_name}`.toLowerCase().includes(searchMember.toLowerCase())
     )
     // members in alphabetical order
     .sort((a, b) => {
-      const nameA = `${a.first_name} ${a.last_name}`.toLowerCase();
-      const nameB = `${b.first_name} ${b.last_name}`.toLowerCase();
+      const nameA = `${a.full_name}`.toLowerCase();
+      const nameB = `${b.full_name}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });  
 
     useEffect(() => {
         async function fetchMembers() {
             try {
-                const response = await fetch (`${BASE_URL}/volunteer`);
+                const response = await fetch (`${BASE_URL}/user`);
                 const data = await response.json();
                 setMembers(data.data || []);
             } catch (error) {
@@ -62,7 +62,7 @@ export default function MembersPage() {
                     filteredMembers.map((member, idx) => (
                     <MemberCard
                         key={idx}
-                        name={`${member.first_name} ${member.last_name}`}
+                        name={`${member.full_name}`}
                         title={`${member.title} - ${member.primary_organization || ''}`}
                         imageSrc={member.profile_image ? `${BASE_URL}${member.profile_image}` : "/assets/ProfileImage.jpg"}
                         onClick={() => router.push(`/ProfilePage/${member.id}`)}

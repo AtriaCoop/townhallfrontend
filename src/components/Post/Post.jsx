@@ -5,7 +5,7 @@ import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
 
 export default function Post({ 
-  userName,
+  fullName,
   organization,
   date,
   content,
@@ -24,6 +24,7 @@ export default function Post({
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
   const optionsRef = useRef(null);
   const router = useRouter();
+  const csrfToken = getCookie("csrftoken");
 
   const [showOptions, setShowOptions] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -32,6 +33,11 @@ export default function Post({
   const [editImage, setEditImage] = useState(null);
   const [commentModal, setCommentModal] = useState(false);
   const [likeModal, setLikeModal] = useState(false);
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
 
   // UPDATE POST
   async function handleUpdatePost() {
@@ -97,6 +103,10 @@ export default function Post({
       const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
         method: "PATCH",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
       });
 
       if (!response.ok) {
@@ -168,7 +178,7 @@ export default function Post({
           }}
         />
         <div className={styles.postInfo} onClick={() => router.push(`/ProfilePage/${userId}`)}>
-          <div className={styles.userName}>{userName}</div>
+          <div className={styles.fullName}>{fullName}</div>
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
         </div>

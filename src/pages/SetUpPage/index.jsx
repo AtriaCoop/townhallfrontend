@@ -9,8 +9,7 @@ export default function SetUpPage() {
     const form = new FormData();
 
     const [formData, setFormData] = useState({
-        first_name: '',
-        last_name: '',
+        full_name: '',
         pronouns: '',
         title: '',
         primary_organization: '',
@@ -65,7 +64,7 @@ export default function SetUpPage() {
         console.log("📦 Sending PATCH to backend with:", formData);
     
         try {
-            const response = await fetch(`${BASE_URL}/volunteer/${user.id}/complete_profile/`, {
+            const response = await fetch(`${BASE_URL}/user/${user.id}/complete_profile/`, {
                 method: 'POST',
                 body: form,
             });
@@ -104,10 +103,8 @@ export default function SetUpPage() {
                     <p>We'll start  with the basics:</p>
                 </div>
                 <div className={styles.inputs}>
-                    <p>First Name</p>
-                        <input type="text" placeholder='Enter first name...' value={formData.first_name} onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}/>
-                    <p>Last Name</p>
-                        <input type="text" placeholder='Enter last name...' value={formData.last_name} onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}/>
+                    <p>Full Name</p>
+                        <input type="text" placeholder='Enter full name...' value={formData.full_name} onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}/>
                     <p>Preferred Pronouns</p>
                         <input type="text" placeholder='What are your pronouns?' value={formData.pronouns} onChange={(e) => setFormData(prev => ({ ...prev, pronouns: e.target.value }))}/>
                     <p>Title</p>

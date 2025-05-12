@@ -20,9 +20,9 @@ export default function HomePage() {
               console.error("No user found in localStorage.");
               return;
             }
-            const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+            const response = await fetch (`${BASE_URL}/user/${user.id}/`);
             const data = await response.json();
-            setProfileData(data.volunteer);
+            setProfileData(data.user);
           } catch(error) {
             console.error("Error fetching profile data:", error);
           }
@@ -38,10 +38,10 @@ export default function HomePage() {
       
             const formattedPosts = data.posts.map((p) => ({
               id: p.id,
-              userId: p.volunteer.id,
-              userName: `${p.volunteer.first_name} ${p.volunteer.last_name}`,
-              organization: p.volunteer.primary_organization,
-              userImage: p.volunteer.profile_image,
+              userId: p.user.id,
+              fullName: `${p.user.full_name}`,
+              organization: p.user.primary_organization,
+              userImage: p.user.profile_image,
               date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
               content: [p.content],
               postImage: p.image,
@@ -86,7 +86,7 @@ export default function HomePage() {
                 {posts.map((post) => (
                     <Post 
                         key={post.id}
-                        userName={post.userName}
+                        fullName={post.fullName}
                         organization={post.organization}
                         date={post.date}
                         content={post.content}

@@ -11,8 +11,7 @@ export default function EditProfilePage() {
     const [showModal, setShowModal] = useState(false);
     const [profileData, setProfileData] = useState(null);
     const [formData, setFormData] = useState({
-        first_name: "",
-        last_name: "",
+        full_name: "",
         pronouns: "",
         title: "",
         primary_organization: "",
@@ -38,12 +37,12 @@ export default function EditProfilePage() {
             const user = JSON.parse(localStorage.getItem("user"));
             if (!user || !user.id) return;
       
-            const response = await fetch(`${BASE_URL}/volunteer/${user.id}/`);
+            const response = await fetch(`${BASE_URL}/user/${user.id}/`);
             const data = await response.json();
-            setProfileData(data.volunteer);
+            setProfileData(data.user);
             setFormData((prev) => ({
               ...prev,
-              ...data.volunteer,
+              ...data.user,
             }));
           } catch (error) {
             console.error("Error fetching profile data:", error);
@@ -61,8 +60,7 @@ export default function EditProfilePage() {
       
         const form = new FormData();
       
-        form.append("first_name", formData.first_name);
-        form.append("last_name", formData.last_name);
+        form.append("full_name", formData.full_name);
         form.append("pronouns", formData.pronouns);
         form.append("title", formData.title);
         form.append("primary_organization", formData.primary_organization);
@@ -80,7 +78,7 @@ export default function EditProfilePage() {
         }
       
         try {
-          const response = await fetch(`${BASE_URL}/volunteer/${user.id}/`, {
+          const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
             method: "PATCH",
             body: form,
           });
@@ -111,23 +109,16 @@ export default function EditProfilePage() {
                         e.target.src = '/assets/ProfileImage.jpg';
                     }}
                 />
-                <h3 className={styles.name}>{profileData?.first_name} {profileData?.last_name}</h3>
+                <h3 className={styles.name}>{profileData?.full_name}</h3>
             </div>
 
             <div className={styles.inputs}>
                     <p>First Name</p>
                         <input
                             type="text"
-                            placeholder='Enter first name...'
-                            value={formData.first_name}
-                            onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-                        />
-                    <p>Last Name</p>
-                        <input
-                            type="text"
-                            placeholder='Enter last name...'
-                            value={formData.last_name}
-                            onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                            placeholder='Enter full name...'
+                            value={formData.full_name}
+                            onChange={(e) => setFormData({...formData, full_name: e.target.value})}
                         />
                     <p>Preferred Pronouns</p>
                         <input 

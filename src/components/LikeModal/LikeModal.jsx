@@ -22,7 +22,7 @@ export default function LikeModal({ onClose, liked_by = [], BASE_URL }) {
                   }}
                 />
                 <div>
-                  <strong>{user.first_name} {user.last_name}</strong>
+                  <strong>{user.full_name}</strong>
                   <p>{user.primary_organization}</p>
                 </div>
               </div>
