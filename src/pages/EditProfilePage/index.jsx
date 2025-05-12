@@ -113,7 +113,7 @@ export default function EditProfilePage() {
             </div>
 
             <div className={styles.inputs}>
-                    <p>First Name</p>
+                    <p>Full Name</p>
                         <input
                             type="text"
                             placeholder='Enter full name...'
