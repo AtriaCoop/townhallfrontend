@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
 import { registerUser } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
@@ -17,6 +17,11 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    fetch(`${BASE_URL}/auth/csrf/`, {
+      credentials: "include"
+    });
+  }, []);
 
   const handleChange = (e) => {
     setError('');
@@ -35,8 +40,8 @@ export default function LandingPage() {
     } else {
       setMessage(result.success);
   
-      // 🧠 FIX: Save the created volunteer to localStorage
-      localStorage.setItem("user", JSON.stringify(result.data.volunteer));
+      // 🧠 FIX: Save the created user to localStorage
+      localStorage.setItem("user", JSON.stringify(result.data.user));
   
       setTimeout(() => {
         router.push('/SetUpPage');
@@ -44,6 +49,10 @@ export default function LandingPage() {
     }
   };
   
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
 
   // SIGN IN
   const handleLogIn = async (event) => {
@@ -57,6 +66,7 @@ export default function LandingPage() {
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
             },
             body: JSON.stringify({ email, password }),
         });

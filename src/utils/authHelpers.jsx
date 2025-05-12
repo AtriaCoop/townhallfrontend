@@ -15,7 +15,7 @@ export const validatePassword = (password, confirmPassword) => {
 
 export const registerUser = async (formData) => {
     try {
-        const response = await fetch(`${BASE_URL}/volunteer/`, {
+        const response = await fetch(`${BASE_URL}/user/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

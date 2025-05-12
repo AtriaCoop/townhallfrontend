@@ -21,9 +21,9 @@ export default function ProfilePage() {
 
     async function fetchProfile() {
       try {
-        const response = await fetch(`${BASE_URL}/volunteer/${id}/`);
+        const response = await fetch(`${BASE_URL}/user/${id}/`);
         const data = await response.json();
-        setProfileData(data.volunteer);
+        setProfileData(data.user);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
@@ -49,7 +49,7 @@ export default function ProfilePage() {
           }}
         />
         <span className={styles.name}>
-          {profileData.first_name} {profileData.last_name}
+          {profileData.full_name}
         </span>
         <span className={styles.dateJoined}>Date Joined: 2 weeks ago (hardcoded)</span>
 

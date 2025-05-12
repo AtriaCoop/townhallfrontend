@@ -102,7 +102,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             <div className={styles.commentContentWrapper}>
               <div className={styles.commentHeader}>
                 <div>
-                  <strong>{comment.user?.first_name} {comment.user?.last_name}</strong> – {
+                  <strong>{comment.user?.full_name}</strong> – {
                     comment.created_at ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true }) : ''
                   }
                   <p>{comment.content}</p>

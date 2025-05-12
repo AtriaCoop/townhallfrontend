@@ -24,9 +24,9 @@ export default function Navigation() {
           console.error("No user found in localStorage.");
           return;
         }
-        const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+        const response = await fetch (`${BASE_URL}/user/${user.id}/`);
         const data = await response.json();
-        setProfileData(data.volunteer);
+        setProfileData(data.user);
         setLoading(false)
       } catch {
         console.error("Error fetching profile data:", error);
@@ -68,7 +68,7 @@ export default function Navigation() {
         />
         <span className={styles.profileName}>
           {profileData ? (
-            <div>{profileData.first_name} {profileData.last_name}</div>
+            <div>{profileData.full_name}</div>
           ) : (
             <p>loading...</p>
           )}
@@ -95,7 +95,7 @@ export default function Navigation() {
           <img src="/assets/test.png" alt="Profile" />
           <span className={styles.modalProfileName}>
             {profileData ? (
-              <div>{profileData.first_name} {profileData.last_name}</div>
+              <div>{profileData.full_name}</div>
             ) : (
               <p>loading...</p>
             )}
