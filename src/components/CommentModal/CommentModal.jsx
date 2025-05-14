@@ -3,6 +3,13 @@ import { formatDistance, subDays } from 'date-fns';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
 
+  const csrfToken = getCookie("csrftoken");
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     const content = e.target.comment.value;
@@ -42,6 +49,10 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
       const response = await fetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
       });
   
       if (!response.ok) {
