@@ -20,13 +20,18 @@ export const validatePassword = (password, confirmPassword) => {
 };
 
 export const registerUser = async (formData) => {
-    let csrfToken = getCookie("csrftoken");
+    let csrfToken = null;
 
-    // Wait up to 500ms if token is null
-    if (!csrfToken) {
-        await new Promise((res) => setTimeout(res, 500));
-        csrfToken = getCookie("csrftoken");
+    // Poll for the token every 100ms up to 1 second
+    for (let i = 0; i < 10; i++) {
+      csrfToken = getCookie("csrftoken");
+      if (csrfToken) break;
+      await new Promise((res) => setTimeout(res, 100));
     }
+  
+    if (!csrfToken) {
+      return { error: "CSRF token not found. Try refreshing the page." };
+    }  
 
     console.log("CSRF Token being sent:", csrfToken);
 
