@@ -20,15 +20,22 @@ export const validatePassword = (password, confirmPassword) => {
 };
 
 export const registerUser = async (formData) => {
+    let csrfToken = getCookie("csrftoken");
+
+    // Wait up to 500ms if token is null
+    if (!csrfToken) {
+        await new Promise((res) => setTimeout(res, 500));
+        csrfToken = getCookie("csrftoken");
+    }
+
+    console.log("CSRF Token being sent:", csrfToken);
+
     try {
-
-        console.log("CSRF Token being sent:", getCookie("csrftoken"));
-
         const response = await fetch(`${BASE_URL}/user/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken"),
+                "X-CSRFToken": csrfToken,
             },
             credentials: "include",
             body: JSON.stringify({
@@ -41,8 +48,9 @@ export const registerUser = async (formData) => {
             const data = await response.json();
             return { success: "Account created successfully!", data };
         } else {
-            const errorData = await response.json();
-            return { error: errorData.email ? "The email has already been used." : "Something went wrong. Please try again." };
+            const errorText = await response.text(); // safer logging
+            console.error("Signup error:", errorText);
+            return { error: "Something went wrong. Please try again." };
         }
     } catch (error) {
         console.error("Error:", error);
