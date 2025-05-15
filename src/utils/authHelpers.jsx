@@ -24,7 +24,7 @@ export const registerUser = async (formData) => {
 
         console.log("CSRF Token being sent:", getCookie("csrftoken"));
 
-        const response = await fetch(`${BASE_URL}/user/user/`, {
+        const response = await fetch(`${BASE_URL}/user/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
