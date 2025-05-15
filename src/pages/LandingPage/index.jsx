@@ -20,15 +20,21 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchCSRF() {
       const res = await fetch(`${BASE_URL}/auth/csrf/`, {
-        credentials: "include"
+        credentials: "include",
       });
       const data = await res.json();
-      const csrfToken = getCookie("csrftoken");
-      console.log("Fetched CSRF token:", csrfToken);
+  
+      // Store the token manually
+      if (data.csrftoken) {
+        localStorage.setItem("csrftoken", data.csrftoken);
+        console.log("Fetched CSRF from server:", data.csrftoken);
+      } else {
+        console.warn("CSRF token not found in response.");
+      }
     }
   
     fetchCSRF();
-  }, []);
+  }, []);  
 
   const handleChange = (e) => {
     setError('');
