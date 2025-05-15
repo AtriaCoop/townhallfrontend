@@ -1,6 +1,7 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
 export const getCookie = (name) => {
+    console.log("getCookie called");
     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
     return match ? decodeURIComponent(match[2]) : null;
   };  

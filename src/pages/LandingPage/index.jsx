@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
-import { registerUser } from '@/utils/authHelpers';
+import { registerUser, getCookie } from '@/utils/authHelpers.jsx';
 import { useRouter } from 'next/router';
 
 export default function LandingPage() {
