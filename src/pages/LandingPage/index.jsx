@@ -18,9 +18,16 @@ export default function LandingPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${BASE_URL}/auth/csrf/`, {
-      credentials: "include"
-    });
+    async function fetchCSRF() {
+      const res = await fetch(`${BASE_URL}/auth/csrf/`, {
+        credentials: "include"
+      });
+      const data = await res.json();
+      const csrfToken = getCookie("csrftoken");
+      console.log("Fetched CSRF token:", csrfToken);
+    }
+  
+    fetchCSRF();
   }, []);
 
   const handleChange = (e) => {
