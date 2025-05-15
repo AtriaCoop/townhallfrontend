@@ -1,7 +1,7 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
 export const validatePassword = (password, confirmPassword) => {
-    if (password.length < 5) {
+    if (password.length < 11) {
         return "Password must be at least 11 characters long";
     }
     if (!isNaN(password)) {
@@ -19,7 +19,9 @@ export const registerUser = async (formData) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
             },
+            credentials: "include",
             body: JSON.stringify({
                 email: formData.email,
                 password: formData.password,
