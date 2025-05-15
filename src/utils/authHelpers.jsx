@@ -1,11 +1,5 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
-export const getCookie = (name) => {
-    console.log("getCookie called");
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? decodeURIComponent(match[2]) : null;
-  };  
-
 export const validatePassword = (password, confirmPassword) => {
     if (password.length < 11) {
         return "Password must be at least 11 characters long";
@@ -20,39 +14,32 @@ export const validatePassword = (password, confirmPassword) => {
 };
 
 export const registerUser = async (formData) => {
-    const csrfToken = localStorage.getItem("csrftoken");
-  
-    if (!csrfToken) {
-      return { error: "CSRF token not found. Try refreshing the page." };
-    }
-  
-    console.log("CSRF Token being sent:", csrfToken);
-  
     try {
-      const response = await fetch(`${BASE_URL}/user/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        return { success: "Account created successfully!", data };
-      } else {
-        const errorText = await response.text();
-        console.error("Signup error:", errorText);
-        return { error: "Something went wrong. Please try again." };
-      }
+        
+        console.log("CSRF Token being sent:", getCookie("csrftoken"));
+
+        const response = await fetch(`${BASE_URL}/user/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: "Account created successfully!", data };
+        } else {
+            const errorData = await response.json();
+            return { error: errorData.email ? "The email has already been used." : "Something went wrong. Please try again." };
+        }
     } catch (error) {
-      console.error("Error:", error);
-      return { error: "Something went wrong. Please try again." };
+        console.error("Error:", error);
+        return { error: "Something went wrong. Please try again." };
     }
-  };
-  
+};
