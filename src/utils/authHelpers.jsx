@@ -1,8 +1,20 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
 export function getCookie(name) {
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? decodeURIComponent(match[2]) : null;
+    if (typeof document === 'undefined') return null;
+  
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
   }
 
 export const validatePassword = (password, confirmPassword) => {
