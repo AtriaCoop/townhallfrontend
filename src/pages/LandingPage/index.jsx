@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 export default function LandingPage() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  console.log("BASE_URL:", BASE_URL);
 
   const [formData, setFormData] = useState({
     email: '',
