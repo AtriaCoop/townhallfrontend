@@ -31,35 +31,47 @@ export const validatePassword = (password, confirmPassword) => {
 };
 
 export const registerUser = async (formData) => {
-  try {
-    const csrfToken = getCookie("csrftoken");
-    console.log("CSRF Token being sent:", csrfToken);
-
-    const response = await fetch(`${BASE_URL}/user/`, {
-      method: "POST",
-      credentials: "include", // ✅ send cookies
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken, // ✅ send csrf token
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      return { success: "Account created successfully!", data };
-    } else {
-      return {
-        error:
-          data.email || data.detail || "Something went wrong. Please try again.",
-      };
+    // 🍪 Wait until cookie is actually readable
+    const cookieCheck = () =>
+      new Promise((resolve) => {
+        const interval = setInterval(() => {
+          const token = getCookie("csrftoken");
+          if (token) {
+            clearInterval(interval);
+            resolve(token);
+          }
+        }, 100);
+      });
+  
+    const csrfToken = await cookieCheck();
+    console.log("CSRF Token being sent:", csrfToken); // should now show real value
+  
+    try {
+      const response = await fetch(`${BASE_URL}/user/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        return { success: "Account created successfully!", data };
+      } else {
+        return {
+          error: data.email || data.detail || "Something went wrong. Please try again.",
+        };
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return { error: "Something went wrong. Please try again." };
     }
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: "Something went wrong. Please try again." };
-  }
-};
+  };
+  
