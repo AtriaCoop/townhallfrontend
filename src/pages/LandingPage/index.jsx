@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
 import { registerUser, getCookie } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 
 export default function LandingPage() {
-
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -17,6 +16,15 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 🧠 GET CSRF COOKIE ON LOAD
+  useEffect(() => {
+    fetch(`${BASE_URL}/auth/csrf/`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(() => console.log("CSRF cookie set"))
+      .catch(err => console.error("CSRF cookie failed", err));
+  }, []);
 
   const handleChange = (e) => {
     setError('');
@@ -26,56 +34,49 @@ export default function LandingPage() {
     }));
   };
 
-  // SIGN UP
   const handleSignUp = async () => {
     const result = await registerUser(formData);
-  
+
     if (result.error) {
       setMessage(result.error);
     } else {
       setMessage(result.success);
-  
-      // 🧠 FIX: Save the created user to localStorage
       localStorage.setItem("user", JSON.stringify(result.data.user));
-  
       setTimeout(() => {
         router.push('/SetUpPage');
       }, 1000);
     }
   };
 
-  // SIGN IN
   const handleLogIn = async (event) => {
     event.preventDefault();
-    
     const { email, password } = formData;
 
     try {
-        const response = await fetch(`${BASE_URL}/auth/login/`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken")
-            },
-            body: JSON.stringify({ email, password }),
-        });
+      const response = await fetch(`${BASE_URL}/auth/login/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok) {
-            localStorage.setItem("user", JSON.stringify(data.user));  // Store user data
-            router.push("/HomePage")
-
-        } else {
-            setLoading(false)
-            setError(data.error || "Invalid email or password");
-        }
+      if (response.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/HomePage");
+      } else {
+        setLoading(false);
+        setError(data.error || "Invalid email or password");
+      }
     } catch (error) {
-        setLoading(false)
-        setError("An error occurred while signing in. Please try again.");
+      setLoading(false);
+      setError("An error occurred while signing in. Please try again.");
     }
-};
+  };
 
   return (
     <div className={styles.container}>
@@ -134,7 +135,6 @@ export default function LandingPage() {
             </>
           )}
         </p>
-        
       </div>
     </div>
   );

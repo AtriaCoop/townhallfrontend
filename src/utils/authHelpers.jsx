@@ -19,32 +19,35 @@ export const validatePassword = (password, confirmPassword) => {
 };
 
 export const registerUser = async (formData) => {
-    try {
-        
-        console.log("CSRF Token being sent:", getCookie("csrftoken"));
+  try {
+    const csrfToken = getCookie("csrftoken");
+    console.log("CSRF Token being sent:", csrfToken);
 
-        const response = await fetch(`${BASE_URL}/user/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken"),
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                email: formData.email,
-                password: formData.password,
-            }),
-        });
+    const response = await fetch(`${BASE_URL}/user/`, {
+      method: "POST",
+      credentials: "include", // ✅ send cookies
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken, // ✅ send csrf token
+      },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
 
-        if (response.ok) {
-            const data = await response.json();
-            return { success: "Account created successfully!", data };
-        } else {
-            const errorData = await response.json();
-            return { error: errorData.email ? "The email has already been used." : "Something went wrong. Please try again." };
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        return { error: "Something went wrong. Please try again." };
+    const data = await response.json();
+
+    if (response.ok) {
+      return { success: "Account created successfully!", data };
+    } else {
+      return {
+        error:
+          data.email || data.detail || "Something went wrong. Please try again.",
+      };
     }
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "Something went wrong. Please try again." };
+  }
 };
