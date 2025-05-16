@@ -40,8 +40,27 @@ export default function LandingPage() {
   };
 
   const handleSignUp = async () => {
+    setLoading(true);
+    setError('');
+    setMessage('');
+  
+    // Wait until the cookie is actually in document.cookie
+    const waitForCookie = () =>
+      new Promise((resolve) => {
+        const interval = setInterval(() => {
+          const token = getCookie("csrftoken");
+          if (token) {
+            clearInterval(interval);
+            resolve(token);
+          }
+        }, 100);
+      });
+  
+    const token = await waitForCookie();
+    console.log("🧠 Final CSRF Token from document.cookie:", token);
+  
     const result = await registerUser(formData);
-
+  
     if (result.error) {
       setMessage(result.error);
     } else {
@@ -51,7 +70,8 @@ export default function LandingPage() {
         router.push('/SetUpPage');
       }, 1000);
     }
-  };
+    setLoading(false);
+  };  
 
   const handleLogIn = async (event) => {
     event.preventDefault();
