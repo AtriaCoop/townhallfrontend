@@ -22,6 +22,7 @@ export default function LandingPage() {
     fetch(`${BASE_URL}/auth/csrf/`, {
       method: "GET",
       credentials: "include",
+      mode: "cors",
     })
       .then(() => console.log("CSRF cookie set"))
       .catch(err => console.error("CSRF cookie failed", err));
