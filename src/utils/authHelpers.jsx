@@ -1,5 +1,10 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
 
+export function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
 export const validatePassword = (password, confirmPassword) => {
     if (password.length < 11) {
         return "Password must be at least 11 characters long";

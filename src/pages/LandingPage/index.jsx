@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './LandingPage.module.scss';
-import { registerUser } from '@/utils/authHelpers';
+import { registerUser, getCookie } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 
 export default function LandingPage() {
@@ -43,11 +43,6 @@ export default function LandingPage() {
       }, 1000);
     }
   };
-  
-  function getCookie(name) {
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-  return match ? decodeURIComponent(match[2]) : null;
-}
 
   // SIGN IN
   const handleLogIn = async (event) => {
