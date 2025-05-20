@@ -58,17 +58,20 @@ const handleLogIn = async (event) => {
   const { email, password } = formData;
 
   try {
-    // Ensure CSRF is set right before login
+    // 🔁 Re-fetch CSRF before login
     await fetch(`${BASE_URL}/auth/csrf/`, {
       method: "GET",
       credentials: "include",
-      mode: "cors",
       headers: {
         Accept: "application/json",
       },
     });
 
+    // 🧠 Wait a tick to ensure cookie is written
+    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms pause
+
     const token = getCookie("csrftoken");
+    console.log("Logging in with CSRF:", token);
 
     const response = await fetch(`${BASE_URL}/auth/login/`, {
       method: "POST",
@@ -86,12 +89,11 @@ const handleLogIn = async (event) => {
       localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/HomePage");
     } else {
-      setLoading(false);
       setError(data.error || "Invalid email or password");
     }
-  } catch (error) {
-    setLoading(false);
-    setError("An error occurred while signing in. Please try again.");
+  } catch (err) {
+    setError("Login failed.");
+    console.error("Login error:", err);
   }
 };
 
