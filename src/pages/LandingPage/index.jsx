@@ -53,35 +53,47 @@ export default function LandingPage() {
     }
   };
 
-  const handleLogIn = async (event) => {
-    event.preventDefault();
-    const { email, password } = formData;
+const handleLogIn = async (event) => {
+  event.preventDefault();
+  const { email, password } = formData;
 
-    try {
-      const response = await fetch(`${BASE_URL}/auth/login/`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken")
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    // Ensure CSRF is set right before login
+    await fetch(`${BASE_URL}/auth/csrf/`, {
+      method: "GET",
+      credentials: "include",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
-      const data = await response.json();
+    const token = getCookie("csrftoken");
 
-      if (response.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        router.push("/HomePage");
-      } else {
-        setLoading(false);
-        setError(data.error || "Invalid email or password");
-      }
-    } catch (error) {
+    const response = await fetch(`${BASE_URL}/auth/login/`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": token,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      router.push("/HomePage");
+    } else {
       setLoading(false);
-      setError("An error occurred while signing in. Please try again.");
+      setError(data.error || "Invalid email or password");
     }
-  };
+  } catch (error) {
+    setLoading(false);
+    setError("An error occurred while signing in. Please try again.");
+  }
+};
 
   return (
     <div className={styles.container}>
