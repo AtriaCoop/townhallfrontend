@@ -58,8 +58,8 @@ const handleLogIn = async (event) => {
   const { email, password } = formData;
 
   try {
-    // 🔁 Re-fetch CSRF before login
-    await fetch(`${BASE_URL}/auth/csrf/`, {
+    // 🧠 STEP 1: Fetch CSRF token directly from JSON
+    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -67,21 +67,29 @@ const handleLogIn = async (event) => {
       },
     });
 
-    // 🧠 Wait a tick to ensure cookie is written
-    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms pause
+    const csrfData = await csrfRes.json();
+    const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
 
-    const token = getCookie("csrftoken");
-    console.log("Logging in with CSRF:", token);
+    console.log("Logging in with CSRF:", csrfToken);
 
+    // 🧠 STEP 2: Send login request with CSRF token
     const response = await fetch(`${BASE_URL}/auth/login/`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": token,
+        "X-CSRFToken": csrfToken,
       },
       body: JSON.stringify({ email, password }),
     });
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response:", text); // prevent crash on HTML error
+      setError("Unexpected server error.");
+      return;
+    }
 
     const data = await response.json();
 
