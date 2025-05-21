@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
 export default function HomePage() {
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [showModal, setShowModal] = useState(false);
     const [posts, setPosts] = useState([]);

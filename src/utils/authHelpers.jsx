@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
 export function getCookie(name) {
     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));

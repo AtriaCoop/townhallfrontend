@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 export default function ProfilePage() {
   const router = useRouter();
   const { id } = router.query;
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);

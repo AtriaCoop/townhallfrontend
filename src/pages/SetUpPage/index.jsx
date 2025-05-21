@@ -2,11 +2,11 @@ import styles from '@/pages/SetUpPage/SetUpPage.module.scss'
 import { useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react';
+import { getCookie } from '@/utils/authHelpers';
 
 export default function SetUpPage() {
 
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
-    const form = new FormData();
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -45,11 +45,15 @@ export default function SetUpPage() {
     }
 
     const handleCompleteClick = async () => {
+        const csrfToken = getCookie("csrftoken");
+        
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user || !user.id) {
             console.error("No user found in localStorage.");
             return;
         }
+
+        const form = new FormData();
 
         // Append all text fields
         for (const key in formData) {
@@ -66,6 +70,10 @@ export default function SetUpPage() {
         try {
             const response = await fetch(`${BASE_URL}/user/${user.id}/complete_profile/`, {
                 method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                },
                 body: form,
             });
     

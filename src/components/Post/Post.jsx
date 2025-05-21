@@ -21,7 +21,7 @@ export default function Post({
   setPosts,
 }) {
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
   const optionsRef = useRef(null);
   const router = useRouter();
   const csrfToken = getCookie("csrftoken");
@@ -168,6 +168,7 @@ export default function Post({
     <div className={styles.post}>
 
       <div className={styles.postHeader}>
+        {console.log(`${BASE_URL}${userImage}`)}
         <img src={`${BASE_URL}${userImage}`}
           alt="User profile"
           className={styles.profilePic}

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 
 export default function EditProfilePage() {
 
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const router = useRouter();
 
     const [showModal, setShowModal] = useState(false);

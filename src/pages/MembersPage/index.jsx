@@ -7,7 +7,7 @@ import Router, { useRouter } from "next/router";
 
 export default function MembersPage() {
 
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const router = useRouter();
 
     const [members, setMembers] = useState([]);
