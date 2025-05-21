@@ -1,9 +1,16 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
 export function getCookie(name) {
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
+    if (typeof document === 'undefined') return null;
+  
+    const cookies = document.cookie.split('; ');
+    for (let cookie of cookies) {
+      const [key, value] = cookie.split('=');
+      if (key === name) return decodeURIComponent(value);
+    }
+  
+    return null;
+  }  
 
 export const registerUser = async (formData) => {
   try {
