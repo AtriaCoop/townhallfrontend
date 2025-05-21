@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 
 export default function LandingPage() {
   const router = useRouter();
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
-  console.log("BASE_URL:", BASE_URL);
+  // const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  // console.log("BASE_URL:", BASE_URL);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -19,7 +19,7 @@ export default function LandingPage() {
 
   // 🧠 GET CSRF COOKIE ON LOAD
   useEffect(() => {
-    fetch(`${BASE_URL}/auth/csrf/`, {
+    fetch(`/auth/csrf/`, {
       method: "GET",
       credentials: "include",
       mode: "cors",
@@ -59,7 +59,7 @@ const handleLogIn = async (event) => {
 
   try {
     // 🧠 STEP 1: Fetch CSRF token directly from JSON
-    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
+    const csrfRes = await fetch(`/auth/csrf/`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -73,7 +73,7 @@ const handleLogIn = async (event) => {
     console.log("Logging in with CSRF:", csrfToken);
 
     // 🧠 STEP 2: Send login request with CSRF token
-    const response = await fetch(`${BASE_URL}/auth/login/`, {
+    const response = await fetch(`/auth/login/`, {
       method: "POST",
       credentials: "include",
       headers: {
