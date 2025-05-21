@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
+import { getCookie } from '@/utils/authHelpers';
 
 export default function Post({ 
   fullName,
@@ -46,11 +47,6 @@ export default function Post({
         .then(() => console.log("CSRF cookie set"))
         .catch(err => console.error("CSRF cookie failed", err));
     }, []);
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
 
   // UPDATE POST
   async function handleUpdatePost() {
@@ -113,7 +109,7 @@ export default function Post({
   // LIKE POST
   async function handleLikePost() {
     const csrfToken = getCookie("csrftoken");
-    
+
     try {
       const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
         method: "PATCH",
