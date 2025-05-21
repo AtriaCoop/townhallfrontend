@@ -93,7 +93,7 @@ export default function Navigation() {
           </div>
         </div>
 
-        <div className={styles.modalProfile} onClick={() => router.push('/ProfilePage')}>
+        <div className={styles.modalProfile} onClick={() => router.push(`/ProfilePage/${profileData?.id}`)}>
           <img src="/assets/test.png" alt="Profile" />
           <span className={styles.modalProfileName}>
             {profileData ? (
