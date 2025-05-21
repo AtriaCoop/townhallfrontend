@@ -8,7 +8,7 @@ export default function Navigation() {
 
   const pathname = usePathname();
   const router = useRouter();
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState(null);
@@ -24,7 +24,9 @@ export default function Navigation() {
           console.error("No user found in localStorage.");
           return;
         }
-        const response = await fetch (`${BASE_URL}/user/${user.id}/`);
+        const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
+          credentials: "include",
+        });
         const data = await response.json();
         setProfileData(data.user);
         setLoading(false)
@@ -58,7 +60,7 @@ export default function Navigation() {
         <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
       </div>
 
-      <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
+      <div className={styles.profile} onClick={() => router.push(`/ProfilePage`)}>
         <img src={`${BASE_URL}${profileData?.profile_image}`}
           alt="Profile"
           onError={(e) => {
