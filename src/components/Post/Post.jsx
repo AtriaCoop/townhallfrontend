@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
-import { getCookie } from '@/utils/authHelpers';
 
 export default function Post({ 
   fullName,
@@ -25,6 +24,7 @@ export default function Post({
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
   const optionsRef = useRef(null);
   const router = useRouter();
+  const csrfToken = getCookie("csrftoken");
 
   const [showOptions, setShowOptions] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -34,19 +34,10 @@ export default function Post({
   const [commentModal, setCommentModal] = useState(false);
   const [likeModal, setLikeModal] = useState(false);
 
-    // 🧠 GET CSRF COOKIE ON LOAD
-    useEffect(() => {
-      fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        mode: "cors",
-        headers: {
-          Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
-        },
-      })
-        .then(() => console.log("CSRF cookie set"))
-        .catch(err => console.error("CSRF cookie failed", err));
-    }, []);
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
 
   // UPDATE POST
   async function handleUpdatePost() {
@@ -108,8 +99,6 @@ export default function Post({
 
   // LIKE POST
   async function handleLikePost() {
-    const csrfToken = getCookie("csrftoken");
-
     try {
       const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
         method: "PATCH",
@@ -179,7 +168,6 @@ export default function Post({
     <div className={styles.post}>
 
       <div className={styles.postHeader}>
-        {console.log(`${BASE_URL}${userImage}`)}
         <img src={`${BASE_URL}${userImage}`}
           alt="User profile"
           className={styles.profilePic}
