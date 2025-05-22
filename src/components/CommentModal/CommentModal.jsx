@@ -1,14 +1,8 @@
 import styles from './CommentModal.module.scss';
 import { formatDistance, subDays } from 'date-fns';
+import { getCookie } from '@/utils/authHelpers';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
-
-  const csrfToken = getCookie("csrftoken");
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,6 +40,26 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
   async function handleDeleteComment(commentId) {
     try {
+      // Step 1: Fetch CSRF from server
+      const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+  
+      const csrfData = await csrfRes.json();
+      const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
+  
+      console.log("CSRF for like:", csrfToken);
+  
+      if (!csrfToken) {
+        alert("Still initializing. Please try again in a moment.");
+        return;
+      }
+      
+      // Step 2: Delete comment
       const response = await fetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
         credentials: "include",
