@@ -59,7 +59,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         return;
       }
       
-      // Step 2: Delete comment
+      // Step 2: Delete post comment
       const response = await fetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
         credentials: "include",
