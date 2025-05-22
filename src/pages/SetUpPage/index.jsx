@@ -45,6 +45,13 @@ export default function SetUpPage() {
     }
 
     const handleCompleteClick = async () => {
+        if (!formData.full_name.trim() ||
+            !formData.title.trim() ||
+            !formData.primary_organization.trim()){
+            alert("Please fill out the required fields");
+            return;
+        }
+        
         const csrfToken = getCookie("csrftoken");
         
         const user = JSON.parse(localStorage.getItem('user'));
@@ -111,13 +118,13 @@ export default function SetUpPage() {
                     <p>We'll start  with the basics:</p>
                 </div>
                 <div className={styles.inputs}>
-                    <p>Full Name</p>
+                    <p>Full Name <span style={{ color: 'red' }}>*</span></p>
                         <input type="text" placeholder='Enter full name...' value={formData.full_name} onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}/>
                     <p>Preferred Pronouns</p>
                         <input type="text" placeholder='What are your pronouns?' value={formData.pronouns} onChange={(e) => setFormData(prev => ({ ...prev, pronouns: e.target.value }))}/>
-                    <p>Title</p>
+                    <p>Title <span style={{ color: 'red' }}>*</span></p>
                         <input type="text" placeholder='What is your job title?' value={formData.title} onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}/>
-                    <p>Primary Organization</p>
+                    <p>Primary Organization <span style={{ color: 'red' }}>*</span></p>
                         <input type="text" placeholder='What organization do you work for?' value={formData.primary_organization} onChange={(e) => setFormData(prev => ({ ...prev, primary_organization: e.target.value }))}/>
                     <p>Other Organizations</p>
                         <input type="text" placeholder='Are there other organizations you work for?' value={formData.other_organizations} onChange={(e) => setFormData(prev => ({ ...prev, other_organizations: e.target.value }))}/>
