@@ -93,7 +93,7 @@ export default function Modal({
         />
         {error && <p className={styles.errorMessage}>{error}</p>}
 
-        <p>Profile Picture</p>
+        <p>Photo</p>
         <div className={styles.imageInput} onClick={handlePostImageClick}>
           {profilePreview ? (
             <img src={profilePreview} alt="Preview" className={styles.previewImage} />
