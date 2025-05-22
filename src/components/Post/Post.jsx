@@ -191,8 +191,8 @@ async function handleLikePost() {
     <div className={styles.post}>
 
       <div className={styles.postHeader}>
-        {console.log(`${BASE_URL}${userImage}`)}
-        <img src={`${BASE_URL}${userImage}`}
+        {console.log({userImage})}
+        <img src={userImage}
           alt="User profile"
           className={styles.profilePic}
           onClick={() => router.push(`/ProfilePage/${userId}`)}
@@ -245,7 +245,7 @@ async function handleLikePost() {
                 />
               ) : isValidImage(postImage) ? (
                 <img
-                  src={`${BASE_URL}${postImage}`}
+                  src={{postImage}}
                   alt="Current Post Image"
                   className={styles.previewImage}
                 />
