@@ -299,7 +299,7 @@ async function handleLikePost() {
         ))}
         {isValidImage(postImage) && (
           <img
-            src={`${BASE_URL}${postImage}`}
+            src={postImage}
             alt="Post content"
             className={styles.postImage}
           />
