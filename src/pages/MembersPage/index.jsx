@@ -64,7 +64,7 @@ export default function MembersPage() {
                         key={idx}
                         name={`${member.full_name}`}
                         title={`${member.title} - ${member.primary_organization || ''}`}
-                        imageSrc={member.profile_image ? `${BASE_URL}${member.profile_image}` : "/assets/ProfileImage.jpg"}
+                        imageSrc={member.profile_image ? `${member.profile_image}` : "/assets/ProfileImage.jpg"}
                         onClick={() => router.push(`/ProfilePage/${member.id}`)}
                     />
                     ))

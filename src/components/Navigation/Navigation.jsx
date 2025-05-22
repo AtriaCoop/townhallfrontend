@@ -61,7 +61,7 @@ export default function Navigation() {
       </div>
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
-        <img src={`${BASE_URL}${profileData?.profile_image}`}
+        <img src={`${profileData?.profile_image}`}
           alt="Profile"
           onError={(e) => {
             e.target.onerror = null;

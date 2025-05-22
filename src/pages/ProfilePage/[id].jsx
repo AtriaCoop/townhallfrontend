@@ -41,7 +41,7 @@ export default function ProfilePage() {
       <div className={styles.profileContainer}>
         <img
           className={styles.profilePic}
-          src={`${BASE_URL}${profileData.profile_image}`}
+          src={`${profileData.profile_image}`}
           alt="Profile Image"
           onError={(e) => {
             e.target.onerror = null;

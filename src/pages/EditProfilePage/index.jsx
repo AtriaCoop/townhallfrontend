@@ -102,7 +102,7 @@ export default function EditProfilePage() {
                     </div>
                     <h1>Account Settings</h1>
                 </div>
-                <img className={styles.profilePic} src={`${BASE_URL}${profileData?.profile_image}`}
+                <img className={styles.profilePic} src={`${profileData?.profile_image}`}
                     alt="Profile Image"
                     onError={(e) => {
                         e.target.onerror = null;
@@ -175,7 +175,7 @@ export default function EditProfilePage() {
                         src={
                         formData.profile_image instanceof File
                             ? URL.createObjectURL(formData.profile_image)
-                            : `${BASE_URL}${profileData?.profile_image}`
+                            : `${profileData?.profile_image}`
                         }
                         alt="Profile Image"
                         title="Click to change"
