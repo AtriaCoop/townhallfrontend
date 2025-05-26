@@ -30,7 +30,7 @@ export default function Navigation() {
         const data = await response.json();
         setProfileData(data.user);
         setLoading(false)
-      } catch {
+      } catch (error) {
         console.error("Error fetching profile data:", error);
         setLoading(false)
       }
