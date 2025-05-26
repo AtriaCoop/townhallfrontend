@@ -40,7 +40,7 @@ export default function Modal({
     }
 
     const formData = new FormData();
-    formData.append("volunteer_id", profileData.id);
+    formData.append("user_id", profileData.id);
     formData.append("content", text);
     if (image) {
       formData.append("image", image);
@@ -57,16 +57,14 @@ export default function Modal({
       const data = await response.json();
       const newPost = {
         id: data.post.id,
-        userId: data.post.volunteer.id,
-        userName: `${data.post.volunteer.first_name} ${data.post.volunteer.last_name}`,
-        organization: data.post.volunteer.primary_organization,
-        userImage: data.post.volunteer.profile_image,
+        userId: data.post.user.id,
+        fullName: `${data.post.user.full_name}`,
+        organization: data.post.user.primary_organization,
+        userImage: data.post.user.profile_image,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
         links: [],
-        likes: 0,
-        comments: 0,
       };
 
       setPosts([newPost, ...posts]);
@@ -86,7 +84,7 @@ export default function Modal({
         <h1>{title}</h1>
 
         <p>Text</p>
-        <input
+        <textarea
           type="text"
           placeholder="Enter text..."
           className={styles.textInput}
@@ -95,7 +93,7 @@ export default function Modal({
         />
         {error && <p className={styles.errorMessage}>{error}</p>}
 
-        <p>Profile Picture</p>
+        <p>Photo</p>
         <div className={styles.imageInput} onClick={handlePostImageClick}>
           {profilePreview ? (
             <img src={profilePreview} alt="Preview" className={styles.previewImage} />

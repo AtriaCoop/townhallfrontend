@@ -8,7 +8,7 @@ export default function Navigation() {
 
   const pathname = usePathname();
   const router = useRouter();
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState(null);
@@ -24,9 +24,11 @@ export default function Navigation() {
           console.error("No user found in localStorage.");
           return;
         }
-        const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+        const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
+          credentials: "include",
+        });
         const data = await response.json();
-        setProfileData(data.volunteer);
+        setProfileData(data.user);
         setLoading(false)
       } catch {
         console.error("Error fetching profile data:", error);
@@ -59,7 +61,7 @@ export default function Navigation() {
       </div>
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
-        <img src={`${BASE_URL}${profileData?.profile_image}`}
+        <img src={`${profileData?.profile_image}`}
           alt="Profile"
           onError={(e) => {
             e.target.onerror = null;
@@ -68,7 +70,7 @@ export default function Navigation() {
         />
         <span className={styles.profileName}>
           {profileData ? (
-            <div>{profileData.first_name} {profileData.last_name}</div>
+            <div>{profileData.full_name}</div>
           ) : (
             <p>loading...</p>
           )}
@@ -91,11 +93,11 @@ export default function Navigation() {
           </div>
         </div>
 
-        <div className={styles.modalProfile} onClick={() => router.push('/ProfilePage')}>
+        <div className={styles.modalProfile} onClick={() => router.push(`/ProfilePage/${profileData?.id}`)}>
           <img src="/assets/test.png" alt="Profile" />
           <span className={styles.modalProfileName}>
             {profileData ? (
-              <div>{profileData.first_name} {profileData.last_name}</div>
+              <div>{profileData.full_name}</div>
             ) : (
               <p>loading...</p>
             )}

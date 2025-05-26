@@ -1,0 +1,90 @@
+@import '@/styles/mixins.scss';
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 2px solid #f9b233;
+  padding: 2rem 1.25rem;
+  border-radius: 12px;
+  width: 100%;
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+
+  h1 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  @include tablet {
+    width: 800px;
+  }
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+  
+    &:hover {
+      color: black;
+    }
+}
+
+.userList {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #333;
+
+    strong {
+      font-weight: bold;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #666;
+    }
+  }
+}

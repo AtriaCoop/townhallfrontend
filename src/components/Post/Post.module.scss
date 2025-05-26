@@ -47,7 +47,7 @@
   cursor: pointer;
 }
 
-.userName {
+.fullName {
   font-weight: bold;
   color: #222;
 }
@@ -102,12 +102,23 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
+    transition: transform 0.1s ease, filter 0.2s ease;
+
+    &:hover {
+      transform: scale(1.15);
+      filter: brightness(1.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
   }
 }
 
 .likesComments {
   font-size: 0.85rem;
   color: #666;
+  cursor: pointer;
 }
 
 .moreOptions {
@@ -222,6 +233,30 @@
   }
 }
 
+.imageInput {
+  padding: 4rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  color: rgb(255, 196, 0);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    border: 2px dashed #f9b233;
+    opacity: 0.8;
+  }
+}
+
+.previewImage {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .updateButton {
   width: 100%;
   background-color: #24873d;
@@ -261,4 +296,39 @@
   border: 1px solid #ccc;
   padding: 8px 0px 96px 8px;
   margin-bottom: 1rem;
+}
+
+// Comments styling
+.commentsSection {
+  margin-top: 1rem;
+  padding-left: 1rem;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  img {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+}
+
+.commentInput {
+  width: 80%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.commentButton {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  background-color: #00a898;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }

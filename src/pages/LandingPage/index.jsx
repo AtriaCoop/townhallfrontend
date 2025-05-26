@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
-import { registerUser } from '@/utils/authHelpers';
+import { registerUser, getCookie } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 
 export default function LandingPage() {
-
   const router = useRouter();
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
+  console.log("BASE_URL:", BASE_URL);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -17,6 +17,19 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 🧠 GET CSRF COOKIE ON LOAD
+  useEffect(() => {
+    fetch(`${BASE_URL}/auth/csrf/`, {
+      method: "GET",
+      credentials: "include",
+      mode: "cors",
+      headers: {
+        Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
+      },
+    })
+      .then(() => console.log("CSRF cookie set"))
+      .catch(err => console.error("CSRF cookie failed", err));
+  }, []);
 
   const handleChange = (e) => {
     setError('');
@@ -26,54 +39,70 @@ export default function LandingPage() {
     }));
   };
 
-  // SIGN UP
   const handleSignUp = async () => {
     const result = await registerUser(formData);
-  
+
     if (result.error) {
       setMessage(result.error);
     } else {
       setMessage(result.success);
-  
-      // 🧠 FIX: Save the created volunteer to localStorage
-      localStorage.setItem("user", JSON.stringify(result.data.volunteer));
-  
+      localStorage.setItem("user", JSON.stringify(result.data.user));
       setTimeout(() => {
         router.push('/SetUpPage');
       }, 1000);
     }
   };
-  
 
-  // SIGN IN
-  const handleLogIn = async (event) => {
-    event.preventDefault();
-    
-    const { email, password } = formData;
+const handleLogIn = async (event) => {
+  event.preventDefault();
+  const { email, password } = formData;
 
-    try {
-        const response = await fetch(`${BASE_URL}/auth/login/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-        });
+  try {
+    // 🧠 STEP 1: Fetch CSRF token directly from JSON
+    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
-        const data = await response.json();
+    const csrfData = await csrfRes.json();
+    const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
 
-        if (response.ok) {
-            localStorage.setItem("user", JSON.stringify(data.user));  // Store user data
-            router.push("/HomePage")
+    console.log("Logging in with CSRF:", csrfToken);
 
-        } else {
-            setLoading(false)
-            setError(data.error || "Invalid email or password");
-        }
-    } catch (error) {
-        setLoading(false)
-        setError("An error occurred while signing in. Please try again.");
+    // 🧠 STEP 2: Send login request with CSRF token
+    const response = await fetch(`${BASE_URL}/auth/login/`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response:", text); // prevent crash on HTML error
+      setError("Unexpected server error.");
+      return;
     }
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      router.push("/HomePage");
+    } else {
+      setError(data.error || "Invalid email or password");
+    }
+  } catch (err) {
+    setError("Login failed.");
+    console.error("Login error:", err);
+  }
 };
 
   return (
@@ -133,7 +162,6 @@ export default function LandingPage() {
             </>
           )}
         </p>
-        
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
 export default function HomePage() {
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [showModal, setShowModal] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -20,9 +20,9 @@ export default function HomePage() {
               console.error("No user found in localStorage.");
               return;
             }
-            const response = await fetch (`${BASE_URL}/volunteer/${user.id}/`);
+            const response = await fetch (`${BASE_URL}/user/${user.id}/`);
             const data = await response.json();
-            setProfileData(data.volunteer);
+            setProfileData(data.user);
           } catch(error) {
             console.error("Error fetching profile data:", error);
           }
@@ -38,16 +38,18 @@ export default function HomePage() {
       
             const formattedPosts = data.posts.map((p) => ({
               id: p.id,
-              userId: p.volunteer.id,
-              userName: `${p.volunteer.first_name} ${p.volunteer.last_name}`,
-              organization: p.volunteer.primary_organization,
-              userImage: p.volunteer.profile_image,
+              userId: p.user.id,
+              fullName: `${p.user.full_name}`,
+              organization: p.user.primary_organization,
+              userImage: p.user.profile_image,
               date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
               content: [p.content],
               postImage: p.image,
               links: [],
-              likes: 0,
-              comments: 0,
+              likes: p.likes,
+              liked_by: p.liked_by,
+              isLiked: false,
+              comments: p.comments,
             }))
             .reverse();
       
@@ -84,13 +86,15 @@ export default function HomePage() {
                 {posts.map((post) => (
                     <Post 
                         key={post.id}
-                        userName={post.userName}
+                        fullName={post.fullName}
                         organization={post.organization}
                         date={post.date}
                         content={post.content}
                         postImage={post.postImage}
                         links={post.links}
                         likes={post.likes}
+                        liked_by={post.liked_by}
+                        isLiked={post.isLiked}
                         comments={post.comments}
                         userId={post.userId}
                         currentUserId={profileData?.id}
@@ -114,7 +118,7 @@ export default function HomePage() {
                 )}
                 {!showModal && (
                 <div className={styles.newPostButton} onClick={handlePostClick}>
-                    NEW POST
+                   <img src={"/assets/pencilIcon.png"} alt="Pencil Icon" className={styles.pencilImage} /> NEW POST
                 </div>
                 )}
                 

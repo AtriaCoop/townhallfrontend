@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/auth/*"
+  to = "https://townhallbackend.onrender.com/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/users/*"
+  to = "https://townhallbackend.onrender.com/users/:splat"
+  status = 200
+  force = true

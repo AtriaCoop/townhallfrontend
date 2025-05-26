@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 export default function ProfilePage() {
   const router = useRouter();
   const { id } = router.query;
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
@@ -21,9 +21,9 @@ export default function ProfilePage() {
 
     async function fetchProfile() {
       try {
-        const response = await fetch(`${BASE_URL}/volunteer/${id}/`);
+        const response = await fetch(`${BASE_URL}/user/${id}/`);
         const data = await response.json();
-        setProfileData(data.volunteer);
+        setProfileData(data.user);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
@@ -41,7 +41,7 @@ export default function ProfilePage() {
       <div className={styles.profileContainer}>
         <img
           className={styles.profilePic}
-          src={`${BASE_URL}${profileData.profile_image}`}
+          src={`${profileData.profile_image}`}
           alt="Profile Image"
           onError={(e) => {
             e.target.onerror = null;
@@ -49,9 +49,9 @@ export default function ProfilePage() {
           }}
         />
         <span className={styles.name}>
-          {profileData.first_name} {profileData.last_name}
+          {profileData.full_name}
         </span>
-        <span className={styles.dateJoined}>Date Joined: 2 weeks ago</span>
+        <span className={styles.dateJoined}>Date Joined: 2 weeks ago (hardcoded)</span>
 
         <div className={styles.profileInfo}>
           <span>Title: {profileData.title}</span>
@@ -74,7 +74,10 @@ export default function ProfilePage() {
             <div className={styles.signoutContainer}>
               <p>Time to go?</p>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => {
+                  localStorage.removeItem('user');
+                  router.push('/')
+                }}
                 className={styles.signoutButton}
               >
                 SIGN OUT
