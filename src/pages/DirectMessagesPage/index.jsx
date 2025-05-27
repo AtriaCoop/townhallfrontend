@@ -3,14 +3,28 @@ import styles from '@/pages/DirectMessagesPage/DirectMessagesPage.module.scss'
 import ChatCard from "@/components/ChatCard/ChatCard"
 import ChatModal from "@/components/ChatModal/ChatModal"
 import ChatWindow from "@/components/ChatWindow/ChatWindow"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function DirectMessagesPage() {
 
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
-
     const [chats, setChats] = useState([]);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+        const stored = localStorage.getItem('chatList');
+        if (stored) {
+          setChats(JSON.parse(stored));
+        }
+      }, []);
+
+    useEffect(() => {
+        if (isClient) {
+            localStorage.setItem('chatList', JSON.stringify(chats));
+        }
+    }, [chats, isClient]);
 
     const handleStartChat = (user) => {
         const alreadyExists = chats.some(chat => chat.name === user.full_name);
