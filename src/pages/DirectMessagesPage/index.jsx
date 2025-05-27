@@ -2,67 +2,40 @@ import Navigation from "@/components/Navigation/Navigation"
 import styles from '@/pages/DirectMessagesPage/DirectMessagesPage.module.scss'
 import ChatCard from "@/components/ChatCard/ChatCard"
 import ChatModal from "@/components/ChatModal/ChatModal"
+import ChatWindow from "@/components/ChatWindow/ChatWindow"
 import { useState } from 'react';
-
 
 export default function DirectMessagesPage() {
 
-        const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [activeChat, setActiveChat] = useState(null);
 
-        const chats = [
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        {
-            name: "Ryan Yee",
-            title: "Atria",
-            time: "5mins ago",
-            imageSrc: "/assets/members/aldo.png",
-        },
-        // Add more here...
-    ];
+    const [chats, setChats] = useState([]);
 
-    const handleChatClick = () => {
-        setShowModal(true);
+    const handleStartChat = (user) => {
+        const alreadyExists = chats.some(chat => chat.name === user.full_name);
+        if (!alreadyExists) {
+          setChats(prev => [
+            ...prev,
+            {
+              name: user.full_name,
+              title: user.title || "VFJC Member",
+              time: "Just now",
+              imageSrc: user.profile_image || "/default.jpg",
+            }
+          ]);
+        }
+        setActiveChat({
+          name: user.full_name,
+          title: user.title || "VFJC Member",
+          time: "Just now",
+          imageSrc: user.profile_image || "/default.jpg",
+        });
+        setShowModal(false);
+      };      
+
+    const handleChatClick = (chat) => {
+        setActiveChat(chat);
     }
 
     return (
@@ -72,33 +45,51 @@ export default function DirectMessagesPage() {
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>
                 <div className={styles.titleContainer}>
-                    <h1 className={styles.title}>Direct Messages <button className={styles.titleButton} onClick={handleChatClick}>New Chat</button> </h1>
+                    <h1 className={styles.title}>Direct Messages 
+                        <button className={styles.titleButton} onClick={() => setShowModal(true)}>
+                            New Chat
+                        </button> 
+                    </h1>
                     <p>
                         You can use this messaging feature to have individual conversations with fellow VFJC members.
                     </p>
                 </div>
+
                 {showModal && (
-                <ChatModal 
-                    onClose={() => setShowModal(false)}
-                    title="New Chat"
-                    buttonText="Start Chat"
-                />
-            )}
-                <input className={styles.searchBar} type="search" placeholder="Search By Name Or Organization"/>
+                    <ChatModal 
+                        onClose={() => setShowModal(false)}
+                        title="New Chat"
+                        onUserSelect={handleStartChat}
+                    />
+                )}
+
+                <input className={styles.searchBar} type="search" placeholder="Search By Name"/>
 
                 <div className={styles.chatList}>
-                    {chats.map((chat, idx) => (
-                        <ChatCard
-                            key={idx}
+                    {chats.length > 0 ? (
+                        chats.map((chat, idx) => (
+                        <div key={idx} onClick={() => handleChatClick(chat)}>
+                            <ChatCard
                             name={chat.name}
                             title={chat.title}
                             time={chat.time}
                             imageSrc={chat.imageSrc}
-                        />
-                    ))}
+                            />
+                        </div>
+                        ))
+                    ) : (
+                        <p className={styles.noChatsMessage}>No chats yet...</p>
+                    )}
                 </div>
+
             </div>
 
+            {activeChat && (
+                <ChatWindow 
+                    chat={activeChat} 
+                    onClose={() => setActiveChat(null)} 
+                />
+            )}
         </div>
     )
 }
