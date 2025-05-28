@@ -4,8 +4,11 @@ import ChatCard from "@/components/ChatCard/ChatCard"
 import ChatModal from "@/components/ChatModal/ChatModal"
 import ChatWindow from "@/components/ChatWindow/ChatWindow"
 import { useState, useEffect } from 'react';
+import { getCookie } from "@/utils/authHelpers";
 
-export default function DirectMessagesPage() {
+export default function DirectMessagesPage({ currentUserId }) {
+
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
@@ -26,27 +29,50 @@ export default function DirectMessagesPage() {
         }
     }, [chats, isClient]);
 
-    const handleStartChat = (user) => {
-        const alreadyExists = chats.some(chat => chat.name === user.full_name);
-        if (!alreadyExists) {
-          setChats(prev => [
-            ...prev,
-            {
-              name: user.full_name,
-              title: user.title || "VFJC Member",
-              time: "Just now",
-              imageSrc: user.profile_image || "/default.jpg",
-            }
-          ]);
+    const handleStartChat = async (user) => {
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const currentUserId = userData.id;
+      
+        // ✅ Check if chat already exists with this user
+        const existingChat = chats.find(chat =>
+          chat.participants &&
+          chat.participants.includes(currentUserId) &&
+          chat.participants.includes(user.id)
+        );
+      
+        if (existingChat) {
+          setActiveChat(existingChat);
+          setShowModal(false);
+          return;
         }
-        setActiveChat({
+      
+        const res = await fetch(`${BASE_URL}/chats/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: `chat-${currentUserId}-${user.id}`,
+            participants: [currentUserId, user.id]
+          }),
+        });
+      
+        const data = await res.json();
+        const chatId = data?.data?.id;
+      
+        const chatObj = {
+          id: chatId,
           name: user.full_name,
           title: user.title || "VFJC Member",
           time: "Just now",
-          imageSrc: user.profile_image || "/default.jpg",
-        });
+          imageSrc: user.profile_image || "/assets/ProfileImage.jpg",
+          participants: [currentUserId, user.id], // ✅ Include participants for future checks
+          messages: [],
+        };
+      
+        setChats(prev => [...prev, chatObj]);
+        setActiveChat(chatObj);
         setShowModal(false);
-      };      
+      };         
 
     const handleChatClick = (chat) => {
         setActiveChat(chat);

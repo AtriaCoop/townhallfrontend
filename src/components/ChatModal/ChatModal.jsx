@@ -31,6 +31,7 @@ export default function Modal({
         try {
             const response = await fetch (`${BASE_URL}/user`);
             const data = await response.json();
+            console.log("Fetched users:", data.data);
             setUsers(data.data || []);
         } catch (error) {
             console.error("Error fetching user data", error);
@@ -52,7 +53,7 @@ export default function Modal({
         <h1>{title}</h1>
 
         <p className={styles.instructionText}>Choose someone to start a new conversation</p>
-        <input
+        <input  
           type="text"
           placeholder="Search for a user"
           className={styles.textInput}

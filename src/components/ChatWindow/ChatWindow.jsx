@@ -1,17 +1,50 @@
 import styles from './ChatWindow.module.scss';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function ChatWindow({ chat, onClose }) {
 
     const [inputText, setInputText] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(chat.messages || []);
 
-    const handleSend = () => {
+    const socketRef = useRef(null);
+    
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = userData.id;
+
+    useEffect(() => {
+        const socketUrl = `ws://127.0.0.1:8000/ws/chats/${chat.id}/`;
+    
+        socketRef.current = new WebSocket(socketUrl);
+    
+        socketRef.current.onmessage = (e) => {
+          const data = JSON.parse(e.data);
+          setMessages((prev) => [...prev, { text: data.message, sender: data.sender }]);
+        };
+    
+        socketRef.current.onclose = () => {
+          console.log('WebSocket closed');
+        };
+    
+        return () => {
+          socketRef.current.close();
+        };
+      }, [chat.id]);
+
+      const handleSend = () => {
         if (inputText.trim() === '') return;
-
-        setMessages(prev => [...prev, { text: inputText, type: 'outgoing' }]);
-        setInputText('');
-    }
+      
+        if (socketRef.current.readyState === WebSocket.OPEN) {
+          socketRef.current.send(
+            JSON.stringify({
+              message: inputText,
+              sender: currentUserId,
+            })
+          );
+          setInputText('');
+        } else {
+          console.warn("WebSocket is not open yet.");
+        }
+      };      
 
     return (
         <div className={styles.chatWindow}>
@@ -24,16 +57,15 @@ export default function ChatWindow({ chat, onClose }) {
                 <button className={styles.closeButton} onClick={onClose}>X</button>
             </div>
 
-            {/* dynamic rendering of fake incoming messages*/}
             <div className={styles.messages}>
                 {messages.map((msg, idx) => (
                     <div
-                    key={idx}
-                    className={
-                        msg.type === 'incoming'
-                        ? styles.messageIncoming
-                        : styles.messageOutgoing
-                    }
+                        key={idx}
+                        className={
+                            msg.sender === currentUserId
+                            ? styles.messageOutgoing
+                            : styles.messageIncoming
+                        }
                     >
                     {msg.text}
                     </div>
