@@ -1,15 +1,36 @@
 import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
 
-export default function ChatWindow({ chat, onClose }) {
+export default function ChatWindow({ chat, onClose, setUnreadMap }) {
 
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState(chat.messages || []);
 
     const socketRef = useRef(null);
+    const messagesEndRef = useRef(null);
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    const currentUserId = userData.id;
+    const currentUserId = userData.id; 
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+          try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/${chat.id}/messages/`);
+            const data = await res.json();
+      
+            const formatted = data.messages.map((m) => ({
+              text: m.content,
+              sender: m.user,
+            }));
+      
+            setMessages(formatted); // Replace with saved messages
+          } catch (err) {
+            console.error("Failed to load past messages:", err);
+          }
+        };
+      
+        fetchMessages();
+      }, [chat.id]);      
 
     useEffect(() => {
         const socketUrl = `ws://127.0.0.1:8000/ws/chats/${chat.id}/`;
@@ -28,9 +49,9 @@ export default function ChatWindow({ chat, onClose }) {
         return () => {
           socketRef.current.close();
         };
-      }, [chat.id]);
+    }, [chat.id]);
 
-      const handleSend = () => {
+    const handleSend = () => {
         if (inputText.trim() === '') return;
       
         if (socketRef.current.readyState === WebSocket.OPEN) {
@@ -44,7 +65,12 @@ export default function ChatWindow({ chat, onClose }) {
         } else {
           console.warn("WebSocket is not open yet.");
         }
-      };      
+    };
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [messages]);
+    
 
     return (
         <div className={styles.chatWindow}>
@@ -70,6 +96,9 @@ export default function ChatWindow({ chat, onClose }) {
                     {msg.text}
                     </div>
                 ))}
+                
+                {/* Scroll to bottom */}
+                <div ref={messagesEndRef} />
             </div>
 
             <div className={styles.inputArea}>

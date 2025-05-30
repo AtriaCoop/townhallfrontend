@@ -40,12 +40,6 @@ export default function Modal({
     fetchUsers();
 }, [BASE_URL]);
 
-    const handleSubmit = async () => {
-      // Replace with chat-specific logic
-      console.log('Starting chat with selected user');
-      onClose();
-    };
-
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>

@@ -15,7 +15,8 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "sass": "^1.86.2",
-    "scss": "^0.2.4"
+    "scss": "^0.2.4",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
