@@ -1,9 +1,13 @@
 import Navigation from "@/components/Navigation/Navigation"
 import styles from '@/pages/GroupChatsPage/GroupChatsPage.module.scss'
 import MessageBubble from "@/components/MessageBubble/MessageBubble";
+import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
+import { useState } from 'react';
 
 
 export default function GroupChatsPage() {
+
+    const [showModal, setShowModal] = useState(false);
 
     // Temporary static data (make dynamic later)
     const messages = [
@@ -18,6 +22,10 @@ export default function GroupChatsPage() {
         // more messages...
     ];
 
+    const handleChatClick = () => {
+        setShowModal(true);
+    }
+
     return (
         <div className={styles.container}>
             <Navigation />
@@ -25,7 +33,7 @@ export default function GroupChatsPage() {
             {/* Group Chats Sidebar */}
             <div className={styles.groupChatsSidebar}>
                 <h2>Group Chats</h2>
-                <button className={styles.joinButton}>+ JOIN A GROUP</button>
+                <button className={styles.joinButton} onClick={handleChatClick}>+ JOIN A GROUP</button>
 
                 <div className={styles.chatList}>
                     <button className={styles.chatItem}>#ATRIA Questions and Support</button>
@@ -43,7 +51,13 @@ export default function GroupChatsPage() {
                     <img src="/assets/leaveGroup.svg" alt="leaveGroup" />
                     </div>
                 </div>
-
+                                {showModal && (
+                <JoinGroupModal 
+                    onClose={() => setShowModal(false)}
+                    title="Join Groups"
+                    buttonText="Join Group"
+                />
+            )}
                 {/* Message Bubble */}
                 {messages.map(msg => (
                     <MessageBubble
