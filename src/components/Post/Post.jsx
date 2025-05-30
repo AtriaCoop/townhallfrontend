@@ -33,6 +33,7 @@ export default function Post({
   const [editImage, setEditImage] = useState(null);
   const [commentModal, setCommentModal] = useState(false);
   const [likeModal, setLikeModal] = useState(false);
+  const [liked, setLiked] = useState(liked_by.includes(currentUserId));
 
     // 🧠 GET CSRF COOKIE ON LOAD
     useEffect(() => {
@@ -144,6 +145,7 @@ async function handleLikePost() {
     }
 
     const result = await response.json();
+    setLiked(prev => !prev);
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.id === postId ? { ...post, likes: result.likes } : post
@@ -328,7 +330,7 @@ async function handleLikePost() {
 
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <img src={"/assets/like.png"} alt="like" onClick={handleLikePost}/>
+          <img src={liked ? "/assets/liked.png" : "/assets/like.png"} alt="like" onClick={handleLikePost}/>
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
