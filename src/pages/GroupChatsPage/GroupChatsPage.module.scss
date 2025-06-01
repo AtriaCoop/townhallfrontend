@@ -67,6 +67,12 @@
   background: none;
   border: none;
   cursor: pointer;
+  
+  img {
+    width: 1.5rem;
+    height: auto;
+    filter: grayscale(100%) opacity(0.5);
+  }
 }
 
 // Group Chats Sidebar
