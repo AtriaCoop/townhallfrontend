@@ -33,7 +33,7 @@ export default function Post({
   const [editImage, setEditImage] = useState(null);
   const [commentModal, setCommentModal] = useState(false);
   const [likeModal, setLikeModal] = useState(false);
-  const [liked, setLiked] = useState(liked_by.includes(currentUserId));
+  const [liked, setLiked] = useState(Array.isArray(liked_by) && liked_by.includes(currentUserId));
 
     // 🧠 GET CSRF COOKIE ON LOAD
     useEffect(() => {
@@ -247,7 +247,7 @@ async function handleLikePost() {
                 />
               ) : isValidImage(postImage) ? (
                 <img
-                  src={{postImage}}
+                  src={postImage}
                   alt="Current Post Image"
                   className={styles.previewImage}
                 />
