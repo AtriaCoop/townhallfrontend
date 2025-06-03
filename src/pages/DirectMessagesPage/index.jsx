@@ -11,16 +11,23 @@ export default function DirectMessagesPage({ currentUserId }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || 'ws://127.0.0.1:8000';
 
-    useEffect(() => {
-      fetch(`${BASE_URL}/auth/csrf/`, {
-        credentials: 'include',
-      });
-    }, []);
-
+    const [csrfToken, setCsrfToken] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
     const [chats, setChats] = useState([]);
     const [unreadMap, setUnreadMap] = useState({});
+
+    useEffect(() => {
+      const fetchCsrf = async () => {
+        const res = await fetch(`${BASE_URL}/auth/csrf/`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        console.log("✅ CSRF fetched:", data);
+        setCsrfToken(data.csrfToken);
+      };
+      fetchCsrf();
+    }, []);    
     
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -73,11 +80,10 @@ export default function DirectMessagesPage({ currentUserId }) {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
         const currentUserId = userData.id;
 
-        const csrfToken = getCookie("csrftoken"); // grab CSRF token
         if (!csrfToken || csrfToken.length < 10) {
           console.error("Invalid CSRF token:", csrfToken);
           return;
-        }
+        }        
       
         // Check if chat already exists with this user
         const existingChat = chats.find(chat =>
@@ -134,7 +140,11 @@ export default function DirectMessagesPage({ currentUserId }) {
       };      
 
     const handleDeleteChat = async (chatId) => {
-        const csrfToken = getCookie("csrftoken");
+
+      if (!csrfToken || csrfToken.length < 10) {
+        console.error("Invalid CSRF token:", csrfToken);
+        return;
+      }      
 
         try {
           const res = await fetch(`${BASE_URL}/chats/${chatId}/`, {
