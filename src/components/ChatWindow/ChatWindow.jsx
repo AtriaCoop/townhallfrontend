@@ -33,7 +33,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap }) {
       }, [chat.id]);      
 
     useEffect(() => {
-        const socketUrl = `ws://127.0.0.1:8000/ws/chats/${chat.id}/`;
+        const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
     
         socketRef.current = new WebSocket(socketUrl);
     

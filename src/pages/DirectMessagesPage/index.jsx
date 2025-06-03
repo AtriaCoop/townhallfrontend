@@ -9,6 +9,7 @@ import { getCookie } from "@/utils/authHelpers";
 export default function DirectMessagesPage({ currentUserId }) {
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
+    const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || 'ws://127.0.0.1:8000';
 
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
@@ -17,7 +18,7 @@ export default function DirectMessagesPage({ currentUserId }) {
     
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const userSocket = new WebSocket(`ws://127.0.0.1:8000/ws/users/${userData.id}/`);
+        const userSocket = new WebSocket(`${WS_BASE_URL}/ws/users/${userData.id}/`);
     
         userSocket.onmessage = (e) => {
           const data = JSON.parse(e.data);
