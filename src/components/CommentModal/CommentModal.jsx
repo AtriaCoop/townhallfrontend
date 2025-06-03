@@ -116,7 +116,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
           {comments.map((comment, idx) => (
             <div className={styles.commentItem} key={idx}>
             <img
-              src={`${BASE_URL}${comment.user?.profile_image || '/assets/ProfileImage.jpg'}`}
+              src={comment.user?.profile_image || '/assets/ProfileImage.jpg'}
               alt="user"
               onError={(e) => {
                 e.target.onerror = null;
