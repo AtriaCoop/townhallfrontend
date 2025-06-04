@@ -14,7 +14,7 @@ export default function LikeModal({ onClose, liked_by = [], BASE_URL }) {
             liked_by.map(user => (
               <div key={user.id} className={styles.userItem}>
                 <img
-                  src={`${BASE_URL}${user.profile_image || '/assets/ProfileImage.jpg'}`}
+                  src={user.profile_image || '/assets/ProfileImage.jpg'}
                   alt="User"
                   onError={(e) => {
                     e.target.onerror = null;

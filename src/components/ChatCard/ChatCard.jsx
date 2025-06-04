@@ -1,6 +1,6 @@
 import styles from './ChatCard.module.scss';
 
-export default function ChatCard({ name, title, time, imageSrc }) {
+export default function ChatCard({ name, title, time, imageSrc, onDelete }) {
     return (
         <div className={styles.card}>
             <img src={imageSrc} alt={name} className={styles.profilePic} />
@@ -10,7 +10,9 @@ export default function ChatCard({ name, title, time, imageSrc }) {
                 <p className={styles.time}>{time}</p>
             </div>
 
-            <button className={styles.button}>Delete Conversation</button>
+            <button className={styles.button} onClick={onDelete}>
+                Delete Conversation
+            </button>
         </div>
     );
 }

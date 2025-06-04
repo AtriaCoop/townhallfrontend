@@ -17,20 +17,6 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 🧠 GET CSRF COOKIE ON LOAD
-  useEffect(() => {
-    fetch(`${BASE_URL}/auth/csrf/`, {
-      method: "GET",
-      credentials: "include",
-      mode: "cors",
-      headers: {
-        Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
-      },
-    })
-      .then(() => console.log("CSRF cookie set"))
-      .catch(err => console.error("CSRF cookie failed", err));
-  }, []);
-
   const handleChange = (e) => {
     setError('');
     setFormData(prev => ({

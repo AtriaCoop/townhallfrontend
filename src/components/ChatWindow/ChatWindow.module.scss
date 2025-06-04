@@ -1,0 +1,76 @@
+.chatWindow {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 400px;
+    height: 500px;
+    background: #fff;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .closeButton {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  .messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  
+  .messageIncoming {
+    background: #eee;
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    max-width: 75%;
+  }
+  
+  .messageOutgoing {
+    background: #cce5ff;
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    max-width: 75%;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+  
+  .inputArea {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+  }
+  
+  .inputArea input {
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+  }
+  
+  .inputArea button {
+    padding: 8px 16px;
+  }
+  
