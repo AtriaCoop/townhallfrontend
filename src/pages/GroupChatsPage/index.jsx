@@ -78,7 +78,7 @@ export default function GroupChatsPage() {
                     placeholder="Enter message"
                     />
                     <button className={styles.sendButton}>
-                        <img src="/assets/send.svg" alt="Send" />
+                        <img src="/assets/send.png" alt="Send" />
                     </button>
                 </div>
             </div>
