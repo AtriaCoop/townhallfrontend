@@ -95,7 +95,7 @@ const handleLogIn = async (event) => {
     <div className={styles.container}>
       <div className={styles.logoContainer}>
         <img src="/assets/VFJC.png" alt="Vancouver Food Justice Coalition" className={styles.vfjcLogo} />
-        <img src="/assets/atria.png" alt="Atria" className={styles.atriaLogo} />
+        <img src="/assets/atriaLogo.png" alt="Atria" className={styles.atriaLogo} />
       </div>
 
       <div className={styles.card}>

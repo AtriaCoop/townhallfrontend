@@ -11,7 +11,7 @@
       @include laptop {
           flex-direction: row-reverse;
           justify-content: center;
-          gap: 8rem;
+          gap: 4rem;
           position: relative;
       }
     }
@@ -30,14 +30,10 @@
       @include laptop {
         max-width: 400px;
       }
-
-      @include desktop {
-        max-width: 800px;
-      }
     }
   
     .atriaLogo {
-      max-width: 80px;
+      max-width: 120px;
       height: auto;
       margin-top: 3rem;
 
