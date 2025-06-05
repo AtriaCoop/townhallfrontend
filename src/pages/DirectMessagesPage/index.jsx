@@ -10,6 +10,7 @@ export default function DirectMessagesPage({ currentUserId }) {
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || 'ws://127.0.0.1:8000';
+    const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
 
     const [csrfToken, setCsrfToken] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -66,7 +67,12 @@ export default function DirectMessagesPage({ currentUserId }) {
               ...chat,
               name: otherUser?.full_name || 'Unknown',
               title: otherUser?.title || 'VFJC Member',
-              imageSrc: otherUser?.profile_image || '/assets/ProfileImage.jpg',
+              imageSrc: otherUser?.profile_image
+              ? otherUser.profile_image.startsWith('http')
+                ? otherUser.profile_image
+                : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
+                : '/assets/ProfileImage.jpg',            
+              time: new Date(chat.created_at).toLocaleString(),
             };
           });
       
@@ -86,11 +92,10 @@ export default function DirectMessagesPage({ currentUserId }) {
         }        
       
         // Check if chat already exists with this user
-        const existingChat = chats.find(chat =>
-          chat.participants &&
-          chat.participants.includes(currentUserId) &&
-          chat.participants.includes(user.id)
-        );
+        const existingChat = chats.find(chat => {
+          const participantIds = chat.participants.map(p => p.id);
+          return participantIds.includes(currentUserId) && participantIds.includes(user.id);
+        });        
       
         if (existingChat) {
           setActiveChat(existingChat);
@@ -120,7 +125,7 @@ export default function DirectMessagesPage({ currentUserId }) {
           id: chatId,
           name: user.full_name,
           title: user.title || "VFJC Member",
-          time: "Just now",
+          time: new Date().toISOString(),
           imageSrc: user.profile_image || "/assets/ProfileImage.jpg",
           participants: [currentUserId, user.id], // ✅ Include participants for future checks
           messages: [],

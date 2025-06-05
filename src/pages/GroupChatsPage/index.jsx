@@ -44,11 +44,10 @@ export default function GroupChatsPage() {
             <div className={styles.chatWrapper}>
                 {/* Chat Header */}
                 <div className={styles.chatHeader}>
-                    <img className={styles.groupsSvg} src="/assets/groups.svg" alt="Groups" />
                     <h2 className={styles.chatTitle}>#ATRIA Questions and Support</h2>
                     <div className={styles.chatIcons}>
-                    <img className={styles.search} src="/assets/search.png" alt="Search" />
-                    <img className={styles.exit} src="/assets/exit.png" alt="Exit" />
+                        <img className={styles.search} src="/assets/search.png" alt="Search" />
+                        <img className={styles.exit} src="/assets/exit.png" alt="Exit" />
                     </div>
                 </div>
                                 {showModal && (
