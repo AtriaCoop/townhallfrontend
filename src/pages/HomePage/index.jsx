@@ -5,7 +5,7 @@ import PostModal from '@/components/PostModal/PostModal';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
-export default function HomePage() {
+export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [showModal, setShowModal] = useState(false);
@@ -70,7 +70,7 @@ export default function HomePage() {
 
     return (
         <div className={styles.container}>
-            <Navigation />
+            <Navigation hasNewDm={hasNewDm} />
 
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>

@@ -3,7 +3,7 @@ import Navigation from '@/components/Navigation/Navigation';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-export default function ProfilePage() {
+export default function ProfilePage({ hasNewDm }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -36,7 +36,7 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      <Navigation />
+      <Navigation hasNewDm={hasNewDm} />
 
       <div className={styles.profileContainer}>
         <img

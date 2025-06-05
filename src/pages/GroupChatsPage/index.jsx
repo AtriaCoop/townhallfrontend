@@ -5,7 +5,7 @@ import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
 import { useState } from 'react';
 
 
-export default function GroupChatsPage() {
+export default function GroupChatsPage({ hasNewDm }) {
 
     const [showModal, setShowModal] = useState(false);
 
@@ -28,7 +28,7 @@ export default function GroupChatsPage() {
 
     return (
         <div className={styles.container}>
-            <Navigation />
+            <Navigation hasNewDm={hasNewDm} />
 
             {/* Group Chats Sidebar */}
             <div className={styles.groupChatsSidebar}>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
 
 
-export default function MembersPage() {
+export default function MembersPage({ hasNewDm }) {
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const router = useRouter();
@@ -39,7 +39,7 @@ export default function MembersPage() {
 
     return (
         <div className={styles.container}>
-            <Navigation />
+            <Navigation hasNewDm={hasNewDm} />
 
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>

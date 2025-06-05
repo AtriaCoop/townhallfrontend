@@ -1,7 +1,7 @@
 import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
 
-export default function ChatWindow({ chat, onClose, setUnreadMap }) {
+export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm }) {
 
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState(chat.messages || []);
@@ -11,6 +11,17 @@ export default function ChatWindow({ chat, onClose, setUnreadMap }) {
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = userData.id; 
+
+    useEffect(() => {
+      if (!chat?.id) return;
+    
+      setUnreadMap(prev => {
+        const updated = { ...prev, [chat.id]: 0 };
+        const stillUnread = Object.entries(updated).some(([_, count]) => count > 0);
+        setHasNewDm(stillUnread);
+        return updated;
+      });
+    }, [chat?.id]);    
 
     useEffect(() => {
         const fetchMessages = async () => {

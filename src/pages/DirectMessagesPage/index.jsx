@@ -6,7 +6,7 @@ import ChatWindow from "@/components/ChatWindow/ChatWindow"
 import { useState, useEffect } from 'react';
 import { getCookie } from "@/utils/authHelpers";
 
-export default function DirectMessagesPage({ currentUserId }) {
+export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewDm, unreadMap, setUnreadMap }) {
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || 'ws://127.0.0.1:8000';
@@ -16,8 +16,6 @@ export default function DirectMessagesPage({ currentUserId }) {
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
     const [chats, setChats] = useState([]);
-    const [unreadMap, setUnreadMap] = useState({});
-    const [hasNewDm, setHasNewDm] = useState(false);
 
     useEffect(() => {
       const fetchCsrf = async () => {
@@ -30,31 +28,6 @@ export default function DirectMessagesPage({ currentUserId }) {
       };
       fetchCsrf();
     }, []);    
-    
-    useEffect(() => {
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const userSocket = new WebSocket(`${WS_BASE_URL}/ws/users/${userData.id}/`);
-    
-        userSocket.onmessage = (e) => {
-          const data = JSON.parse(e.data);
-          const { chat_id, message, sender } = data;
-    
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-
-          // Only trigger notification if the sender is NOT you
-          if (sender !== userData.id && activeChat?.id !== chat_id) {
-            setUnreadMap(prev => ({
-              ...prev,
-              [chat_id]: (prev[chat_id] || 0) + 1,
-            }));
-            setHasNewDm(true); // Show red dot in navbar
-          }          
-    
-          console.log("New global message:", message);
-        };
-    
-        return () => userSocket.close();
-      }, []);
 
       useEffect(() => {
         const fetchChats = async () => {
@@ -143,12 +116,14 @@ export default function DirectMessagesPage({ currentUserId }) {
 
       const handleChatClick = (chat) => {
         setActiveChat(chat);
-        setHasNewDm(false);
-        setUnreadMap(prev => ({
-          ...prev,
-          [chat.id]: 0,
-        }));
-      };      
+      
+        setUnreadMap(prev => {
+          const updatedMap = { ...prev, [chat.id]: 0 };
+          const anyUnread = Object.values(updatedMap).some(count => count > 0);
+          setHasNewDm(anyUnread);
+          return updatedMap;
+        });
+      };        
 
     const handleDeleteChat = async (chatId) => {
 
@@ -237,6 +212,7 @@ export default function DirectMessagesPage({ currentUserId }) {
                     chat={activeChat} 
                     onClose={() => setActiveChat(null)} 
                     setUnreadMap={setUnreadMap}
+                    setHasNewDm={setHasNewDm}
                 />
             )}
         </div>

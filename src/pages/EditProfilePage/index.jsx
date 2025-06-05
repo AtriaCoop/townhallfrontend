@@ -3,7 +3,7 @@ import Navigation from '@/components/Navigation/Navigation'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router';
 
-export default function EditProfilePage() {
+export default function EditProfilePage({ hasNewDm }) {
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
     const router = useRouter();
@@ -93,7 +93,7 @@ export default function EditProfilePage() {
 
     return (
         <div className={styles.container}>
-            <Navigation />
+            <Navigation hasNewDm={hasNewDm} />
 
             <div className={styles.editProfileContainer}>
                 <div className={styles.title}>
