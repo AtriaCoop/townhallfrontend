@@ -294,3 +294,17 @@
     border: 2px solid #ddd;
   }
 }
+
+// Styling for DM notfications
+.badge {
+  color: red;
+  font-size: 1.5rem;
+  margin-left: 6px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}

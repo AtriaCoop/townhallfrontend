@@ -17,6 +17,7 @@ export default function DirectMessagesPage({ currentUserId }) {
     const [activeChat, setActiveChat] = useState(null);
     const [chats, setChats] = useState([]);
     const [unreadMap, setUnreadMap] = useState({});
+    const [hasNewDm, setHasNewDm] = useState(false);
 
     useEffect(() => {
       const fetchCsrf = async () => {
@@ -38,12 +39,16 @@ export default function DirectMessagesPage({ currentUserId }) {
           const data = JSON.parse(e.data);
           const { chat_id, message, sender } = data;
     
-          if (activeChat?.id !== chat_id) {
+          const userData = JSON.parse(localStorage.getItem('user') || '{}');
+
+          // Only trigger notification if the sender is NOT you
+          if (sender !== userData.id && activeChat?.id !== chat_id) {
             setUnreadMap(prev => ({
               ...prev,
               [chat_id]: (prev[chat_id] || 0) + 1,
             }));
-          }
+            setHasNewDm(true); // Show red dot in navbar
+          }          
     
           console.log("New global message:", message);
         };
@@ -138,6 +143,7 @@ export default function DirectMessagesPage({ currentUserId }) {
 
       const handleChatClick = (chat) => {
         setActiveChat(chat);
+        setHasNewDm(false);
         setUnreadMap(prev => ({
           ...prev,
           [chat.id]: 0,
@@ -175,7 +181,7 @@ export default function DirectMessagesPage({ currentUserId }) {
 
     return (
         <div className={styles.container}>
-            <Navigation />
+            <Navigation hasNewDm={hasNewDm} />
 
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>
@@ -210,16 +216,12 @@ export default function DirectMessagesPage({ currentUserId }) {
                                     title={chat.title}
                                     time={chat.time}
                                     imageSrc={chat.imageSrc}
+                                    hasNotification={unreadMap[chat.id] > 0}
                                     onDelete={(e) => {
                                         e.stopPropagation();
                                         handleDeleteChat(chat.id);
                                     }}
                                 />
-                                {unreadMap[chat.id] > 0 && (
-                                    <span className={styles.unreadDot}>
-                                    {unreadMap[chat.id]}
-                                    </span>
-                                )}
                             </div>
                         </div>
                         ))

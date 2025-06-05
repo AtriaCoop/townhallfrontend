@@ -1,7 +1,7 @@
 import styles from './ChatCard.module.scss';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function ChatCard({ name, title, time, imageSrc, onDelete }) {
+export default function ChatCard({ name, title, time, imageSrc, onDelete, hasNotification}) {
 
     const formattedTime = formatDistanceToNow(new Date(time), { addSuffix: true });
 
@@ -17,13 +17,16 @@ export default function ChatCard({ name, title, time, imageSrc, onDelete }) {
             }}
             />
             <div className={styles.textInfo}>
-                <p className={styles.name}>{name}</p>
+                <p className={styles.name}>
+                    {name}
+                    {hasNotification && <span className={styles.badge} />}
+                </p>
                 <p className={styles.title}>{title}</p>
                 <p className={styles.time}>{formattedTime}</p>
             </div>
 
             <button className={styles.button} onClick={onDelete}>
-                Delete Conversation
+                <img src="/assets/garbage.png" alt="Garbage" />
             </button>
         </div>
     );
