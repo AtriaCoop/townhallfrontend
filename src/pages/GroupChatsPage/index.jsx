@@ -47,8 +47,8 @@ export default function GroupChatsPage() {
                     <img className={styles.groupsSvg} src="/assets/groups.svg" alt="Groups" />
                     <h2 className={styles.chatTitle}>#ATRIA Questions and Support</h2>
                     <div className={styles.chatIcons}>
-                    <img src="/assets/search.svg" alt="Search" />
-                    <img src="/assets/leaveGroup.svg" alt="leaveGroup" />
+                    <img className={styles.search} src="/assets/search.png" alt="Search" />
+                    <img className={styles.exit} src="/assets/exit.png" alt="Exit" />
                     </div>
                 </div>
                                 {showModal && (
@@ -78,7 +78,7 @@ export default function GroupChatsPage() {
                     placeholder="Enter message"
                     />
                     <button className={styles.sendButton}>
-                        <img src="/assets/send.svg" alt="Send" />
+                        <img src="/assets/sent.png" alt="Sent" />
                     </button>
                 </div>
             </div>
