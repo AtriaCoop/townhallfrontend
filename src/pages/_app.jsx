@@ -8,7 +8,6 @@ export default function App({ Component, pageProps }) {
   const [hasNewDm, setHasNewDm] = useState(false);
   const [unreadMap, setUnreadMap] = useState({});
 
-  // Fetch CSRF token on load
   useEffect(() => {
     fetch(`${BASE_URL}/auth/csrf/`, {
       method: 'GET',
@@ -17,24 +16,6 @@ export default function App({ Component, pageProps }) {
     }).catch((err) => console.error('CSRF Error:', err));
   }, []);
 
-  // Hydrate unreadMap from localStorage when app loads
-  useEffect(() => {
-    const storedMap = JSON.parse(localStorage.getItem('unreadMap') || '{}');
-    setUnreadMap(storedMap);
-
-    const anyUnread = Object.values(storedMap).some(count => count > 0);
-    setHasNewDm(anyUnread);
-  }, []);
-
-  // Persist unreadMap to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('unreadMap', JSON.stringify(unreadMap));
-
-    const anyUnread = Object.values(unreadMap).some(count => count > 0);
-    setHasNewDm(anyUnread);
-  }, [unreadMap]);
-
-  // Listen for incoming DMs via WebSocket
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || '{}');
     if (!user?.id) return;
@@ -45,6 +26,7 @@ export default function App({ Component, pageProps }) {
       const { chat_id, sender } = JSON.parse(e.data);
 
       if (sender !== user.id) {
+        setHasNewDm(true);
         setUnreadMap(prev => ({
           ...prev,
           [chat_id]: (prev[chat_id] || 0) + 1,
