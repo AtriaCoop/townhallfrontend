@@ -2,6 +2,7 @@ import styles from '@/pages/ProfilePage/ProfilePage.module.scss';
 import Navigation from '@/components/Navigation/Navigation';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function ProfilePage({ hasNewDm }) {
   const router = useRouter();
@@ -51,7 +52,10 @@ export default function ProfilePage({ hasNewDm }) {
         <span className={styles.name}>
           {profileData.full_name}
         </span>
-        <span className={styles.dateJoined}>Date Joined: 2 weeks ago (hardcoded)</span>
+        
+        <span className={styles.dateJoined}>
+          Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
+        </span>
 
         <div className={styles.profileInfo}>
           <span>Title: {profileData.title}</span>
