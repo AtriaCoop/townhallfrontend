@@ -34,9 +34,9 @@ export default function GroupChatsPage({ hasNewDm }) {
     
             const newMsg = {
                 id: Date.now(),
-                avatar: "/assets/evan.png", // Update later to match sender
+                avatar: "/assets/ProfileImage.jpg", // Update later to match sender
                 sender: data.sender === currentUserId ? "You" : `User ${data.sender}`,
-                organization: "Your Org",
+                organization: "Atria",
                 timestamp: "just now",
                 message: data.message,
             };
