@@ -16,6 +16,11 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
     const [showModal, setShowModal] = useState(false);
     const [activeChat, setActiveChat] = useState(null);
     const [chats, setChats] = useState([]);
+    const [searchUser, setSearchUser] = useState('');
+
+    const filteredChats = chats
+      .filter(chat => chat.name.toLowerCase().includes(searchUser.toLowerCase()))
+      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
     useEffect(() => {
       const fetchCsrf = async () => {
@@ -179,11 +184,17 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
                     />
                 )}
 
-                <input className={styles.searchBar} type="search" placeholder="Search By Name"/>
+                <input
+                  className={styles.searchBar}
+                  type="search"
+                  placeholder="Search By Name"
+                  value={searchUser}
+                  onChange={(e) => setSearchUser(e.target.value)}
+                />
 
                 <div className={styles.chatList}>
                     {chats.length > 0 ? (
-                        chats.map((chat, idx) => (
+                        filteredChats.map((chat, idx) => (
                         <div key={idx} onClick={() => handleChatClick(chat)}>
                             <div style={{ position: 'relative' }}>
                                 <ChatCard

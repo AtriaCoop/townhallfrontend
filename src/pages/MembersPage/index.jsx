@@ -22,7 +22,7 @@ export default function MembersPage({ hasNewDm }) {
       const nameA = `${a.full_name}`.toLowerCase();
       const nameB = `${b.full_name}`.toLowerCase();
       return nameA.localeCompare(nameB);
-    });  
+    });
 
     useEffect(() => {
         async function fetchMembers() {
