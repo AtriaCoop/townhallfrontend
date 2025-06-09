@@ -1,34 +1,23 @@
 import styles from './JoinGroupModal.module.scss';
 import { useRef, useState } from 'react';
 
-export default function Modal({
-  title,
-  buttonText = "Submit",
-  onClose,
-
-}) {
+export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
   const [text, setText] = useState('');
-  const [error, setError] = useState('');
 
+  const groups = [
+    { name: "atria-questions-and-support" },
+    { name: "city-food-budget-city-meeting" },
+    { name: "living-wage-community-food-sector-analysis" },
+    { name: "wg-climate-resilient-local-food-systems" },
+    { name: "wg-decolonization-and-indigenous-food-sovereignty" },
+    { name: "wg-food-as-a-human-right" },
+    { name: "wg-food-justice-as-a-public-health-priority" },
+    { name: "wg-sustainable-resourcing-for-community-food-systems" },
+  ];  
 
-   const groups = [
-  { name: "#ATRIA Questions and Support" },
-  { name: "#City Food Budget - City Meeting" },
-  { name: "#Living Wage Community Food Sector Analysis" },
-  { name: "#WG: Climate-Resilient Local Food Systems" },
-  { name: "#WG: Decolonization & Indigenous Food Sovereignty" },
-  { name: "#WG: Food as a Human Right" },
-  { name: "#WG: Food Justice as a Public Health Priority" },
-  { name: "#WG: Sustainable Resourcing for Community Food Systems" },
-];
-
-
-
-    const handleSubmit = async () => {
-      // Replace with chat-specific logic
-      console.log('Starting chat with selected user');
-      onClose();
-    };
+  const filteredGroups = groups.filter(group =>
+    group.name.toLowerCase().includes(text.toLowerCase())
+  );
 
   return (
     <div className={styles.modalOverlay}>
@@ -43,20 +32,19 @@ export default function Modal({
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        {error && <p className={styles.errorMessage}>{error}</p>}
+
         <div className={styles.userList}>
-          {groups.map((group, idx) => (
-            <div key={idx} className={styles.userItem}>
+          {filteredGroups.map((group, idx) => (
+            <div
+              key={idx}
+              className={styles.userItem}
+              onClick={() => onJoinGroup(group.name)}
+            >
               <div className={styles.userInfo}>
                 <h3>{group.name}</h3>
               </div>
             </div>
           ))}
-        </div>
-        <div className={styles.modalButton}>
-          <button className={styles.postButton} onClick={handleSubmit}>
-            {buttonText}
-          </button>
         </div>
       </div>
     </div>

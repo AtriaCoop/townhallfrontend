@@ -2,29 +2,127 @@ import Navigation from "@/components/Navigation/Navigation"
 import styles from '@/pages/GroupChatsPage/GroupChatsPage.module.scss'
 import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 
 export default function GroupChatsPage({ hasNewDm }) {
 
-    const [showModal, setShowModal] = useState(false);
+    const socketRef = useRef(null);
 
-    // Temporary static data (make dynamic later)
-    const messages = [
-        {
-        id: 1,
-        avatar: "/assets/evan.png",
-        sender: "Evan Sidwell",
-        organization: "Atria",
-        timestamp: "1 month ago",
-        message: "Welcome again everyone! If you have any questions about how to use the Atria tool, feel free to post those here. Or you can call me (6044177909) or email (atriacommunity@gmail.com). Have fun!"
-        },
-        // more messages...
-    ];
+    const [showModal, setShowModal] = useState(false);
+    const [joinedGroups, setJoinedGroups] = useState([]);
+    const [activeGroup, setActiveGroup] = useState('');
+    const [inputText, setInputText] = useState('');
+    const [groupMessages, setGroupMessages] = useState({});
+    const [currentUserId, setCurrentUserId] = useState(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const userData = JSON.parse(localStorage.getItem('user') || '{}');
+            setCurrentUserId(userData.id);
+        }
+    }, []);    
+
+    useEffect(() => {
+        if (!activeGroup || !currentUserId) return;
+    
+        const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/groups/${activeGroup}/`;
+        socketRef.current = new WebSocket(socketUrl);
+    
+        socketRef.current.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+    
+            const newMsg = {
+                id: Date.now(),
+                avatar: "/assets/evan.png", // Update later to match sender
+                sender: data.sender === currentUserId ? "You" : `User ${data.sender}`,
+                organization: "Your Org",
+                timestamp: "just now",
+                message: data.message,
+            };
+    
+            setGroupMessages(prev => {
+                const updated = { ...prev };
+                if (!updated[activeGroup]) updated[activeGroup] = [];
+                updated[activeGroup] = [...updated[activeGroup], newMsg];
+                return updated;
+            });
+        };
+    
+        socketRef.current.onclose = () => {
+            console.log(`WebSocket closed for group: ${activeGroup}`);
+        };
+    
+        return () => {
+            socketRef.current?.close();
+        };
+    }, [activeGroup]);
+    
+
+    // Load from localStorage on mount
+    useEffect(() => {
+        const storedGroups = JSON.parse(localStorage.getItem("joinedGroups") || "[]");
+        const storedActive = localStorage.getItem("activeGroup");
+
+        setJoinedGroups(storedGroups);
+        if (storedActive) setActiveGroup(storedActive);
+    }, []);
+
+    // Save joined groups to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem("joinedGroups", JSON.stringify(joinedGroups));
+    }, [joinedGroups]);
+
+    // Save active group to localStorage when it changes
+    useEffect(() => {
+        if (activeGroup) {
+        localStorage.setItem("activeGroup", activeGroup);
+        }
+    }, [activeGroup]);
+
+    const handleJoinGroup = (groupName) => {
+        if (!joinedGroups.includes(groupName)) {
+            setJoinedGroups(prev => [...prev, groupName]);
+        }
+        setActiveGroup(groupName);
+        setShowModal(false);
+    };
 
     const handleChatClick = () => {
         setShowModal(true);
     }
+
+    const handleLeaveGroup = () => {
+        if (!activeGroup) return;
+      
+        // Filter out the group we're leaving
+        const updatedGroups = joinedGroups.filter(group => group !== activeGroup);
+        setJoinedGroups(updatedGroups);
+      
+        // Clear the active group
+        setActiveGroup('');
+      
+        // Update localStorage directly (optional: redundant due to useEffect)
+        localStorage.setItem("joinedGroups", JSON.stringify(updatedGroups));
+        localStorage.removeItem("activeGroup");
+    };
+
+    const handleSendMessage = () => {
+        if (inputText.trim() === '') return;
+    
+        // Send through WebSocket if open
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && currentUserId) {
+            socketRef.current.send(
+                JSON.stringify({
+                    message: inputText,
+                    sender: currentUserId,
+                })
+            );
+            setInputText('');
+        } else {
+            console.warn("WebSocket is not open.");
+        }
+    };
 
     return (
         <div className={styles.container}>
@@ -36,47 +134,66 @@ export default function GroupChatsPage({ hasNewDm }) {
                 <button className={styles.joinButton} onClick={handleChatClick}>+ JOIN A GROUP</button>
 
                 <div className={styles.chatList}>
-                    <button className={styles.chatItem}>#ATRIA Questions and Support</button>
-                    <button className={styles.chatItem}>#Test</button>
+                    {joinedGroups.length === 0 ? (
+                        <p className={styles.noChats}>No groups joined yet...</p>
+                    ) : (
+                        joinedGroups.map((group, idx) => (
+                            <button 
+                                key={idx}
+                                className={styles.chatItem}
+                                onClick={() => setActiveGroup(group)}
+                            >
+                                {group}
+                            </button>
+                        ))
+                    )}
                 </div>
+
             </div>
 
             <div className={styles.chatWrapper}>
                 {/* Chat Header */}
                 <div className={styles.chatHeader}>
-                    <h2 className={styles.chatTitle}>#ATRIA Questions and Support</h2>
+                    <h2 className={styles.chatTitle}>
+                        {activeGroup}
+                    </h2>
                     <div className={styles.chatIcons}>
                         <img className={styles.search} src="/assets/search.png" alt="Search" />
-                        <img className={styles.exit} src="/assets/exit.png" alt="Exit" />
+                        <img className={styles.exit} src="/assets/exit.png" alt="Exit" onClick={handleLeaveGroup}/>
                     </div>
                 </div>
-                                {showModal && (
-                <JoinGroupModal 
-                    onClose={() => setShowModal(false)}
-                    title="Join Groups"
-                    buttonText="Join Group"
-                />
-            )}
+
+                {showModal && (
+                    <JoinGroupModal 
+                        onClose={() => setShowModal(false)}
+                        onJoinGroup={handleJoinGroup}
+                        title="Join Groups"
+                    />
+                )}
+
                 {/* Message Bubble */}
-                {messages.map(msg => (
+                {(groupMessages[activeGroup] || []).map((msg) => (
                     <MessageBubble
-                    key={msg.id}
-                    avatar={msg.avatar}
-                    sender={msg.sender}
-                    organization={msg.organization}
-                    timestamp={msg.timestamp}
-                    message={msg.message}
+                        key={msg.id}
+                        avatar={msg.avatar}
+                        sender={msg.sender}
+                        organization={msg.organization}
+                        timestamp={msg.timestamp}
+                        message={msg.message}
                     />
                 ))}
 
                 {/* Chat Input */}
                 <div className={styles.chatInputContainer}>
                     <input
-                    type="text"
-                    className={styles.chatInput}
-                    placeholder="Enter message"
+                        type="text"
+                        className={styles.chatInput}
+                        placeholder="Enter message"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     />
-                    <button className={styles.sendButton}>
+                    <button className={styles.sendButton} onClick={handleSendMessage}>
                         <img src="/assets/sent.png" alt="Sent" />
                     </button>
                 </div>

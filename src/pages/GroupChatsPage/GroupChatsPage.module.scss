@@ -30,7 +30,6 @@
 
 .chatTitle {
   font-size: 1.1rem;
-  font-weight: 600;
 }
 
 .chatIcons {
@@ -67,12 +66,12 @@
 }
 
 .chatInput {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 6px;
-  }
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+}
 
 .sendButton {
   background: none;
@@ -83,13 +82,13 @@
 // Group Chats Sidebar
 
 .groupsSvg {
-    @include tablet {
-        display: none;
-    }
+  @include tablet {
+      display: none;
+  }
 }
 
 .groupChatsSidebar {
-    display: none;
+  display: none;
   
     @include tablet {
       display: flex;
@@ -101,6 +100,7 @@
       border-right: 1px solid #ddd;
       padding: 1.5rem 1rem;
       z-index: 10;
+      width: 220px;
     }
   
     @include laptop {
@@ -113,38 +113,43 @@
     }
   }
   
-  .joinButton {
-    background-color: #24873d;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
+.joinButton {
+  background-color: #24873d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  font-weight: bold;
 
-    &:hover {
-      background-color: rgb(30, 100, 50);
-    }     
+  &:hover {
+    background-color: rgb(30, 100, 50);
+  }     
+}
+  
+.chatList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+  
+.chatItem {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background-color: #e9e9e9;
   }
-  
-  .chatList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .chatItem {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 0.5rem;
-    text-align: left;
-    font-size: 0.9rem;
-    cursor: pointer;
-  
-    &:hover {
-      background-color: #e9e9e9;
-    }
-  }
-  
+}
+
