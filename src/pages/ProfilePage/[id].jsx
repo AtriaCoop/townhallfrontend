@@ -35,6 +35,17 @@ export default function ProfilePage({ hasNewDm }) {
 
   if (!profileData) return null;
 
+  // User Logout
+  async function userLogout() {
+    await fetch(`${BASE_URL}/auth/logout/`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    localStorage.removeItem("user");
+    router.push('/');
+  }
+
   return (
     <div className={styles.container}>
       <Navigation hasNewDm={hasNewDm} />
@@ -52,7 +63,7 @@ export default function ProfilePage({ hasNewDm }) {
         <span className={styles.name}>
           {profileData.full_name}
         </span>
-        
+
         <span className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
         </span>
@@ -78,10 +89,7 @@ export default function ProfilePage({ hasNewDm }) {
             <div className={styles.signoutContainer}>
               <p>Time to go?</p>
               <button
-                onClick={() => {
-                  localStorage.removeItem('user');
-                  router.push('/')
-                }}
+                onClick={userLogout}
                 className={styles.signoutButton}
               >
                 SIGN OUT

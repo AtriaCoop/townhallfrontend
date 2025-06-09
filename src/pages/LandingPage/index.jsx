@@ -91,6 +91,15 @@ const handleLogIn = async (event) => {
   }
 };
 
+useEffect(() => {
+  if (!router.isReady) return;
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser) {
+    router.push("/HomePage");
+  }
+}, [router.isReady]);
+
   return (
     <div className={styles.container}>
       <div className={styles.logoContainer}>
