@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 export default function GroupChatsPage({ hasNewDm }) {
 
     const socketRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
     const [joinedGroups, setJoinedGroups] = useState([]);
@@ -21,7 +22,29 @@ export default function GroupChatsPage({ hasNewDm }) {
             const userData = JSON.parse(localStorage.getItem('user') || '{}');
             setCurrentUserId(userData.id);
         }
-    }, []);    
+    }, []);
+
+    useEffect(() => {
+        if (!activeGroup || !currentUserId) return;
+      
+        const fetchGroupMessages = async () => {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/${activeGroup}/messages/`);
+          const data = await res.json();
+      
+          const formatted = data.messages.map((msg) => ({
+            id: Date.now() + Math.random(),
+            avatar: "/assets/ProfileImage.jpg",
+            sender: msg.sender === currentUserId ? "You" : msg.full_name,
+            organization: "Atria",
+            timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+            message: msg.content,
+          }));
+      
+          setGroupMessages((prev) => ({ ...prev, [activeGroup]: formatted }));
+        };
+      
+        fetchGroupMessages();
+      }, [activeGroup, currentUserId]);      
 
     useEffect(() => {
         if (!activeGroup || !currentUserId) return;
@@ -124,6 +147,10 @@ export default function GroupChatsPage({ hasNewDm }) {
         }
     };
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, [groupMessages, activeGroup]);
+
     return (
         <div className={styles.container}>
             <Navigation hasNewDm={hasNewDm} />
@@ -172,16 +199,27 @@ export default function GroupChatsPage({ hasNewDm }) {
                 )}
 
                 {/* Message Bubble */}
+                <div className={styles.messageContainer}>
                 {(groupMessages[activeGroup] || []).map((msg) => (
+                    <div
+                    key={msg.id}
+                    className={
+                        msg.sender === "You"
+                        ? styles.messageOutgoing
+                        : styles.messageIncoming
+                    }
+                    >
                     <MessageBubble
-                        key={msg.id}
                         avatar={msg.avatar}
                         sender={msg.sender}
                         organization={msg.organization}
                         timestamp={msg.timestamp}
                         message={msg.message}
                     />
+                    </div>
                 ))}
+                <div ref={messagesEndRef} />
+                </div>
 
                 {/* Chat Input */}
                 <div className={styles.chatInputContainer}>
