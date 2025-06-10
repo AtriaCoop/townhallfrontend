@@ -99,7 +99,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
                     <div
                         key={idx}
                         className={
-                            msg.sender === currentUserId
+                            msg.sender?.id === currentUserId
                             ? styles.messageOutgoing
                             : styles.messageIncoming
                         }
