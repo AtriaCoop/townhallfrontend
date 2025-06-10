@@ -31,7 +31,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
       
             const formatted = data.messages.map((m) => ({
               text: m.content,
-              sender: m.user,
+              sender: m.user?.id,
             }));
       
             setMessages(formatted); // Replace with saved messages
@@ -99,7 +99,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
                     <div
                         key={idx}
                         className={
-                            msg.sender?.id === currentUserId
+                            msg.sender === currentUserId
                             ? styles.messageOutgoing
                             : styles.messageIncoming
                         }
