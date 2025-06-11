@@ -246,7 +246,7 @@ export default function GroupChatsPage({ hasNewDm }) {
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     />
                     <button className={styles.sendButton} onClick={handleSendMessage}>
-                        <img src="/assets/sent.png" alt="Sent" />
+                        <img src="/assets/send.png" alt="Send" />
                     </button>
                 </div>
             </div>
