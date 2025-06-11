@@ -18,6 +18,10 @@
 }
 
 .chatHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -164,6 +168,8 @@
   padding: 1rem;
   overflow-y: auto;
   flex-grow: 1;
+  max-height: calc(100vh - 0rem);
+  overflow-y: auto;
 }
 
 .messageOutgoing,

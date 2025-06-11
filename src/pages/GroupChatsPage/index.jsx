@@ -20,6 +20,15 @@ export default function GroupChatsPage({ hasNewDm }) {
     const [groupMessages, setGroupMessages] = useState({});
     const [currentUserId, setCurrentUserId] = useState(null);
 
+    // DISABLE GLOBAL SCROLL JUST FOR THIS PAGE
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+          document.body.style.overflow = '';
+        };
+      }, []);
+
     useEffect(() => {
         if (typeof window !== "undefined") {
             const userData = JSON.parse(localStorage.getItem('user') || '{}');
