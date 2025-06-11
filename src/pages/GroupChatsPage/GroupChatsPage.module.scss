@@ -48,6 +48,15 @@
   cursor: pointer;
 }
 
+.searchInput {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  max-width: 200px;
+  margin-right: 8px;
+}
+
 // Chat Input
 .chatInputContainer {
   position: fixed;

@@ -19,6 +19,8 @@ export default function GroupChatsPage({ hasNewDm }) {
     const [inputText, setInputText] = useState('');
     const [groupMessages, setGroupMessages] = useState({});
     const [currentUserId, setCurrentUserId] = useState(null);
+    const [searchMode, setSearchMode] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // DISABLE GLOBAL SCROLL JUST FOR THIS PAGE
     useEffect(() => {
@@ -199,8 +201,33 @@ export default function GroupChatsPage({ hasNewDm }) {
                         {activeGroup}
                     </h2>
                     <div className={styles.chatIcons}>
-                        <img className={styles.search} src="/assets/search.png" alt="Search" />
-                        <img className={styles.exit} src="/assets/exit.png" alt="Exit" onClick={handleLeaveGroup}/>
+                        {searchMode && (
+                            <input
+                            type="text"
+                            className={styles.searchInput}
+                            placeholder="Search messages..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                setSearchMode(false);
+                                setSearchQuery('');
+                                }
+                            }}
+                            />
+                        )}
+                        <img
+                            className={styles.search}
+                            src="/assets/search.png"
+                            alt="Search"
+                            onClick={() => setSearchMode((prev) => !prev)}
+                        />
+                        <img
+                            className={styles.exit}
+                            src="/assets/exit.png"
+                            alt="Exit"
+                            onClick={handleLeaveGroup}
+                        />
                     </div>
                 </div>
 
@@ -214,22 +241,26 @@ export default function GroupChatsPage({ hasNewDm }) {
 
                 {/* Message Bubble */}
                 <div className={styles.messageContainer}>
-                {(groupMessages[activeGroup] || []).map((msg) => (
-                    <div
-                    key={msg.id}
-                    className={
-                        msg.sender === "You"
-                        ? styles.messageOutgoing
-                        : styles.messageIncoming
-                    }
-                    >
-                    <MessageBubble
-                        avatar={msg.avatar}
-                        sender={msg.sender}
-                        organization={msg.organization}
-                        timestamp={msg.timestamp}
-                        message={msg.message}
-                    />
+                    {(groupMessages[activeGroup] || [])
+                    .filter(msg =>
+                        msg.message.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((msg) => (
+                        <div
+                        key={msg.id}
+                        className={
+                            msg.sender === "You"
+                            ? styles.messageOutgoing
+                            : styles.messageIncoming
+                        }
+                        >
+                        <MessageBubble
+                            avatar={msg.avatar}
+                            sender={msg.sender}
+                            organization={msg.organization}
+                            timestamp={msg.timestamp}
+                            message={msg.message}
+                        />
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
