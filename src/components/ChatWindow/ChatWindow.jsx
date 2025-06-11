@@ -50,7 +50,8 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     
         socketRef.current.onmessage = (e) => {
           const data = JSON.parse(e.data);
-          setMessages((prev) => [...prev, { text: data.message, sender: data.sender }]);
+          console.log("Incoming WebSocket data:", data);
+          setMessages((prev) => [...prev, { text: data.message, sender: data.sender_id, }]);
         };
     
         socketRef.current.onclose = () => {

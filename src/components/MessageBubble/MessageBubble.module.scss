@@ -1,30 +1,56 @@
 @import '@/styles/mixins.scss';
 
 .messageBubble {
-    display: flex;
-    gap: 0.75rem;
-    padding: 1rem;
-  }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  .sender {
-    margin: 0;
-    font-size: 0.95rem;
-  }
-  
-  .timestamp {
-    font-weight: 400;
-    color: #666;
-  }
-  
-  .messageText {
-    margin: 0.3rem 0 0 0;
-    line-height: 1.4;
-  }
-  
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fb;
+  border-radius: 12px;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #e2e6ea;
+}
+
+.messageContent {
+  flex: 1;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #555;
+}
+
+.sender {
+  font-weight: 600;
+  color: #222;
+}
+
+.organization {
+  font-weight: 400;
+  color: #777;
+}
+
+.timestamp {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.messageText {
+  font-size: 1rem;
+  color: #333;
+  margin: 0;
+  line-height: 1.5;
+}

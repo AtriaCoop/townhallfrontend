@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env HOST=127.0.0.1 next dev",
+    "dev": "HOST=127.0.0.1 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,12 +16,12 @@
     "react-dom": "19.0.0",
     "sass": "^1.86.2",
     "scss": "^0.2.4",
+    "uuid": "^11.1.0",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4"

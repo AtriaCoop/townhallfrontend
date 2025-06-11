@@ -3,9 +3,12 @@ import styles from '@/pages/GroupChatsPage/GroupChatsPage.module.scss'
 import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
 import { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 
 export default function GroupChatsPage({ hasNewDm }) {
+
+    const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
@@ -32,10 +35,10 @@ export default function GroupChatsPage({ hasNewDm }) {
           const data = await res.json();
       
           const formatted = data.messages.map((msg) => ({
-            id: Date.now() + Math.random(),
-            avatar: "/assets/ProfileImage.jpg",
+            id: uuidv4(),
+            avatar: msg.profile_image || "/assets/ProfileImage.jpg",
             sender: msg.sender === currentUserId ? "You" : msg.full_name,
-            organization: "Atria",
+            organization: msg.organization || "",
             timestamp: new Date(msg.timestamp).toLocaleTimeString(),
             message: msg.content,
           }));
@@ -54,15 +57,17 @@ export default function GroupChatsPage({ hasNewDm }) {
     
         socketRef.current.onmessage = (e) => {
             const data = JSON.parse(e.data);
+            console.log("Incoming WebSocket data:", data);
     
             const newMsg = {
-                id: Date.now(),
-                avatar: "/assets/ProfileImage.jpg", // Update later to match sender
-                sender: data.sender === currentUserId ? "You" : `User ${data.sender}`,
-                organization: "Atria",
+                id: uuidv4(),
+                sender_id: data.sender_id,
+                avatar: data.profile_image || "/assets/ProfileImage.jpg",
+                sender: data.sender_id === currentUserId ? "You" : data.full_name,
+                organization: data.organization || "Atria",
                 timestamp: "just now",
                 message: data.message,
-            };
+              };              
     
             setGroupMessages(prev => {
                 const updated = { ...prev };
