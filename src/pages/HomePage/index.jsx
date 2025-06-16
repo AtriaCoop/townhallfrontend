@@ -12,23 +12,36 @@ export default function HomePage({ hasNewDm }) {
     const [posts, setPosts] = useState([]);
     const [profileData, setProfileData] = useState(null)
 
-    useEffect (() => {
-        async function fetchProfile() {
-          try {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user || !user.id) {
-              console.error("No user found in localStorage.");
-              return;
-            }
-            const response = await fetch (`${BASE_URL}/user/${user.id}/`);
-            const data = await response.json();
-            setProfileData(data.user);
-          } catch(error) {
-            console.error("Error fetching profile data:", error);
+    useEffect(() => {
+      async function fetchProfile() {
+        try {
+          const user = JSON.parse(localStorage.getItem("user"));
+          if (!user || !user.id) {
+            localStorage.removeItem("user"); // Clear any broken data
+            window.location.href = "/";     // Redirect to landing/login page
+            return;
           }
+    
+          const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+    
+          if (!response.ok) {
+            localStorage.removeItem("user");
+            window.location.href = "/";
+            return;
+          }
+    
+          const data = await response.json();
+          setProfileData(data.user);
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          localStorage.removeItem("user");
+          window.location.href = "/";
         }
-        fetchProfile();
-      }, [])
+      }
+    
+      fetchProfile();
+    }, []);    
+
 
       useEffect(() => {
         async function fetchPosts() {
