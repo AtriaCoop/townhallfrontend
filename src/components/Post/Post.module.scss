@@ -81,6 +81,21 @@
   }
 }
 
+.imageGallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.galleryImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
 .postImage {
   width: 100%;
   max-height: 400px;

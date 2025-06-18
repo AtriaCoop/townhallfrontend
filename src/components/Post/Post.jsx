@@ -295,7 +295,23 @@ async function handleLikePost() {
       </div>
 
       <div className={styles.postContent}>
-        {content.map((p, i) => <p key={i}>{p}</p>)}
+
+        {/* Detected links and hyperlinks it */}
+        {content.map((p, i) => (
+          <p key={i}>
+            {p.split(/(\s+)/).map((part, j) => {
+              const isLink = /^https?:\/\/\S+$/.test(part);
+              return isLink ? (
+                <a key={j} href={part} target="_blank" rel="noopener noreferrer">
+                  {part}
+                </a>
+              ) : (
+                part
+              );
+            })}
+          </p>
+        ))}
+
         {links.map((link, i) => (
           <a href={link.href} target="_blank" key={i}>{link.text}</a>
         ))}

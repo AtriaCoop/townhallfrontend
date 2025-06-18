@@ -2,120 +2,154 @@
 
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.modalContent {
+.modalCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: white;
-  border: 2px solid #f9b233;
-  padding: 2rem 1.25rem;
-  border-radius: 12px;
-  width: 100%;
-  width: 400px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  gap: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 
-  h1 {
-    display: flex;
-    justify-content: center;
-  }
-
-  @include tablet {
-    width: 800px;
-  }
+.modalTitle {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
 .closeButton {
   position: absolute;
-  top: 1rem;
   right: 1rem;
-  background: transparent;
+  top: 1rem;
+  background: none;
   border: none;
   font-size: 1.5rem;
-  color: #666;
   cursor: pointer;
+  color: #888;
 
   &:hover {
-    color: black;
+    color: #000;
   }
 }
 
-.textInput {
-  color: rgb(66, 66, 66);
-  font-size: 16px;
-  border-radius: 4.5px;
+.textArea {
+  min-height: 120px;
+  padding: 0.75rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
-  padding: 8px 0px 96px 8px;
-  margin-bottom: 1rem;
+  border-radius: 8px;
+  resize: vertical;
 }
 
-.errorMessage {
-  color: red;
-  font-size: 0.875rem;
+.imageGrid {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-top: 1rem;
+}
+
+.imagePreviewContainer {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+}
+
+.previewImage {
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #eee;
+  }
+}
+
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
-.imageInput {
-  padding: 4rem;
-  text-align: center;
-  border: 1px solid #ddd;
-  color: rgb(255, 196, 0);
+.iconButton {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
   cursor: pointer;
-  margin-bottom: 2rem;
+  color: #555;
+
+  &:hover {
+    color: #111;
+  }
 }
 
-.modalButton {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.flexSpacer {
+  flex-grow: 1;
 }
 
 .postButton {
-  width: 100%;
   background-color: #24873d;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  cursor: pointer;
   font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
 
   &:hover {
-    background-color: rgb(30, 100, 50);
+    background-color: #1e6f35;
   }
 }
 
-.deleteButton {
-  width: 100%;
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-
-  &:hover {
-    background-color: #c9302c;
-  }
+.emojiWrapper {
+  position: relative;
 }
 
-.previewImage {
-  top: 0;
+.emojiPicker {
+  position: absolute;
+  top: 2.5rem;
   left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  z-index: 1;
-}  
+  z-index: 10;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.875rem;
+  text-align: center;
+}
