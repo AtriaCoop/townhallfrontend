@@ -61,7 +61,7 @@ const handleImageSelect = (e) => {
     const formData = new FormData();
     formData.append("user_id", profileData.id);
     formData.append("content", text);
-    images.forEach((img) => formData.append("images[]", img));
+    images.forEach((img) => formData.append("image", img));
 
     try {
       const res = await fetch(`${BASE_URL}/post/`, {
