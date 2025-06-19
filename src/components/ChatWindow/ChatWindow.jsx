@@ -24,6 +24,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
 
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState(chat.messages || []);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
@@ -136,8 +137,9 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
             <div className={styles.inputArea}>
             <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
             <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
-                    <FaImage />
+              <FaImage />
             </button>
+
             <input
               type="file"
               accept="image/*"
@@ -145,11 +147,26 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
               hidden
               onChange={(e) => {
                 const file = e.target.files[0];
-                if (file) {
-                  alert("You selected an image: " + file.name);
-                }
+                if (file) setSelectedImage(file);
               }}
             />
+
+            {selectedImage && (
+              <div className={styles.imagePreviewWrapper}>
+                <img
+                  src={URL.createObjectURL(selectedImage)}
+                  alt="preview"
+                  className={styles.previewImage}
+                />
+                <button
+                  className={styles.removePreviewButton}
+                  onClick={() => setSelectedImage(null)}
+                  type="button"
+                >
+                  ×
+                </button>
+              </div>
+            )}
                 <input
                     type="text"
                     placeholder="Type your message..."
