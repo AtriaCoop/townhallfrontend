@@ -47,6 +47,14 @@
     margin-bottom: 5px;
     border-radius: 8px;
     max-width: 75%;
+
+    img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      margin-top: 0.5rem;
+      border-radius: 8px;
+    }
   }
   
   .messageOutgoing {
@@ -57,6 +65,14 @@
     max-width: 75%;
     align-self: flex-end;
     margin-left: auto;
+
+    img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      margin-top: 0.5rem;
+      border-radius: 8px;
+    }
   }
   
   .inputArea {
