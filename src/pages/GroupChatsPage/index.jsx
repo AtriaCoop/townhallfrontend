@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import { FaImage } from 'react-icons/fa';
-import { getCookie } from '@/utils/authHelpers'; 
+import { getCookie, fetchCsrfToken } from '@/utils/authHelpers'; 
 
 export default function GroupChatsPage({ hasNewDm }) {
 
