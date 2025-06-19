@@ -154,13 +154,13 @@ export default function GroupChatsPage({ hasNewDm }) {
 
     const handleSendMessage = async () => {
         if (!inputText.trim() && !selectedImage) return;
+
+        const csrfToken = await fetchCsrfToken();
       
         const formData = new FormData();
         formData.append("group_name", activeGroup);
         formData.append("content", inputText);
         if (selectedImage) formData.append("image", selectedImage);
-
-        const csrfToken = getCookie("csrftoken");
       
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/messages/`, {
             method: "POST",
