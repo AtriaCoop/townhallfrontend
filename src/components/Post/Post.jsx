@@ -270,11 +270,6 @@ async function handleLikePost() {
             />
 
             <div className={styles.modalButton}>
-              <button className={styles.postButton} onClick={() => {
-                setShowEditModal(false);
-              }}>
-                Choose Photo
-              </button>
               <button className={styles.updateButton} onClick={handleUpdatePost}>
                 Update
               </button>
