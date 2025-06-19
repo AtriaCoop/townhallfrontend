@@ -4,7 +4,8 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
+import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
+import { FaImage } from 'react-icons/fa';
 
 export default function GroupChatsPage({ hasNewDm }) {
 
@@ -12,6 +13,7 @@ export default function GroupChatsPage({ hasNewDm }) {
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const postImageRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
     const [joinedGroups, setJoinedGroups] = useState([]);
@@ -259,7 +261,20 @@ export default function GroupChatsPage({ hasNewDm }) {
                             sender={msg.sender}
                             organization={msg.organization}
                             timestamp={msg.timestamp}
-                            message={msg.message}
+                            message={
+                                <p>
+                                {/* Detected links and hyperlinks it */}
+                                  {msg.message.split(/(\s+)/).map((part, i) =>
+                                    /^https?:\/\/\S+$/.test(part) ? (
+                                      <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                                        {part}
+                                      </a>
+                                    ) : (
+                                      part
+                                    )
+                                  )}
+                                </p>
+                              }
                         />
                     </div>
                 ))}
@@ -268,6 +283,22 @@ export default function GroupChatsPage({ hasNewDm }) {
 
                 {/* Chat Input */}
                 <div className={styles.chatInputContainer}>
+                <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
+                <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
+                    <FaImage />
+                </button>
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={postImageRef}
+                    hidden
+                    onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                        alert("You selected an image: " + file.name);
+                        }
+                    }}
+                />
                     <input
                         type="text"
                         className={styles.chatInput}

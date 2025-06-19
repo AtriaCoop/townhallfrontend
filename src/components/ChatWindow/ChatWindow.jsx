@@ -1,5 +1,24 @@
 import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
+import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
+import { FaImage } from 'react-icons/fa';
+
+{/* Detected links and hyperlinks it */}
+function formatMessageWithLinks(text) {
+  return (
+    <p>
+      {text.split(/(\s+)/).map((part, i) =>
+        /^https?:\/\/\S+$/.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+    </p>
+  );
+}
 
 export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm }) {
 
@@ -8,6 +27,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const postImageRef = useRef(null);
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = userData.id; 
@@ -105,7 +125,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
                             : styles.messageIncoming
                         }
                     >
-                    {msg.text}
+                    {formatMessageWithLinks(msg.text)}
                     </div>
                 ))}
                 
@@ -114,6 +134,22 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
             </div>
 
             <div className={styles.inputArea}>
+            <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
+            <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
+                    <FaImage />
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={postImageRef}
+              hidden
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  alert("You selected an image: " + file.name);
+                }
+              }}
+            />
                 <input
                     type="text"
                     placeholder="Type your message..."

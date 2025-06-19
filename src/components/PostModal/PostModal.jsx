@@ -1,8 +1,8 @@
 import styles from './PostModal.module.scss';
 import { useRef, useState, useEffect } from 'react';
-import EmojiPicker from 'emoji-picker-react';
 import { formatDistance } from 'date-fns';
-import { FaRegSmile, FaImage } from 'react-icons/fa';
+import { FaImage } from 'react-icons/fa';
+import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 
 export default function Modal({
   title,
@@ -16,11 +16,9 @@ export default function Modal({
   const [text, setText] = useState('');
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [images, setImages] = useState([]);
 
   const postImageRef = useRef(null);
-  const emojiRef = useRef(null);
 
 const handleImageSelect = (e) => {
   const files = Array.from(e.target.files);
@@ -32,25 +30,6 @@ const handleImageSelect = (e) => {
     alert("Please upload valid image files.");
   }
 };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (emojiRef.current && !emojiRef.current.contains(e.target)) {
-        setShowEmojiPicker(false);
-      }
-    };
-  
-    if (showEmojiPicker) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-  
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showEmojiPicker]);
-
-  const handleEmojiClick = (emojiData) => {
-    setText(prev => prev + emojiData.emoji);
-    setShowEmojiPicker(false);
-  };
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -127,16 +106,8 @@ const handleImageSelect = (e) => {
           </div>
         )}
 
-        {showEmojiPicker && (
-          <div ref={emojiRef} className={styles.emojiPicker}>
-            <EmojiPicker onEmojiClick={handleEmojiClick} />
-          </div>
-        )}
-
         <div className={styles.actionRow}>
-          <button className={styles.iconButton} onClick={() => setShowEmojiPicker(prev => !prev)}>
-            <FaRegSmile />
-          </button>
+          <EmojiPickerButton onSelect={(emoji) => setText(prev => prev + emoji)} />
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
             <FaImage />
           </button>

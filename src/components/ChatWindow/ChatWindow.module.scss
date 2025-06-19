@@ -67,11 +67,22 @@
   
   .inputArea input {
     flex: 1;
-    padding: 8px;
     margin-right: 10px;
   }
   
   .inputArea button {
-    padding: 8px 16px;
+    padding: 4px 8px;
+  }
+
+  .iconButton {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #555;
+  
+    &:hover {
+      color: #111;
+    }
   }
   
