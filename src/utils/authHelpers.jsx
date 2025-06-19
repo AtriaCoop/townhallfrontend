@@ -1,19 +1,16 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
 export function getCookie(name) {
-  if (!document || !document.cookie) return null;
-
-  const cookieString = document.cookie;
-  const cookies = cookieString.split(';').map(c => c.trim());
-
-  for (let cookie of cookies) {
-      if (cookie.startsWith(name + '=')) {
-          return decodeURIComponent(cookie.slice(name.length + 1));
-      }
-  }
-
-  return null;
-}
+    if (typeof document === 'undefined') return null;
+  
+    const cookies = document.cookie.split('; ');
+    for (let cookie of cookies) {
+      const [key, value] = cookie.split('=');
+      if (key === name) return decodeURIComponent(value);
+    }
+  
+    return null;
+  }  
 
 export const registerUser = async (formData) => {
   try {
