@@ -10,7 +10,17 @@ export function getCookie(name) {
     }
   
     return null;
-  }  
+  }
+
+
+export async function fetchCsrfToken() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/csrf/`, {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    return data.csrfToken;
+  }
+
 
 export const registerUser = async (formData) => {
   try {
