@@ -26,6 +26,9 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      react-icons:
+        specifier: ^5.5.0
+        version: 5.5.0(react@19.0.0)
       react-spinners:
         specifier: ^0.17.0
         version: 0.17.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
