@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
 import { registerUser, getCookie } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
-
+import Loader from '@/components/Loader/Loader';
+import { set } from 'date-fns';
 export default function LandingPage() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -27,9 +28,14 @@ export default function LandingPage() {
 
   const handleSignUp = async () => {
     const result = await registerUser(formData);
+    setLoading(true);
+
 
     if (result.error) {
       setMessage(result.error);
+      setLoading(false);
+
+      
     } else {
       setMessage(result.success);
       localStorage.setItem("user", JSON.stringify(result.data.user));
@@ -41,6 +47,7 @@ export default function LandingPage() {
 
 const handleLogIn = async (event) => {
   event.preventDefault();
+  setLoading(true);
   const { email, password } = formData;
 
   try {
@@ -87,6 +94,7 @@ const handleLogIn = async (event) => {
     }
   } catch (err) {
     setError("Login failed.");
+    setLoading(false);
     console.error("Login error:", err);
   }
 };
@@ -102,62 +110,68 @@ useEffect(() => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.logoContainer}>
-        <img src="/assets/VFJC.png" alt="Vancouver Food Justice Coalition" className={styles.vfjcLogo} />
-        <img src="/assets/atriaLogo.png" alt="Atria" className={styles.atriaLogo} />
-      </div>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className={styles.logoContainer}>
+            <img src="/assets/VFJC.png" alt="Vancouver Food Justice Coalition" className={styles.vfjcLogo} />
+            <img src="/assets/atriaLogo.png" alt="Atria" className={styles.atriaLogo} />
+          </div>
 
-      <div className={styles.card}>
-        <h1>{logIn ? 'Welcome Back!' : 'Welcome to Atria, the platform for coalition collaboration.'}</h1>
-        <p>{logIn ? 'Log Into Your Account' : 'This tool will help the Vancouver Food Justice Coalition communicate, stay organized, and accomplish more together.'}</p>
+          <div className={styles.card}>
+            <h1>{logIn ? 'Welcome Back!' : 'Welcome to Atria, the platform for coalition collaboration.'}</h1>
+            <p>{logIn ? 'Log Into Your Account' : 'This tool will help the Vancouver Food Justice Coalition communicate, stay organized, and accomplish more together.'}</p>
 
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter email..."
-          onChange={handleChange}
-        />
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter email..."
+              onChange={handleChange}
+            />
 
-        <label>Password</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter password..."
-          onChange={handleChange}
-        />
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password..."
+              onChange={handleChange}
+            />
 
-        <button className={styles.signupButton} onClick={logIn ? handleLogIn : handleSignUp}>
-          {logIn ? 'LOGIN' : 'SIGN UP'}
-        </button>
+            <button className={styles.signupButton} onClick={logIn ? handleLogIn : handleSignUp}>
+              {logIn ? 'LOGIN' : 'SIGN UP'}
+            </button>
 
-        {logIn && (
-          <p className={styles.forgotPassword}>
-            <a href="#">FORGOT YOUR PASSWORD?</a>
-          </p>
-        )}
+            {logIn && (
+              <p className={styles.forgotPassword}>
+                <a href="#">FORGOT YOUR PASSWORD?</a>
+              </p>
+            )}
 
-        {message && <p className={styles.message}>{message}</p>}
-        {logIn && error && <p className={styles.error}>{error}</p>}
+            {message && <p className={styles.message}>{message}</p>}
+            {logIn && error && <p className={styles.error}>{error}</p>}
 
-        <p className={styles.loginText}>
-          {logIn ? (
-            <>
-              Don't Have An Account?{' '}
-              <span onClick={() => { setLogIn(false); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
-                SIGN UP
-              </span>
-            </>
-          ) : (
-            <>
-              Already Have An Account?{' '}
-              <span onClick={() => { setLogIn(true); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
-                LOG IN
-              </span>
-            </>
-          )}
-        </p>
-      </div>
+            <p className={styles.loginText}>
+              {logIn ? (
+                <>
+                  Don't Have An Account?{' '}
+                  <span onClick={() => { setLogIn(false); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
+                    SIGN UP
+                  </span>
+                </>
+              ) : (
+                <>
+                  Already Have An Account?{' '}
+                  <span onClick={() => { setLogIn(true); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
+                    LOG IN
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
