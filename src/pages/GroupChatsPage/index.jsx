@@ -4,7 +4,9 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
+import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
+import { FaImage } from 'react-icons/fa';
+import { getCookie, fetchCsrfToken } from '@/utils/authHelpers'; 
 
 export default function GroupChatsPage({ hasNewDm }) {
 
@@ -12,6 +14,7 @@ export default function GroupChatsPage({ hasNewDm }) {
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const postImageRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
     const [joinedGroups, setJoinedGroups] = useState([]);
@@ -52,6 +55,7 @@ export default function GroupChatsPage({ hasNewDm }) {
             organization: msg.organization || "",
             timestamp: new Date(msg.timestamp).toLocaleTimeString(),
             message: msg.content,
+            image: msg.image || null,
           }));
       
           setGroupMessages((prev) => ({ ...prev, [activeGroup]: formatted }));
@@ -146,22 +150,50 @@ export default function GroupChatsPage({ hasNewDm }) {
         localStorage.removeItem("activeGroup");
     };
 
-    const handleSendMessage = () => {
-        if (inputText.trim() === '') return;
-    
-        // Send through WebSocket if open
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && currentUserId) {
-            socketRef.current.send(
-                JSON.stringify({
-                    message: inputText,
-                    sender: currentUserId,
-                })
-            );
-            setInputText('');
-        } else {
-            console.warn("WebSocket is not open.");
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const handleSendMessage = async () => {
+        if (!inputText.trim() && !selectedImage) return;
+
+        const csrfToken = await fetchCsrfToken();
+      
+        const formData = new FormData();
+        formData.append("group_name", activeGroup);
+        formData.append("content", inputText);
+        if (selectedImage) formData.append("image", selectedImage);
+      
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/messages/`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "X-CSRFToken": csrfToken,
+            },
+            body: formData,
+        });
+      
+        const data = await res.json();
+        if (data?.data) {
+          const newMsg = {
+            id: uuidv4(),
+            sender_id: data.data.sender,
+            avatar: data.data.profile_image || "/assets/ProfileImage.jpg",
+            sender: data.data.sender === currentUserId ? "You" : data.data.full_name,
+            organization: data.data.organization || "Atria",
+            timestamp: "just now",
+            message: data.data.content,
+            image: data.data.image,
+          };
+      
+          setGroupMessages((prev) => {
+            const updated = { ...prev };
+            updated[activeGroup] = [...(updated[activeGroup] || []), newMsg];
+            return updated;
+          });
         }
-    };
+      
+        setInputText('');
+        setSelectedImage(null);
+      };
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -255,11 +287,35 @@ export default function GroupChatsPage({ hasNewDm }) {
                         }
                         >
                         <MessageBubble
-                            avatar={msg.avatar}
-                            sender={msg.sender}
-                            organization={msg.organization}
-                            timestamp={msg.timestamp}
-                            message={msg.message}
+                        avatar={msg.avatar}
+                        sender={msg.sender}
+                        organization={msg.organization}
+                        timestamp={msg.timestamp}
+                        message={
+                            <div>
+                            {/* Text with hyperlinking */}
+                            <p>
+                                {msg.message.split(/(\s+)/).map((part, i) =>
+                                /^https?:\/\/\S+$/.test(part) ? (
+                                    <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                                    {part}
+                                    </a>
+                                ) : (
+                                    part
+                                )
+                                )}
+                            </p>
+
+                            {/* Conditionally show image */}
+                            {msg.image && (
+                                <img
+                                src={msg.image}
+                                alt="attachment"
+                                className={styles.chatImage}
+                                />
+                            )}
+                            </div>
+                        }
                         />
                     </div>
                 ))}
@@ -268,6 +324,38 @@ export default function GroupChatsPage({ hasNewDm }) {
 
                 {/* Chat Input */}
                 <div className={styles.chatInputContainer}>
+                <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
+                <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
+                    <FaImage />
+                </button>
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={postImageRef}
+                    hidden
+                    onChange={(e) => {
+                        const file = e.target.files[0];
+                        if(file) setSelectedImage(file);
+                    }}
+                />
+
+                {selectedImage && (
+                <div className={styles.imagePreviewWrapper}>
+                    <img
+                    src={URL.createObjectURL(selectedImage)}
+                    alt="preview"
+                    className={styles.previewImage}
+                    />
+                    <button
+                    className={styles.removePreviewButton}
+                    onClick={() => setSelectedImage(null)}
+                    type="button"
+                    >
+                    ×
+                    </button>
+                </div>
+                )}
+                
                     <input
                         type="text"
                         className={styles.chatInput}
@@ -281,7 +369,6 @@ export default function GroupChatsPage({ hasNewDm }) {
                     </button>
                 </div>
             </div>
-
         </div>
     )
 }
