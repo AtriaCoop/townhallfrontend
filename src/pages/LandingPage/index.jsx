@@ -27,8 +27,8 @@ export default function LandingPage() {
   };
 
   const handleSignUp = async () => {
+      setLoading(true);
     const result = await registerUser(formData);
-    setLoading(true);
 
 
     if (result.error) {
