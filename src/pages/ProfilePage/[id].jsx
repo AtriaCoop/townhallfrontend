@@ -35,7 +35,6 @@ export default function ProfilePage({ hasNewDm }) {
 
   if (!profileData) return null;
 
-  // User Logout
   async function userLogout() {
     await fetch(`${BASE_URL}/auth/logout/`, {
       method: "POST",
@@ -51,51 +50,52 @@ export default function ProfilePage({ hasNewDm }) {
       <Navigation hasNewDm={hasNewDm} />
 
       <div className={styles.profileContainer}>
+        <div className={styles.cardHeader}>Profile Overview</div>
+
         <img
           className={styles.profilePic}
           src={`${profileData.profile_image}`}
-          alt="Profile Image"
+          alt="Profile"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/assets/ProfileImage.jpg'
+            e.target.src = '/assets/ProfileImage.jpg';
           }}
         />
-        <span className={styles.name}>
-          {profileData.full_name}
-        </span>
 
-        <span className={styles.dateJoined}>
+        <div className={styles.name}>{profileData.full_name}</div>
+        <div className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
-        </span>
+        </div>
 
+        <div className={styles.sectionTitle}>👤 Details</div>
         <div className={styles.profileInfo}>
-          <span>Title: {profileData.title}</span>
-          <span>Primary Organization: {profileData.primary_organization}</span>
-          <span>Other Organizations: {profileData.other_organizations}</span>
-          <span>Other Networks: {profileData.other_networks}</span>
-          <span>About Me: {profileData.about_me}</span>
-          <span>My Skills & Interests: {profileData.skills_interests}</span>
+          <div><strong>Title:</strong> {profileData.title}</div>
+          <div><strong>Primary Organization:</strong> {profileData.primary_organization}</div>
+          <div><strong>Other Organizations:</strong> {profileData.other_organizations}</div>
+          <div><strong>Other Networks:</strong> {profileData.other_networks}</div>
+        </div>
+
+        <div className={styles.sectionTitle}>📝 About</div>
+        <div className={styles.aboutBox}>
+          <div><strong>About Me:</strong> {profileData.about_me}</div>
+          <div><strong>Skills & Interests:</strong> {profileData.skills_interests}</div>
         </div>
 
         {isCurrentUser && (
-          <>
+          <div className={styles.buttonGroup}>
             <button
               onClick={() => router.push('/EditProfilePage')}
               className={styles.editButton}
             >
               EDIT MY PROFILE
             </button>
-
-            <div className={styles.signoutContainer}>
-              <p>Time to go?</p>
-              <button
-                onClick={userLogout}
-                className={styles.signoutButton}
-              >
-                SIGN OUT
-              </button>
-            </div>
-          </>
+            <button
+              onClick={userLogout}
+              className={styles.signoutButton}
+            >
+              SIGN OUT
+            </button>
+          </div>
         )}
       </div>
     </div>

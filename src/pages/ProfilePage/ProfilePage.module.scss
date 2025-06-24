@@ -1,79 +1,114 @@
 @import '@/styles/mixins.scss';
 
 .container {
-
-    @include tablet {
-        margin-left: 89px;
-    }
-
-    @include laptop {
-        margin-left: 289px;
-    }
+  @include tablet { margin-left: 89px; }
+  @include laptop { margin-left: 289px; }
 }
 
 .profileContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
+  background: #ffffff;
+  margin: 1rem auto;
+  padding: 1rem 2rem 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  height: 100vh;
+}
+
+.cardHeader {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  align-self: flex-start;
 }
 
 .profilePic {
-    width: 149px;
-    height: 149px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ddd;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .name {
-    font-size: -webkit-xxx-large;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
 }
 
 .dateJoined {
-    color: #555;
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  width: 100%;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+  margin-top: 1rem;
 }
 
 .profileInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 2rem;
+  width: 100%;
+  font-size: 0.95rem;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+}
+
+.aboutBox {
+  width: 100%;
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.editButton, .signoutButton {
+  flex: 1 1 45%;
+  padding: 0.6rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
 }
 
 .editButton {
-    background-color: #24873d;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-
-    &:hover {
-      background-color: rgb(30, 100, 50);
-    }  
-}
-
-.signoutContainer {
-    background-color: rgba(0, 168, 152, 0.1);
-    border-radius: 12px;
-    padding: 1rem 4rem 1rem 4rem;
-    color: rgb(0, 75, 20);
+  background-color: #24873d;
+  color: #fff;
+  &:hover { background-color: rgb(30, 100, 50); }
 }
 
 .signoutButton {
-    background-color: #cc0829;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-
-    &:hover {
-      background-color: #88071c;
-    }  
+  background: #dc2626;
+  color: #fff;
+  &:hover { background: #b91c1c; }
 }
