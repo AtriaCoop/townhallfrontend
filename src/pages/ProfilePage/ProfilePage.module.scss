@@ -113,3 +113,42 @@
   color: #fff;
   &:hover { background: #b91c1c; }
 }
+
+.editButtonInline {
+  margin-top: 0.5rem;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background-color: #1d4ed8;
+  }
+}
+
+.signoutFloatingButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #dc2626;
+  color: #fff;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: #7b0303;
+  }
+}

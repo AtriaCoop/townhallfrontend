@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation/Navigation';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { FaEdit, FaSignOutAlt } from 'react-icons/fa';
 
 export default function ProfilePage({ hasNewDm }) {
   const router = useRouter();
@@ -62,6 +63,16 @@ export default function ProfilePage({ hasNewDm }) {
           }}
         />
 
+        {isCurrentUser && (
+          <button
+            onClick={() => router.push('/EditProfilePage')}
+            className={styles.editButtonInline}
+          >
+            <FaEdit style={{ marginRight: '0.4rem' }} />
+            Edit Profile
+          </button>
+        )}
+
         <div className={styles.name}>{profileData.full_name}</div>
         <div className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
@@ -82,21 +93,17 @@ export default function ProfilePage({ hasNewDm }) {
         </div>
 
         {isCurrentUser && (
-          <div className={styles.buttonGroup}>
-            <button
-              onClick={() => router.push('/EditProfilePage')}
-              className={styles.editButton}
-            >
-              EDIT MY PROFILE
-            </button>
+          <>
             <button
               onClick={userLogout}
-              className={styles.signoutButton}
+              className={styles.signoutFloatingButton}
             >
-              SIGN OUT
+              <FaSignOutAlt />
+              Sign Out
             </button>
-          </div>
+          </>
         )}
+
       </div>
     </div>
   );
