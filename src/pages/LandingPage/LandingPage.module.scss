@@ -8,6 +8,11 @@
       background-color: white;
       min-height: 100vh;
 
+      background-image: url('/assets/landingBackground.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
       @include laptop {
           flex-direction: row-reverse;
           justify-content: center;

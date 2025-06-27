@@ -14,9 +14,17 @@
 }
 
 .title {
-
     p {
         color: rgb(117, 117, 117);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    
+    img {
+        width: 85px;
     }
 }
 

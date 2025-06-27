@@ -88,7 +88,10 @@ export default function HomePage({ hasNewDm }) {
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>
                 <div className={styles.title}>
-                    <h1>News Feed</h1>
+                  <h1 className={styles.header}>
+                    News Feed
+                    <img src="/assets/atriaLogo.png" alt="Atria" />
+                  </h1>
                     <p>
                         A place to share general information and updates with members
                         of the Vancouver Food Justice Coalition.
