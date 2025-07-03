@@ -135,9 +135,22 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     };    
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages]);
+      const container = messagesEndRef.current?.parentElement;
+      if (!container) return;
     
+      const interval = setInterval(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 100); // hammer every 100ms
+    
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+      }, 2000); // stop after 2s
+    
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }, [messages]);
 
     return (
         <div className={styles.chatWindow}>

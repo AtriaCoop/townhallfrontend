@@ -10,7 +10,7 @@ export default function MessageBubble({ avatar, sender, organization, timestamp,
           {organization && <span className={styles.organization}> · {organization}</span>}
           <span className={styles.timestamp}>{timestamp}</span>
         </div>
-        <p className={styles.messageText}>{message}</p>
+        <div className={styles.messageText}>{message}</div>
       </div>
     </div>
   );

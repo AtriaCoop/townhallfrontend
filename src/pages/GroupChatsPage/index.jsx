@@ -195,9 +195,19 @@ export default function GroupChatsPage({ hasNewDm }) {
         setSelectedImage(null);
       };
 
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, [groupMessages, activeGroup]);
+      useEffect(() => {
+        const interval = setInterval(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        }, 100); // hammer it every 100ms
+      
+        // Stop after 2 seconds (enough time for images/rendering)
+        const timeout = setTimeout(() => clearInterval(interval), 2000);
+      
+        return () => {
+          clearInterval(interval);
+          clearTimeout(timeout);
+        };
+      }, [groupMessages, activeGroup]);    
 
     return (
         <div className={styles.container}>
