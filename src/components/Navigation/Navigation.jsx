@@ -1,5 +1,5 @@
 import styles from './Navigation.module.scss';
-import { Menu, User, Users, MessageSquare, Home } from 'lucide-react';
+import { Menu, LayoutDashboard, User, Users, MessageSquare, Home } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -55,6 +55,7 @@ export default function Navigation({ hasNewDm = false }) {
 
       <div className={styles.logos}>
         <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Home /><span className={styles.linkText}>Home</span></div>
+        <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><LayoutDashboard /><span className={styles.linkText}>Dashboard</span></div>
         <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
         <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
         <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
@@ -87,6 +88,7 @@ export default function Navigation({ hasNewDm = false }) {
 
           <div className={styles.logos}>
             <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Home /><span className={styles.linkText}>Home</span></div>
+            <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><LayoutDashboard /><span className={styles.linkText}>Dashboard</span></div>
             <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
             <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
             <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
