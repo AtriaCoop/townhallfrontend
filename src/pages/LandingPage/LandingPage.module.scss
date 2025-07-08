@@ -20,7 +20,7 @@
           position: relative;
       }
     }
-  
+
   .logoContainer {
     display: flex;
     flex-direction: column;
@@ -145,4 +145,38 @@
       text-align: center;
     }
   }
-  
+
+.logoSequence {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.logoCluster {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.redLogo,
+.yellowLogo,
+.blueLogo {
+  position: absolute;
+  width: 100px;
+  height: auto;
+  animation: popIn 0.3s ease-in-out;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -3,114 +3,130 @@ import styles from './LandingPage.module.scss';
 import { registerUser, getCookie } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 import Loader from '@/components/Loader/Loader';
-import { set } from 'date-fns';
+
 export default function LandingPage() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
-  console.log("BASE_URL:", BASE_URL);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const [logIn, setLogIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Logo animation
+  const [visibleLogos, setVisibleLogos] = useState([]);
+  const [showAuthUI, setShowAuthUI] = useState(false);
+
+  useEffect(() => {
+    const logoSequence = [
+      { src: "/assets/redLogo.png", delay: 500 },
+      { src: "/assets/yellowLogo.png", delay: 1250 },
+      { src: "/assets/blueLogo.png", delay: 2000 },
+    ];
+
+    logoSequence.forEach((logo) => {
+      setTimeout(() => {
+        setVisibleLogos((prev) => [...prev, logo.src]);
+      }, logo.delay);
+    });
+
+    const timeout = setTimeout(() => {
+      setShowAuthUI(true);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   const handleChange = (e) => {
     setError('');
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSignUp = async () => {
-      setLoading(true);
+    setLoading(true);
     const result = await registerUser(formData);
-
-
     if (result.error) {
       setMessage(result.error);
       setLoading(false);
-
-      
     } else {
       setMessage(result.success);
       localStorage.setItem("user", JSON.stringify(result.data.user));
-      setTimeout(() => {
-        router.push('/SetUpPage');
-      }, 1000);
+      setTimeout(() => router.push('/SetUpPage'), 1000);
     }
   };
 
-const handleLogIn = async (event) => {
-  event.preventDefault();
-  setLoading(true);
-  const { email, password } = formData;
+  const handleLogIn = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    const { email, password } = formData;
 
-  try {
-    // 🧠 STEP 1: Fetch CSRF token directly from JSON
-    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    try {
+      const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
+        method: "GET",
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
 
-    const csrfData = await csrfRes.json();
-    const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
+      const csrfData = await csrfRes.json();
+      const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
 
-    console.log("Logging in with CSRF:", csrfToken);
+      const response = await fetch(`${BASE_URL}/auth/login/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // 🧠 STEP 2: Send login request with CSRF token
-    const response = await fetch(`${BASE_URL}/auth/login/`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-      },
-      body: JSON.stringify({ email, password }),
-    });
+      const contentType = response.headers.get("content-type");
+      if (!contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        setError("Unexpected server error.");
+        return;
+      }
 
-    const contentType = response.headers.get("content-type");
-    if (!contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("Non-JSON response:", text); // prevent crash on HTML error
-      setError("Unexpected server error.");
-      return;
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/HomePage");
+      } else {
+        setError(data.error || "Invalid email or password");
+      }
+    } catch (err) {
+      setError("Login failed.");
+      setLoading(false);
+      console.error("Login error:", err);
     }
+  };
 
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/HomePage");
-    } else {
-      setError(data.error || "Invalid email or password");
-    }
-  } catch (err) {
-    setError("Login failed.");
-    setLoading(false);
-    console.error("Login error:", err);
-  }
-};
-
-useEffect(() => {
-  if (!router.isReady) return;
-
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (storedUser) {
-    router.push("/HomePage");
-  }
-}, [router.isReady]);
+  useEffect(() => {
+    if (!router.isReady) return;
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) router.push("/HomePage");
+  }, [router.isReady]);
 
   return (
     <div className={styles.container}>
-      {loading ? (
+      {!showAuthUI ? (
+        <div className={styles.logoSequence}>
+          <div className={styles.logoCluster}>
+            {visibleLogos.includes("/assets/redLogo.png") && (
+              <img src="/assets/redLogo.png" className={styles.redLogo} alt="Red" />
+            )}
+            {visibleLogos.includes("/assets/yellowLogo.png") && (
+              <img src="/assets/yellowLogo.png" className={styles.yellowLogo} alt="Yellow" />
+            )}
+            {visibleLogos.includes("/assets/blueLogo.png") && (
+              <img src="/assets/blueLogo.png" className={styles.blueLogo} alt="Blue" />
+            )}
+          </div>
+        </div>
+      ) : loading ? (
         <Loader />
       ) : (
         <>
@@ -124,20 +140,10 @@ useEffect(() => {
             <p>{logIn ? 'Log Into Your Account' : 'This tool will help the Vancouver Food Justice Coalition communicate, stay organized, and accomplish more together.'}</p>
 
             <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter email..."
-              onChange={handleChange}
-            />
+            <input type="email" name="email" placeholder="Enter email..." onChange={handleChange} />
 
             <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter password..."
-              onChange={handleChange}
-            />
+            <input type="password" name="password" placeholder="Enter password..." onChange={handleChange} />
 
             <button className={styles.signupButton} onClick={logIn ? handleLogIn : handleSignUp}>
               {logIn ? 'LOGIN' : 'SIGN UP'}
@@ -154,19 +160,9 @@ useEffect(() => {
 
             <p className={styles.loginText}>
               {logIn ? (
-                <>
-                  Don't Have An Account?{' '}
-                  <span onClick={() => { setLogIn(false); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
-                    SIGN UP
-                  </span>
-                </>
+                <>Don't Have An Account? <span onClick={() => { setLogIn(false); setError(''); setMessage(''); }}>SIGN UP</span></>
               ) : (
-                <>
-                  Already Have An Account?{' '}
-                  <span onClick={() => { setLogIn(true); setError(''); setMessage(''); }} style={{ cursor : 'pointer' }}>
-                    LOG IN
-                  </span>
-                </>
+                <>Already Have An Account? <span onClick={() => { setLogIn(true); setError(''); setMessage(''); }}>LOG IN</span></>
               )}
             </p>
           </div>
