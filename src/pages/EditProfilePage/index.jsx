@@ -2,6 +2,7 @@ import styles from '@/pages/EditProfilePage/EditProfilePage.module.scss'
 import Navigation from '@/components/Navigation/Navigation'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router';
+import {Pencil} from 'lucide-react';
 
 export default function EditProfilePage({ hasNewDm }) {
 
@@ -53,13 +54,14 @@ export default function EditProfilePage({ hasNewDm }) {
 
     async function updateProfile() {
         const user = JSON.parse(localStorage.getItem("user"));
+        console.log(localStorage.getItem("user"))
         if (!user?.id) {
           console.error("No user ID found.");
           return;
         }
       
         const form = new FormData();
-      
+        
         form.append("full_name", formData.full_name);
         form.append("pronouns", formData.pronouns);
         form.append("title", formData.title);
@@ -102,13 +104,61 @@ export default function EditProfilePage({ hasNewDm }) {
                     </div>
                     <h1>Account Settings</h1>
                 </div>
-                <img className={styles.profilePic} src={`${profileData?.profile_image}`}
-                    alt="Profile Image"
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/assets/ProfileImage.jpg';
-                    }}
-                />
+
+                <div className={styles.profilePicBox}>
+                    <label htmlFor="profileImageUpload">
+                        <img className={styles.profilePic} 
+                        src={
+                        formData.profile_image instanceof File
+                            ? URL.createObjectURL(formData.profile_image)
+                            : `${profileData?.profile_image}`
+                        }
+                            alt="Profile Image"
+        
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = '/assets/ProfileImage.jpg';
+                            }}
+                        
+                            
+                            />
+                            <div className={styles.profilePicOverlay}>
+                                <Pencil className={styles.pencilIcon}/>
+                            </div>
+                    </label>
+                    <input
+                    id="profileImageUpload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
+                    />
+                    
+                </div>
+                {/*
+                <label className={styles.profileImageInput} htmlFor="profileImageUpload">
+                    <img
+                        src={
+                        formData.profile_image instanceof File
+                            ? URL.createObjectURL(formData.profile_image)
+                            : `${profileData?.profile_image}`
+                        }
+                        alt="Profile Image"
+                        title="Click to change"
+                        className={styles.clickableImage}
+                    />
+                    </label>
+                    <input
+                    id="profileImageUpload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
+                    />
+                
+                */}
+                
+
                 <h3 className={styles.name}>{profileData?.full_name}</h3>
             </div>
 
@@ -169,6 +219,7 @@ export default function EditProfilePage({ hasNewDm }) {
                             value={formData.skills_interests}
                             onChange={(e) => setFormData({...formData, skills_interests: e.target.value})}
                         />
+
                     <p>Profile Image</p>
                     <label className={styles.profileImageInput} htmlFor="profileImageUpload">
                     <img
@@ -189,7 +240,7 @@ export default function EditProfilePage({ hasNewDm }) {
                     style={{ display: 'none' }}
                     onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
                     />
-
+                    
                     <p>Profile Header</p>
                         <div className={styles.profileHeaderInput}>
                             <img src="/assets/test.png" alt="Profile Header" />

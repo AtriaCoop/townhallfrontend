@@ -33,6 +33,37 @@
   }
 }
 
+.profilePicBox{
+    position:relative;
+}
+
+
+.profilePicOverlay:hover{
+    background-color: rgba(0,0,0,0.3);
+}
+    
+.profilePicOverlay{
+    width: 100%;
+    height: 97.5%;
+    position: absolute;
+    top: 0;
+    text-align:center;
+    border-radius:120px;
+}
+
+.pencilIcon{
+    width: 30px;
+    height: 30px;
+    margin-top: 40%;
+    opacity:0;
+}
+
+.profilePicOverlay:hover .pencilIcon{
+    opacity: 1;
+    color:white;
+}
+
+
 .profilePic {
     width: 149px;
     height: 149px;
