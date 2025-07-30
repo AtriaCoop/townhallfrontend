@@ -61,7 +61,7 @@ export default function Navigation({ hasNewDm = false }) {
       </div>
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
-        <img src={`${profileData?.profile_image}`}
+        <img src={profileData?.profile_image || '/assets/ProfileImage.jpg'}
           alt="Profile"
           onError={(e) => {
             e.target.onerror = null;
@@ -94,7 +94,13 @@ export default function Navigation({ hasNewDm = false }) {
         </div>
 
         <div className={styles.modalProfile} onClick={() => router.push(`/ProfilePage/${profileData?.id}`)}>
-          <img src="/assets/test.png" alt="Profile" />
+          <img src={profileData?.profile_image || '/assets/ProfileImage.jpg'}
+            alt="Profile"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/assets/ProfileImage.jpg';
+            }}
+          />
           <span className={styles.modalProfileName}>
             {profileData ? (
               <div>{profileData.full_name}</div>

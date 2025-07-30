@@ -39,7 +39,14 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #ddd;
+    cursor: pointer;
 }
+
+.profilePic:hover {
+    box-shadow: 0 0 0 4px #4d90fe33;
+    opacity: 0.8;
+    transition: box-shadow 0.2s, opacity 0.2s;
+  }  
 
 .inputs {
     display: flex;
@@ -74,7 +81,6 @@
     text-align: center;
     border: 1px solid #ddd;
     color: rgb(255, 196, 0);;
-    cursor: pointer;
 
     img {
         width: 100%;
@@ -84,10 +90,6 @@
 
 .clickableImage {
   cursor: pointer;
-  transition: opacity 0.2s;
-}
-.clickableImage:hover {
-  opacity: 0.8;
 }
 
 .saveButton {
