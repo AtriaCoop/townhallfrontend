@@ -78,33 +78,18 @@ export default function EditProfilePage({ hasNewDm }) {
         }
       
         try {
-        //   const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
-        //     method: "PATCH",
-        //     body: form,
-        //   });
-      
-        //   const data = await response.json();
-        //   if (!response.ok) throw new Error(data.message || "Update failed");
-
-            const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
+          const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
             method: "PATCH",
             body: form,
-            credentials: 'include', // If backend uses sessions/cookies
-            // headers: Do NOT set Content-Type when using FormData
           });
-          let data;
-          try {
-            data = await response.json();
-          } catch (e) {
-            const text = await response.text();
-            throw new Error("Non-JSON response: " + text);
-          }
+      
+          const data = await response.json();
           if (!response.ok) throw new Error(data.message || "Update failed");
-           
-         } catch (err) {
-           console.error("Failed to update profile:", err);
-         }
-      }       
+          console.log("Profile updated", data);
+        } catch (err) {
+          console.error("Failed to update profile:", err);
+        }
+      }      
 
     return (
         <div className={styles.container}>
