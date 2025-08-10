@@ -28,6 +28,11 @@
     text-align: center;
     height: 40px;
     object-fit: contain;
+    cursor: pointer;
+  }
+
+  .logo:hover {
+    opacity: 0.7;
   }
 
   .logoSmall {
