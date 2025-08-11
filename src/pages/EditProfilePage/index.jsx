@@ -89,7 +89,7 @@ export default function EditProfilePage({ hasNewDm }) {
         } catch (err) {
           console.error("Failed to update profile:", err);
         }
-      }       
+      }      
 
     return (
         <div className={styles.container}>
@@ -102,13 +102,31 @@ export default function EditProfilePage({ hasNewDm }) {
                     </div>
                     <h1>Account Settings</h1>
                 </div>
-                <img className={styles.profilePic} src={`${profileData?.profile_image}`}
-                    alt="Profile Image"
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/assets/ProfileImage.jpg';
-                    }}
-                />
+                <label className={styles.profilePic} 
+                        htmlFor="profileImageUpload">
+                    <img className={styles.profilePic} 
+                        src={
+                            formData.profile_image instanceof File
+                                ? URL.createObjectURL(formData.profile_image)
+                                : profileData?.profile_image 
+                                    ? profileData.profile_image
+                                    : '/assets/ProfileImage.jpg'
+                            }
+                        alt="Profile Image"
+                        title="Click to change"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/assets/ProfileImage.jpg';
+                        }}
+                    />
+                </label>
+                <input
+                    id="profileImageUpload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
+                    />
                 <h3 className={styles.name}>{profileData?.full_name}</h3>
             </div>
 
@@ -169,37 +187,26 @@ export default function EditProfilePage({ hasNewDm }) {
                             value={formData.skills_interests}
                             onChange={(e) => setFormData({...formData, skills_interests: e.target.value})}
                         />
-                    <p>Profile Image</p>
-                    <label className={styles.profileImageInput} htmlFor="profileImageUpload">
-                    <img
-                        src={
-                        formData.profile_image instanceof File
-                            ? URL.createObjectURL(formData.profile_image)
-                            : `${profileData?.profile_image}`
-                        }
-                        alt="Profile Image"
-                        title="Click to change"
-                        className={styles.clickableImage}
-                    />
-                    </label>
-                    <input
-                    id="profileImageUpload"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
-                    />
 
                     <p>Profile Header</p>
                         <div className={styles.profileHeaderInput}>
-                            <img src="/assets/test.png" alt="Profile Header" />
-                        </div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setFormData({ ...formData, profile_header: e.target.files[0] })}
-                                style={{ display: 'none' }}
+                            <img
+                                src={
+                                formData.profile_header instanceof File
+                                    ? URL.createObjectURL(formData.profile_header)
+                                    : profileData?.profile_header
+                                }
+                                alt="Profile Header"
+                                title="Click to change"
+                                className={styles.clickableImage}
                             />
+                        </div>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setFormData({ ...formData, profile_header: e.target.files[0] })}
+                            style={{ display: 'none' }}
+                        />
 
                     <button
                         className={styles.saveButton}

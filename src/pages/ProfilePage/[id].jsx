@@ -55,7 +55,7 @@ export default function ProfilePage({ hasNewDm }) {
 
         <img
           className={styles.profilePic}
-          src={`${profileData.profile_image}`}
+          src={profileData.profile_image || '/assets/ProfileImage.jpg'}
           alt="Profile"
           onError={(e) => {
             e.target.onerror = null;
