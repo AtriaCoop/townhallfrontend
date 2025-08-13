@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 
 export default function Modal({
   title,
+  currUserId,
   buttonText = "Submit",
   onClose,
   onUserSelect,
@@ -17,7 +18,7 @@ export default function Modal({
 
   const filteredUsers = users
   .filter((user) =>
-  `${user.full_name}`.toLowerCase().includes(searchUsers.toLowerCase())
+  `${user.full_name}`.toLowerCase().includes(searchUsers.toLowerCase()) //&& user.id != currUserId
   )
   // users in alphabetical order
   .sort((a, b) => {
