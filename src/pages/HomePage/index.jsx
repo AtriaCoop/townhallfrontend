@@ -48,7 +48,17 @@ export default function HomePage({ hasNewDm }) {
           try {
             const res = await fetch(`${BASE_URL}/post/`);
             const data = await res.json();
-      
+
+            //Helper funciton to get user id from like_by list and compare it to current user
+            function userInLiked(list, curr_uid){
+              for (const user of list){
+                if(user.id == curr_uid){
+                  return true;
+                }
+              }
+              return false;
+            }
+
             const formattedPosts = data.posts.map((p) => ({
               id: p.id,
               userId: p.user.id,
@@ -61,11 +71,11 @@ export default function HomePage({ hasNewDm }) {
               links: [],
               likes: p.likes,
               liked_by: p.liked_by,
-              isLiked: false,
+              isLiked: userInLiked(p.liked_by,profileData.id),
               comments: p.comments,
             }))
             .reverse();
-      
+
             setPosts(formattedPosts);
           } catch (err) {
             console.error("Failed to fetch posts", err);
