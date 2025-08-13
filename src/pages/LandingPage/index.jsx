@@ -58,8 +58,12 @@ export default function LandingPage() {
 
   const handleLogIn = async (event) => {
     event.preventDefault();
-    setLoading(true);
     const { email, password } = formData;
+    if(email == "" || password == "") {
+      setMessage("Please fill in all fields.");
+      return;
+    }
+    setLoading(true);
 
     try {
       const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
