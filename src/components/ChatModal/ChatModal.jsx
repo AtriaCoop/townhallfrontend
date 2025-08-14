@@ -18,7 +18,7 @@ export default function Modal({
 
   const filteredUsers = users
   .filter((user) =>
-  `${user.full_name}`.toLowerCase().includes(searchUsers.toLowerCase()) //&& user.id != currUserId
+  `${user.full_name}`.toLowerCase().includes(searchUsers.toLowerCase()) && user.id != currUserId
   )
   // users in alphabetical order
   .sort((a, b) => {
