@@ -99,6 +99,7 @@ export default function LandingPage() {
         localStorage.setItem("user", JSON.stringify(data.user));
         router.push("/HomePage");
       } else {
+        setLoading(false);
         setError(data.error || "Invalid email or password");
       }
     } catch (err) {
