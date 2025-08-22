@@ -1,9 +1,10 @@
 import styles from './ChatCard.module.scss';
-import { formatDistanceToNow } from 'date-fns';
+import { parse, formatDistanceToNow } from 'date-fns';
+
 
 export default function ChatCard({ name, title, time, imageSrc, onDelete, hasNotification}) {
-
-    const formattedTime = formatDistanceToNow(new Date(time), { addSuffix: true });
+    const date = parse(time, "dd/MM/yyyy, HH:mm:ss", new Date());
+    const formattedTime = formatDistanceToNow(date, { addSuffix: true });
 
     return (
         <div className={styles.card}>
