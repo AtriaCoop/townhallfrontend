@@ -157,7 +157,7 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
         } catch (err) {
           console.error("Error deleting chat:", err);
         }
-      };      
+      };
 
     return (
         <div className={styles.container}>
