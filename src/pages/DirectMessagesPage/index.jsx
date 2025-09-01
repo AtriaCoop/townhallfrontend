@@ -34,36 +34,36 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
       fetchCsrf();
     }, []);    
 
-      useEffect(() => {
-        const fetchChats = async () => {
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-          const res = await fetch(`${BASE_URL}/chats/?user_id=${userData.id}`, {
-            credentials: 'include',
-          });
-          const data = await res.json();
-          const chatsFromServer = data?.data || [];
-      
-          // 🧠 Inject name/title/image from other user
-          const processedChats = chatsFromServer.map(chat => {
-            const otherUser = chat.participants.find(p => p.id !== userData.id);
-            return {
-              ...chat,
-              name: otherUser?.full_name || 'Unknown',
-              title: otherUser?.title || 'VFJC Member',
-              imageSrc: otherUser?.profile_image
-              ? otherUser.profile_image.startsWith('http')
-                ? otherUser.profile_image
-                : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
-                : '/assets/ProfileImage.jpg',            
-              time: new Date(chat.created_at).toLocaleString(),
-            };
-          });
-      
-          setChats(processedChats);
-        };
-      
-        fetchChats();
-      }, []);         
+    useEffect(() => {
+      const fetchChats = async () => {
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const res = await fetch(`${BASE_URL}/chats/?user_id=${userData.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        const chatsFromServer = data?.data || [];
+    
+        // 🧠 Inject name/title/image from other user
+        const processedChats = chatsFromServer.map(chat => {
+          const otherUser = chat.participants.find(p => p.id !== userData.id);
+          return {
+            ...chat,
+            name: otherUser?.full_name || 'Unknown',
+            title: otherUser?.title || 'VFJC Member',
+            imageSrc: otherUser?.profile_image
+            ? otherUser.profile_image.startsWith('http')
+              ? otherUser.profile_image
+              : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
+              : '/assets/ProfileImage.jpg',            
+            time: new Date(chat.created_at).toLocaleString(),
+          };
+        });
+    
+        setChats(processedChats);
+      };
+    
+      fetchChats();
+    }, []);         
 
     const handleStartChat = async (user) => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -178,6 +178,9 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
 
                 {showModal && (
                     <ChatModal 
+                        currUserId = {(() => {const userData = JSON.parse(localStorage.getItem('user'));
+                                      return userData.id ? userData.id : -1;
+                                     })()}
                         onClose={() => setShowModal(false)}
                         title="New Chat"
                         onUserSelect={handleStartChat}
