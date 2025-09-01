@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import { FaImage } from 'react-icons/fa';
 import { fetchCsrfToken } from '@/utils/authHelpers';
+import MessageModal from '@/components/MessageModal/MessageModal'
+import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
+
 
 {/* Detected links and hyperlinks it */}
 function formatMessageWithLinks(text) {
@@ -26,13 +29,27 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState(chat.messages || []);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [showMessageModal, setShowMessageModal] = useState(false);
+    const [showUpdateMessageModal, setShowUpdateMessageModal] = useState(false);
+    const [selectedMessage, setSelectedMessage] = useState(null);
+
+    const handleMessageClick = (msg) => {
+      setShowMessageModal(true);
+      console.log("msg: ", msg);
+      setSelectedMessage(msg);
+    };
+
+    const handleEditClick = () => {
+      setShowMessageModal(false);
+      setShowUpdateMessageModal(true);
+    };
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
     const postImageRef = useRef(null);
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    const currentUserId = userData.id; 
+    const currentUserId = userData.id;
 
     useEffect(() => {
       if (!chat?.id) return;
@@ -54,6 +71,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
             const formatted = data.messages.map((m) => ({
               text: m.content,
               sender: m.user?.id,
+              id: m.id
             }));
       
             setMessages(formatted); // Replace with saved messages
@@ -63,7 +81,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
         };
       
         fetchMessages();
-      }, [chat.id]);      
+      }, [chat.id]);
 
     useEffect(() => {
         const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
@@ -73,7 +91,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
         socketRef.current.onmessage = (e) => {
           const data = JSON.parse(e.data);
           console.log("Incoming WebSocket data:", data);
-          setMessages((prev) => [...prev, { text: data.message, sender: data.sender_id, }]);
+          setMessages((prev) => [...prev, { text: data.message, sender: data.sender_id, id: data.id }]);
         };
     
         socketRef.current.onclose = () => {
@@ -132,12 +150,11 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
       } else {
         console.error("Message send failed:", data.error);
       }
-    };    
+    };
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages]);
-    
+    }, [messages]);    
 
     return (
         <div className={styles.chatWindow}>
@@ -151,28 +168,52 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
             </div>
 
             <div className={styles.messages}>
-                {messages.map((msg, idx) => (
-                    <div
-                        key={idx}
-                        className={
-                            msg.sender === currentUserId
-                            ? styles.messageOutgoing
-                            : styles.messageIncoming
-                        }
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={
+                    msg.sender === currentUserId
+                      ? styles.messageOutgoing
+                      : styles.messageIncoming
+                  }
+                >
+                  <div className={styles.messageContent}>
+                    {msg.text.startsWith("<img") ? (
+                      <div dangerouslySetInnerHTML={{ __html: msg.text }} />
+                    ) : (
+                      formatMessageWithLinks(msg.text)
+                    )}
+
+                    {/* Three-dot button */}
+                    <button
+                      className={styles.optionsButton}
+                      onClick={() => handleMessageClick(msg)}
                     >
-                    <>
-                      {msg.text.startsWith("<img") ? (
-                        <div dangerouslySetInnerHTML={{ __html: msg.text }} />
-                      ) : (
-                        formatMessageWithLinks(msg.text)
-                      )}
-                  </>
-                    </div>
+                      ⋯
+                    </button>
+                  </div>
+                </div>
                 ))}
                 
                 {/* Scroll to bottom */}
                 <div ref={messagesEndRef} />
             </div>
+
+            {showMessageModal && (
+              <MessageModal
+                // {/* TODO: implement the delete message function */}
+                onEdit={handleEditClick}
+                onClose={() => setShowMessageModal(false)}
+              />
+            )}
+
+            {showUpdateMessageModal && (
+              <UpdateMessageModal
+                msg={selectedMessage}
+                onCancel={() => setShowUpdateMessageModal(false)}
+
+              />
+            )}
 
             <div className={styles.inputArea}>
             <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
