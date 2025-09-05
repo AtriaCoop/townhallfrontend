@@ -18,6 +18,29 @@
   gap: 1rem;
 }
 
+.toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1200;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.toastSuccess {
+  background: #e7f7ec;
+  color: #1b5e20;
+  border: 1px solid #b5e1c1;
+}
+
+.toastError {
+  background: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6cb;
+}
+
 .cardHeader {
   font-size: 1rem;
   font-weight: 700;

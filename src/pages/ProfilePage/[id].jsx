@@ -1,7 +1,7 @@
 import styles from '@/pages/ProfilePage/ProfilePage.module.scss';
 import Navigation from '@/components/Navigation/Navigation';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { FaEdit, FaSignOutAlt } from 'react-icons/fa';
 
@@ -12,6 +12,8 @@ export default function ProfilePage({ hasNewDm }) {
 
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', message: string }
+  const toastTimerRef = useRef(null);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -32,7 +34,28 @@ export default function ProfilePage({ hasNewDm }) {
     }
 
     fetchProfile();
+
+    // Check for deferred toast from previous page
+    try {
+      const queued = sessionStorage.getItem('toastAfterNav');
+      if (queued) {
+        const parsed = JSON.parse(queued);
+        setToast(parsed);
+        sessionStorage.removeItem('toastAfterNav');
+      }
+    } catch (e) {
+      // no-op
+    }
   }, [id, router.isReady]);
+
+  useEffect(() => {
+    if (!toast) return;
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 6000);
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, [toast]);
 
   if (!profileData) return null;
 
@@ -51,6 +74,11 @@ export default function ProfilePage({ hasNewDm }) {
       <Navigation hasNewDm={hasNewDm} />
 
       <div className={styles.profileContainer}>
+        {toast && (
+          <div className={`${styles.toast} ${toast.type === 'success' ? styles.toastSuccess : styles.toastError}`} role="status" aria-live="assertive">
+            {toast.message}
+          </div>
+        )}
         <div className={styles.cardHeader}>Profile Overview</div>
 
         <img
