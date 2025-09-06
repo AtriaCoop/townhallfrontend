@@ -12,6 +12,14 @@ export function getCookie(name) {
     return null;
   }
 
+export function validateEmail(email) {
+  const trimmedEmail = email.trim().toLowerCase();
+  const emailRegex = /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i;
+  const isValid = emailRegex.test(trimmedEmail);
+  
+  return isValid;
+}
+
 
 export async function fetchCsrfToken() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/csrf/`, {
@@ -24,6 +32,10 @@ export async function fetchCsrfToken() {
 
 export const registerUser = async (formData) => {
   try {
+    if (!validateEmail(formData.email)) {
+      return { error: "Please enter a valid email address." };
+    }
+
     const csrfToken = getCookie("csrftoken");
     console.log("CSRF Token being sent:", csrfToken);
 
