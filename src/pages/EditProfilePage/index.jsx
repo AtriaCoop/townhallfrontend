@@ -1,6 +1,6 @@
 import styles from '@/pages/EditProfilePage/EditProfilePage.module.scss'
 import Navigation from '@/components/Navigation/Navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router';
 
 export default function EditProfilePage({ hasNewDm }) {
@@ -22,6 +22,9 @@ export default function EditProfilePage({ hasNewDm }) {
         profile_image: null,
         profile_header: null,
     });
+    const [saveStatus, setSaveStatus] = useState(null); // 'success' | 'error' | null
+    const [saveMessage, setSaveMessage] = useState("");
+    const dismissTimerRef = useRef(null);
 
     const handleDeleteClick = () => {
         setShowModal(true);
@@ -55,7 +58,9 @@ export default function EditProfilePage({ hasNewDm }) {
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user?.id) {
           console.error("No user ID found.");
-          return;
+          setSaveStatus('error');
+          setSaveMessage('No user found. Please sign in again.');
+          return { ok: false, message: 'No user ID found' };
         }
       
         const form = new FormData();
@@ -84,12 +89,53 @@ export default function EditProfilePage({ hasNewDm }) {
           });
       
           const data = await response.json();
-          if (!response.ok) throw new Error(data.message || "Update failed");
+          if (!response.ok) {
+            // Use backend error message or create specific message based on status
+            let errorMessage = data.message || data.error || data.detail;
+            if (!errorMessage) {
+              switch (response.status) {
+                case 400: errorMessage = "Invalid data provided"; break;
+                case 401: errorMessage = "Please sign in again"; break;
+                case 403: errorMessage = "You don't have permission to update this profile"; break;
+                case 404: errorMessage = "Profile not found"; break;
+                case 500: errorMessage = "Server error occurred"; break;
+                default: errorMessage = `Update failed (${response.status})`;
+              }
+            }
+            throw new Error(errorMessage);
+          }
           console.log("Profile updated", data);
+          return { ok: true, message: data.message || 'Profile saved successfully.' };
         } catch (err) {
           console.error("Failed to update profile:", err);
+          return { ok: false, message: err?.message || 'Failed to save profile.' };
         }
       }      
+
+    useEffect(() => {
+        if (!saveStatus) return;
+        if (dismissTimerRef.current) {
+            clearTimeout(dismissTimerRef.current);
+        }
+        dismissTimerRef.current = setTimeout(() => {
+            setSaveStatus(null);
+            setSaveMessage("");
+        }, 3500);
+        return () => {
+            if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+        };
+    }, [saveStatus]);
+
+    function handleFieldChange(patch) {
+        setFormData({ ...formData, ...patch });
+        if (saveStatus) {
+            setSaveStatus(null);
+            setSaveMessage("");
+            if (dismissTimerRef.current) {
+                clearTimeout(dismissTimerRef.current);
+            }
+        }
+    }
 
     return (
         <div className={styles.container}>
@@ -102,6 +148,11 @@ export default function EditProfilePage({ hasNewDm }) {
                     </div>
                     <h1>Account Settings</h1>
                 </div>
+                {saveStatus && (
+                    <div className={`${styles.toast} ${saveStatus === 'success' ? styles.toastSuccess : styles.toastError}`} role="status" aria-live="assertive">
+                        {saveMessage}
+                    </div>
+                )}
                 <label className={styles.profilePic} 
                         htmlFor="profileImageUpload">
                     <img className={styles.profilePic} 
@@ -125,7 +176,7 @@ export default function EditProfilePage({ hasNewDm }) {
                     type="file"
                     accept="image/*"
                     style={{ display: 'none' }}
-                    onChange={(e) => setFormData({ ...formData, profile_image: e.target.files[0] })}
+                    onChange={(e) => handleFieldChange({ profile_image: e.target.files[0] })}
                     />
                 <h3 className={styles.name}>{profileData?.full_name}</h3>
             </div>
@@ -136,56 +187,56 @@ export default function EditProfilePage({ hasNewDm }) {
                             type="text"
                             placeholder='Enter full name...'
                             value={formData.full_name}
-                            onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                            onChange={(e) => handleFieldChange({ full_name: e.target.value })}
                         />
                     <p>Preferred Pronouns</p>
                         <input 
                             type="text"
                             placeholder='Share your pronouns (Optional)'
                             value={formData.pronouns}
-                            onChange={(e) => setFormData({...formData, pronouns: e.target.value})}
+                            onChange={(e) => handleFieldChange({ pronouns: e.target.value })}
                         />
                     <p>Title</p>
                         <input
                             type="text"
                             placeholder='Enter title...'
                             value={formData.title}
-                            onChange={(e) => setFormData({...formData, title: e.target.value})}
+                            onChange={(e) => handleFieldChange({ title: e.target.value })}
                         />
                     <p>Primary Organization</p>
                         <input
                             type="text"
                             placeholder='What is the main organization you work for?'
                             value={formData.primary_organization}
-                            onChange={(e) => setFormData({...formData, primary_organization: e.target.value})}
+                            onChange={(e) => handleFieldChange({ primary_organization: e.target.value })}
                         />
                     <p>Other Organizations</p>
                         <input
                             type="text"
                             placeholder='Enter other organizations you are a part of...'
                             value={formData.other_organizations}
-                            onChange={(e) => setFormData({...formData, other_organizations: e.target.value})}
+                            onChange={(e) => handleFieldChange({ other_organizations: e.target.value })}
                         />
                     <p>Other Networks</p>
                         <input
                             type="text"
                             placeholder='List any coalitions or networks you are connected to other than the VFJC.'
                             value={formData.other_networks}
-                            onChange={(e) => setFormData({...formData, other_networks: e.target.value})}
+                            onChange={(e) => handleFieldChange({ other_networks: e.target.value })}
                         />
                     <p>About Me</p>
                         <input
                             type="text"
                             placeholder='Tell us about yourself!'
                             value={formData.about_me}
-                            onChange={(e) => setFormData({...formData, about_me: e.target.value})}
+                            onChange={(e) => handleFieldChange({ about_me: e.target.value })}
                         />
                     <p>Skills & Interests</p>
                         <input
                             type="text"
                             placeholder='Enter any skills & interests that may benfeit the coalition.'
                             value={formData.skills_interests}
-                            onChange={(e) => setFormData({...formData, skills_interests: e.target.value})}
+                            onChange={(e) => handleFieldChange({ skills_interests: e.target.value })}
                         />
 
                     <p>Profile Header</p>
@@ -204,15 +255,27 @@ export default function EditProfilePage({ hasNewDm }) {
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={(e) => setFormData({ ...formData, profile_header: e.target.files[0] })}
+                            onChange={(e) => handleFieldChange({ profile_header: e.target.files[0] })}
                             style={{ display: 'none' }}
                         />
 
                     <button
                         className={styles.saveButton}
                         onClick={async () => {
-                            await updateProfile();
-                            router.push(`/ProfilePage/${profileData.id}`)
+                            const result = await updateProfile();
+                            if (result?.ok) {
+                                const message = result.message || 'Profile saved successfully.';
+                                console.log('✅ Success:', message);
+                                try {
+                                    sessionStorage.setItem('toastAfterNav', JSON.stringify({ type: 'success', message }));
+                                } catch (e) {}
+                                router.push(`/ProfilePage/${profileData.id}`)
+                            } else {
+                                const errorMessage = result?.message || 'Failed to save profile.';
+                                setSaveStatus('error');
+                                setSaveMessage(errorMessage);
+                                console.error('❌ Error:', errorMessage);
+                            }
                         }}>
                             SAVE
                     </button>
