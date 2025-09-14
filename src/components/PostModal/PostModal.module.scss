@@ -54,6 +54,19 @@
   resize: vertical;
 }
 
+.textAreaError {
+  min-height: 120px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid red;
+  border-radius: 8px;
+  resize: vertical;
+
+  &:focus {
+    outline: {color: red};
+  }  
+}
+
 .imageGrid {
   display: flex;
   gap: 1rem;
@@ -98,7 +111,6 @@
   }
 }
 
-
 .actionRow {
   display: flex;
   align-items: center;
@@ -141,4 +153,18 @@
   color: red;
   font-size: 0.875rem;
   text-align: center;
+}
+
+.characterCount {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: #737373; 
+}
+
+.characterCountError {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: red;
 }
