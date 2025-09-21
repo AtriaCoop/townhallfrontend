@@ -17,23 +17,29 @@ export default function Modal({
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [images, setImages] = useState([]);
+  const maxPostLen = 250;
 
   const postImageRef = useRef(null);
 
-const handleImageSelect = (e) => {
-  const files = Array.from(e.target.files);
-  const validImages = files.filter(file => file.type.startsWith("image/"));
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    const validImages = files.filter(file => file.type.startsWith("image/"));
 
-  if (validImages.length) {
-    setImages(prev => [...prev, ...validImages]);
-  } else {
-    alert("Please upload valid image files.");
-  }
-};
+    if (validImages.length) {
+      setImages(prev => [...prev, ...validImages]);
+    } else {
+      alert("Please upload valid image files.");
+    }
+  };
 
   const handleSubmit = async () => {
     if (!text.trim()) {
       setError("Post content is required.");
+      return;
+    }
+
+    if (text.length > maxPostLen) {
+      setError("Post content is over " + maxPostLen + " characters.");
       return;
     }
 
@@ -78,7 +84,7 @@ const handleImageSelect = (e) => {
         <h2 className={styles.modalTitle}>{title}</h2>
 
         <textarea
-          className={styles.textArea}
+          className={text.length > maxPostLen ? styles.textAreaError : styles.textArea}
           placeholder="What's on your mind?"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -111,6 +117,7 @@ const handleImageSelect = (e) => {
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
             <FaImage />
           </button>
+          <p className={text.length > maxPostLen ? styles.characterCountError: styles.characterCount}>{text.length}/{maxPostLen}</p>
           <input
             ref={postImageRef}
             type="file"
@@ -127,5 +134,5 @@ const handleImageSelect = (e) => {
         {error && <p className={styles.errorMessage}>{error}</p>}
       </div>
     </div>
-  );
+);
 }
