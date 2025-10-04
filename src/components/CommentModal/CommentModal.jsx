@@ -2,8 +2,6 @@ import styles from './CommentModal.module.scss';
 import { formatDistance, subDays } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
 import { useState } from 'react';
-import { ServerInsertedHTMLContext } from 'next/navigation';
-import { SERVER_PROPS_EXPORT_ERROR } from 'next/dist/lib/constants';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
   const [text, setText] = useState('');
