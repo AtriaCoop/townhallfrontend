@@ -124,6 +124,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             <button type="submit" className={styles.postButton}>POST</button>
           </div>
         </form>
+        {error && <p className={styles.errorMessage}>{error}</p>}
 
         {/* Show existing comments */}
         <div className={styles.commentList}>
@@ -162,7 +163,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
           </div>
           ))}
         </div>
-        {error && <p className={styles.errorMessage}>{error}</p>}
       </div>
       
     </div>
