@@ -37,6 +37,8 @@ export default function Post({
   const [likeModal, setLikeModal] = useState(false);
   const [liked, setLiked] = useState(isLiked);
   const [isMyOwnPost, setIsMyOwnPost] = useState(false)
+  const [reportResponse, setReportResponse] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
     // 🧠 GET CSRF COOKIE ON LOAD
     useEffect(() => {
@@ -198,15 +200,16 @@ async function handleLikePost() {
   // REPORT POST
   const handleReportPost = async () => {
 
+    // User should not be able to report their own post
     if (userId === currentUserId) return
 
     const reportData = {
       user_id : currentUserId,
       post_id : postId
     }
-    console.log('report data', reportData)
 
     try {
+      setIsLoading(true)
       const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
         method : 'POST',
         body : JSON.stringify(reportData),
@@ -214,18 +217,16 @@ async function handleLikePost() {
           "Content-type" : 'application/json'
         }
       })
-      console.log('response', response)
-
       const result = await response.json()
-      console.log(result)
 
-      if (!response.ok) {
-        throw new Error(result.message || "Unexpected error.");
-      }
+      // Set either success or error message
+      setReportResponse(result.message)
+
     } catch (err){
-      console.error("Error reporting post.",err)
+      console.error(err)
+      setReportResponse(err)      
     } finally {
-      setShowReportModal(false)
+      setIsLoading(false)
     }
   }
 
@@ -337,9 +338,20 @@ async function handleLikePost() {
         { showReportModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContentDelete}>
-              <button className={styles.closeButton} onClick={() => setShowReportModal(false)}>×</button>
-              <h1>Are you sure?</h1>
-              <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
+              <button className={styles.closeButton} onClick={() => {setReportResponse(''); setShowReportModal(false)}}>×</button>
+              { isLoading && (
+                <h1>Loading...</h1>
+              )}
+              { reportResponse ? (
+                <>
+                  <h1>{reportResponse}</h1>
+                </>
+              ) : (
+                <>
+                  <h1>Are you sure?</h1>
+                  <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
+                </>
+              ) }
             </div>
           </div>
         ) }
