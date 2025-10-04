@@ -1,12 +1,23 @@
 import styles from './CommentModal.module.scss';
 import { formatDistance, subDays } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
+import { useState } from 'react';
+import { ServerInsertedHTMLContext } from 'next/navigation';
+import { SERVER_PROPS_EXPORT_ERROR } from 'next/dist/lib/constants';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
+  const [text, setText] = useState('');
+  const [error, setError] = useState('');
+  const MAX_COMMENT_LEN = 250;
 
   async function handleSubmit(e) {
     e.preventDefault();
     const content = e.target.comment.value;
+
+    if (text.length > MAX_COMMENT_LEN) {
+      setError("Comment content is over " + MAX_COMMENT_LEN + " characters.");
+      return;
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/comment/`, {
@@ -31,6 +42,8 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             : post
         )
       );
+      setText('');
+      setError('');
 
       e.target.reset();
     } catch (err) {
@@ -102,9 +115,13 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             name="comment"
             type="text"
             placeholder="Enter Comment..."
-            className={styles.textInput}
+            className={text.length > MAX_COMMENT_LEN ? styles.textInputError: styles.textInput}
+            onChange={(e) => setText(e.target.value)}
             required
           />
+          <p className={text.length > MAX_COMMENT_LEN ? styles.characterCountError: styles.characterCount}>
+            {text.length}/{MAX_COMMENT_LEN}
+          </p>
           <div className={styles.modalButton}>
             <button type="submit" className={styles.postButton}>POST</button>
           </div>
@@ -144,9 +161,10 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
               </div>
             </div>
-          </div>          
+          </div>
           ))}
         </div>
+        {error && <p className={styles.errorMessage}>{error}</p>}
       </div>
       
     </div>
