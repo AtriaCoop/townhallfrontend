@@ -53,4 +53,15 @@
     background: none;
     margin-left: -1rem;
   }
-  
+
+.emptyFeed {
+  text-align: center;
+  color: #777;
+  padding: 40px 0;
+  font-size: 1.1rem;
+}
+
+.newsfeedLoader {
+    transform: scale(0.8);
+    transform-origin: center;
+}  

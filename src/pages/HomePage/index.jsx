@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation/Navigation'
 import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
 import PostModal from '@/components/PostModal/PostModal';
+import Loader from '@/components/Loader/Loader';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
@@ -9,6 +10,7 @@ export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
     const [profileData, setProfileData] = useState(null)
 
@@ -46,6 +48,7 @@ export default function HomePage({ hasNewDm }) {
       useEffect(() => {
         async function fetchPosts() {
           try {
+            setLoading(true);
             const res = await fetch(`${BASE_URL}/post/`);
             const data = await res.json();
 
@@ -75,10 +78,12 @@ export default function HomePage({ hasNewDm }) {
               comments: p.comments,
             }))
             .reverse();
-
+            
             setPosts(formattedPosts);
+            setLoading(false);
           } catch (err) {
             console.error("Failed to fetch posts", err);
+            setLoading(false);
           }
         }
       
@@ -109,6 +114,8 @@ export default function HomePage({ hasNewDm }) {
                 </div>
 
                 {/* Post component */}
+                {loading ? <div className={styles.newsfeedLoader}><Loader/></div> : null}
+                {!loading && posts.length < 1 ? <div className={styles.emptyFeed}><i>Your feed is empty</i></div> : null}
                 {posts.map((post) => (
                     <Post 
                         key={post.id}
