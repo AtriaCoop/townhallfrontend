@@ -3,7 +3,6 @@ import { formatDistance, subDays } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
 import { useState, useRef } from 'react';
 import { fetchMentions } from '@/api/user';
-import Image from 'next/image';
 import DynamicAvatar from '../DynamicAvatar/DynamicAvatar';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
