@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from './DynamicAvatar.module.scss'
-import Image from 'next/image'
 
 const DynamicAvatar = ({fullName, profileImage}) => {
     const colors = ["#F44336", "#39BF47", "#9C27B0", "#3F51B5", "#2196F3", "#009688", "#FF9800"]
@@ -22,7 +21,7 @@ const DynamicAvatar = ({fullName, profileImage}) => {
     <div className={styles.profilePlaceholder} style={{ '--bg-color': profileImage ? 'transparent' : color }}>
 
         { profileImage ? (
-            <Image
+            <img
                 src={profileImage}
                 alt='user profile image'
             />
