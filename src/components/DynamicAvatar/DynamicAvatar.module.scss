@@ -1,0 +1,14 @@
+@import '@/styles/mixins.scss';
+
+
+.profilePlaceholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    background-color: var(--bg-color, gray); // default to gray if not set
+  }
