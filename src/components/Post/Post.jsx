@@ -32,11 +32,15 @@ export default function Post({
   const [showOptions, setShowOptions] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false)
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
   const [commentModal, setCommentModal] = useState(false);
   const [likeModal, setLikeModal] = useState(false);
   const [liked, setLiked] = useState(isLiked);
+  const [isMyOwnPost, setIsMyOwnPost] = useState(false)
+  const [reportResponse, setReportResponse] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [showReactionPicker, setShowReactionPicker] = useState(false);
 
   // Can make this a separate file and import but I'm lazy (this is for testing)
@@ -61,7 +65,10 @@ export default function Post({
       })
         .then(() => console.log("CSRF cookie set"))
         .catch(err => console.error("CSRF cookie failed", err));
-    }, []);
+
+      // Set state if post is own post
+      setIsMyOwnPost( userId === currentUserId )
+    }, [userId, currentUserId]);
 
   // UPDATE POST
   async function handleUpdatePost() {
@@ -203,6 +210,39 @@ async function handleLikePost() {
     return img && img !== 'null' && img !== '';
   }
 
+  // REPORT POST
+  const handleReportPost = async () => {
+
+    // User should not be able to report their own post
+    if (userId === currentUserId) return
+
+    const reportData = {
+      user_id : currentUserId,
+      post_id : postId
+    }
+
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
+        method : 'POST',
+        body : JSON.stringify(reportData),
+        headers : {
+          "Content-type" : 'application/json'
+        }
+      })
+      const result = await response.json()
+
+      // Set either success or error message
+      setReportResponse(result.message)
+
+    } catch (err){
+      console.error(err)
+      setReportResponse(err)      
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleReactionClick = () => {
     setShowReactionPicker(prev => !prev);
   }
@@ -231,16 +271,22 @@ async function handleLikePost() {
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
         </div>
-        {userId === currentUserId && (
-          <div className={styles.moreOptions} onClick={handleOptionsClick}>
-            ⋯
-          </div>
-        )}
+        
+        <div className={styles.moreOptions} onClick={handleOptionsClick}>
+          ⋯
+        </div>
+       
         {/* Edit Post Modal */}
         {showOptions && (
           <div className={styles.optionsMenu} ref={optionsRef}>
-            <button onClick={() => setShowEditModal(true)}>Edit</button>
-            <button onClick={() => setShowDeleteModal(true)}>Delete</button>
+            { isMyOwnPost ? (
+              <>
+                <button onClick={() => setShowEditModal(true)}>Edit</button>
+                <button onClick={() => setShowDeleteModal(true)}>Delete</button>
+              </>
+            ) : (
+              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true) }>Report</button>
+            )}
           </div>
         )}
         {/* Show Edit Modal */}
@@ -310,6 +356,27 @@ async function handleLikePost() {
             </div>
           </div>
         )}
+        {/* Show Report Modal */}
+        { showReportModal && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContentDelete}>
+              <button className={styles.closeButton} onClick={() => {setReportResponse(''); setShowReportModal(false)}}>×</button>
+              { isLoading && (
+                <h1>Loading...</h1>
+              )}
+              { reportResponse ? (
+                <>
+                  <h1>{reportResponse}</h1>
+                </>
+              ) : (
+                <>
+                  <h1>Are you sure?</h1>
+                  <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
+                </>
+              ) }
+            </div>
+          </div>
+        ) }
       </div>
 
       <div className={styles.postContent}>
