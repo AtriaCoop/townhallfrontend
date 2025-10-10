@@ -10,7 +10,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const content = e.target.comment.value;
 
     if (text.length > MAX_COMMENT_LEN) {
       setError("Comment content is over " + MAX_COMMENT_LEN + " characters.");
@@ -24,7 +23,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         body: JSON.stringify({
           user: currentUserId,
           post: postId,
-          content: content,
+          content: text,
           created_at: new Date().toISOString(),
         }),
       });
@@ -43,7 +42,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
       setText('');
       setError('');
 
-      e.target.reset();
     } catch (err) {
       console.error("Failed to add comment:", err);
     }
@@ -115,6 +113,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             placeholder="Enter Comment..."
             className={text.length > MAX_COMMENT_LEN ? styles.textInputError: styles.textInput}
             onChange={(e) => setText(e.target.value)}
+            maxLength={MAX_COMMENT_LEN}
             required
           />
           <p className={text.length > MAX_COMMENT_LEN ? styles.characterCountError: styles.characterCount}>
