@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation/Navigation'
 import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
 import PostModal from '@/components/PostModal/PostModal';
+import Clock from '@/components/Clock/Clock';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
@@ -73,6 +74,7 @@ export default function HomePage({ hasNewDm }) {
               liked_by: p.liked_by,
               isLiked: userInLiked(p.liked_by,profileData.id),
               comments: p.comments,
+              reactions: p.reactions || {}, // Add this line!
             }))
             .reverse();
 
@@ -98,10 +100,15 @@ export default function HomePage({ hasNewDm }) {
             {/* HOME CONTENT CONTAINER */}
             <div className={styles.homeContainer}>
                 <div className={styles.title}>
-                  <h1 className={styles.header}>
-                    News Feed
-                    <img src="/assets/atriaLogo.png" alt="Atria" />
-                  </h1>
+                  <div className={styles.headerSection}>
+                    <h1 className={styles.header}>
+                      News Feed
+                    </h1>
+                    <div className={styles.logoAndClockContainer}>
+                      <img src="/assets/atriaLogo.png" alt="Atria" className={styles.atriaLogo} />
+                      <Clock />
+                    </div>
+                  </div>
                     <p>
                         A place to share general information and updates with members
                         of the Vancouver Food Justice Coalition.
@@ -122,6 +129,7 @@ export default function HomePage({ hasNewDm }) {
                         liked_by={post.liked_by}
                         isLiked={post.isLiked}
                         comments={post.comments}
+                        reactions={post.reactions}
                         userId={post.userId}
                         currentUserId={profileData?.id}
                         userImage={post.userImage}

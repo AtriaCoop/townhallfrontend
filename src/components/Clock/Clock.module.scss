@@ -1,0 +1,35 @@
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.1rem;
+}
+
+.timezone {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .clock {
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+  
+  .time {
+    font-size: 1rem;
+  }
+  
+  .timezone {
+    font-size: 0.7rem;
+  }
+}
