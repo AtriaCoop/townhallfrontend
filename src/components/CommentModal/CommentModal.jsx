@@ -1,12 +1,20 @@
 import styles from './CommentModal.module.scss';
 import { formatDistance, subDays } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
+import { useState } from 'react';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
+  const [text, setText] = useState('');
+  const [error, setError] = useState('');
+  const MAX_COMMENT_LEN = 250;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const content = e.target.comment.value;
+
+    if (text.length > MAX_COMMENT_LEN) {
+      setError("Comment content is over " + MAX_COMMENT_LEN + " characters.");
+      return;
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/comment/`, {
@@ -15,7 +23,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         body: JSON.stringify({
           user: currentUserId,
           post: postId,
-          content: content,
+          content: text,
           created_at: new Date().toISOString(),
         }),
       });
@@ -31,8 +39,9 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             : post
         )
       );
+      setText('');
+      setError('');
 
-      e.target.reset();
     } catch (err) {
       console.error("Failed to add comment:", err);
     }
@@ -102,13 +111,19 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             name="comment"
             type="text"
             placeholder="Enter Comment..."
-            className={styles.textInput}
+            className={text.length > MAX_COMMENT_LEN ? styles.textInputError: styles.textInput}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={MAX_COMMENT_LEN}
             required
           />
+          <p className={text.length > MAX_COMMENT_LEN ? styles.characterCountError: styles.characterCount}>
+            {text.length}/{MAX_COMMENT_LEN}
+          </p>
           <div className={styles.modalButton}>
             <button type="submit" className={styles.postButton}>POST</button>
           </div>
         </form>
+        {error && <p className={styles.errorMessage}>{error}</p>}
 
         {/* Show existing comments */}
         <div className={styles.commentList}>
@@ -144,7 +159,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
               </div>
             </div>
-          </div>          
+          </div>
           ))}
         </div>
       </div>

@@ -17,7 +17,7 @@ export default function Modal({
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [images, setImages] = useState([]);
-  const maxPostLen = 250;
+  const MAX_POST_LEN = 250;
 
   const postImageRef = useRef(null);
 
@@ -38,8 +38,8 @@ export default function Modal({
       return;
     }
 
-    if (text.length > maxPostLen) {
-      setError("Post content is over " + maxPostLen + " characters.");
+    if (text.length > MAX_POST_LEN) {
+      setError("Post content is over " + MAX_POST_LEN + " characters.");
       return;
     }
 
@@ -84,7 +84,7 @@ export default function Modal({
         <h2 className={styles.modalTitle}>{title}</h2>
 
         <textarea
-          className={text.length > maxPostLen ? styles.textAreaError : styles.textArea}
+          className={text.length > MAX_POST_LEN ? styles.textAreaError : styles.textArea}
           placeholder="What's on your mind?"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -117,7 +117,7 @@ export default function Modal({
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
             <FaImage />
           </button>
-          <p className={text.length > maxPostLen ? styles.characterCountError: styles.characterCount}>{text.length}/{maxPostLen}</p>
+          <p className={text.length > MAX_POST_LEN ? styles.characterCountError: styles.characterCount}>{text.length}/{MAX_POST_LEN}</p>
           <input
             ref={postImageRef}
             type="file"
