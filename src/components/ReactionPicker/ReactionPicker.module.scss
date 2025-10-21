@@ -1,0 +1,96 @@
+.reactionPicker {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .reactionButton {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    min-width: 60px;
+    justify-content: center;
+  
+    &:hover {
+      background: #e9ecef;
+      border-color: #dee2e6;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    &.reacted {
+      background: #e3f2fd;
+      border-color: #2196f3;
+      color: #1976d2;
+      
+      .emoji {
+        transform: scale(1.1);
+      }
+    }
+  }
+  
+  .emoji {
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+  
+  .count {
+    background: #6c757d;
+    color: white;
+    border-radius: 10px;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 16px;
+    text-align: center;
+  }
+  
+  .reacted .count {
+    background: #2196f3;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .reactionPicker {
+      gap: 0.25rem;
+      padding: 0.5rem;
+    }
+    
+    .reactionButton {
+      padding: 0.4rem 0.6rem;
+      min-width: 50px;
+      font-size: 0.8rem;
+    }
+    
+    .emoji {
+      font-size: 1.1rem;
+    }
+    
+    .count {
+      font-size: 0.65rem;
+      padding: 0.05rem 0.3rem;
+    }
+  }
+  
+  /* Animation for reaction button press */
+  .reactionButton:active {
+    transform: scale(0.95);
+  }
+  
+  .reacted:active {
+    transform: scale(0.95);
+  }

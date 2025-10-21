@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
 import { getCookie } from '@/utils/authHelpers';
+import ReactionPicker from '../ReactionPicker/ReactionPicker';
 
 export default function Post({ 
   fullName,
@@ -21,6 +22,7 @@ export default function Post({
   userImage,
   postId,
   setPosts,
+  reactions = {},
 }) {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -39,6 +41,17 @@ export default function Post({
   const [isMyOwnPost, setIsMyOwnPost] = useState(false)
   const [reportResponse, setReportResponse] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+
+  // Can make this a separate file and import but I'm lazy (this is for testing)
+  const REACTIONS = [
+    { type: 'love', emoji: '❤️' },
+    { type: 'appreciate', emoji: '🤲' },
+    { type: 'respect', emoji: '👌' },
+    { type: 'support', emoji: '🤝' },
+    { type: 'inspired', emoji: '☀️' },
+    { type: 'helpful', emoji: '✅' },
+  ];
 
     // 🧠 GET CSRF COOKIE ON LOAD
     useEffect(() => {
@@ -230,6 +243,15 @@ async function handleLikePost() {
     }
   }
 
+  const handleReactionClick = () => {
+    setShowReactionPicker(prev => !prev);
+  }
+
+  const handleReactionSelect = (reactionType) => {
+    // Reaction is handled in the ReactionPicker component
+    // This callback can be used for any additional UI updates
+  }
+
   return (
     <div className={styles.post}>
 
@@ -407,15 +429,42 @@ async function handleLikePost() {
         />
       )}
 
+      {Object.keys(reactions).length > 0 && (
+        <div className={styles.reactionsDisplay}>
+          {Object.entries(reactions).map(([reactionType, userIds]) => (
+            userIds.length > 0 && (
+              <div key={reactionType} className={styles.reactionGroup}>
+                <span className={styles.reactionEmoji}>
+                {REACTIONS.find(r => r.type === reactionType)?.emoji}
+                </span>
+                <span className={styles.reactionCount}>{userIds.length}</span>
+              </div>
+            )
+          ))}
+        </div>
+      )}
+      
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
           <img src={liked ? "/assets/liked.png" : "/assets/like.png"} alt="like" onClick={handleLikePost}/>
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
+          <button className={styles.reactButton} onClick={handleReactionClick}>
+            😊 React
+          </button>
         </div>
       </div>
-
+      {showReactionPicker && (
+        <ReactionPicker 
+          onReactionSelect={handleReactionSelect}
+          currentReactions={reactions}
+          currentUserId={currentUserId}
+          postId={postId}
+          BASE_URL={BASE_URL}
+          setPosts={setPosts}
+        />
+      )}
     </div>
   );
 }
