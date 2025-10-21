@@ -2,18 +2,45 @@
 import { useState, useRef } from 'react';
 import { fetchMentions } from '@/api/user';
 
-export const useMentionInput = (initialValue = "", mentionChipClassName = "") => {
+export const useMentionInput = (initialValue = "", mentionChipClassName = "", maxLength = "") => {
   const [input, setInput] = useState(initialValue);
   const [showMentionUI, setShowMentionUI] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
   const [mentionResults, setMentionResults] = useState([]);
+  const [charLength, setCharLength] = useState(initialValue.length);
   const divRef = useRef(null);
 
   const handleInput = (e) => {
+    const rawText = e.currentTarget.innerText;
+    const text = rawText.trim() === '' ? '' : rawText; // Only trim if completely empty
+    
+    // Check maxLength limit if provided
+    if (maxLength && text.length > maxLength) {
+      // For contentEditable divs, we need to restore the previous content
+      if (divRef.current) {
+        // Restore the previous HTML content
+        const previousHTML = divRef.current.getAttribute('data-previous-html') || '';
+        divRef.current.innerHTML = previousHTML;
+        // Set cursor to end
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(divRef.current);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      return;
+    }
+    
+    // Store the previous HTML before updating
+    if (divRef.current) {
+      divRef.current.setAttribute('data-previous-html', divRef.current.innerHTML);
+    }
+    
     // Store the innerText from the editable div
-    setInput(e.currentTarget.innerText);
+    setInput(text);
+    setCharLength(text.length);
     // Use '@' to Trigger Mention UI
-    const text = e.currentTarget.innerText;
     const lastAt = text.lastIndexOf("@");
     // If not found lastAt would return -1
     if (lastAt === -1) {
@@ -30,7 +57,23 @@ export const useMentionInput = (initialValue = "", mentionChipClassName = "") =>
     if (regex.test(query)) {
       setShowMentionUI(true);
       setMentionQuery(query);
-      fetchMentions(query).then(setMentionResults);
+      fetchMentions(query).then(results => {
+        // Filter mentions based on maxLength if provided
+        if (maxLength) {
+          const beforeAt = text.slice(0, lastAt);
+          const filteredResults = results.map(user => {
+            const mentionText = `@${user.full_name} `;
+            const newTextLength = beforeAt.length + mentionText.length;
+            return {
+              ...user,
+              disabled: newTextLength > maxLength
+            };
+          });
+          setMentionResults(filteredResults);
+        } else {
+          setMentionResults(results);
+        }
+      });
     } else {
       setShowMentionUI(false);
       setMentionQuery("");
@@ -48,10 +91,17 @@ export const useMentionInput = (initialValue = "", mentionChipClassName = "") =>
     
     // Get current HTML content and preserve existing mention spans
     const currentHTML = divRef.current.innerHTML;
-    const currentText = divRef.current.innerText;
+    const rawText = divRef.current.innerText;
+    const currentText = rawText.trim() === '' ? '' : rawText; // Only trim if completely empty
     const lastAtIndex = currentText.lastIndexOf("@");
     
     if (lastAtIndex === -1) return;
+    
+    // Check if the mention is disabled (would exceed maxLength)
+    if (user.disabled) {
+      // Don't insert the mention if it's disabled, but keep the UI open
+      return;
+    }
     
     // Find the text before the @ symbol
     const beforeAt = currentText.slice(0, lastAtIndex);
@@ -134,7 +184,9 @@ export const useMentionInput = (initialValue = "", mentionChipClassName = "") =>
       divRef.current.focus();
       
       // Update plain text state
-      setInput(beforeAt + `@${user.full_name} `);
+      const newText = beforeAt + `@${user.full_name} `;
+      setInput(newText);
+      setCharLength(newText.length);
     }
     
     // Hide mention UI
@@ -144,6 +196,7 @@ export const useMentionInput = (initialValue = "", mentionChipClassName = "") =>
 
   const clearInput = () => {
     setInput("");
+    setCharLength(0);
     setMentionQuery("");
     if (divRef.current) {
       divRef.current.innerHTML = "";
@@ -152,6 +205,7 @@ export const useMentionInput = (initialValue = "", mentionChipClassName = "") =>
 
   return {
     input,
+    charLength,
     divRef,
     showMentionUI,
     mentionResults,

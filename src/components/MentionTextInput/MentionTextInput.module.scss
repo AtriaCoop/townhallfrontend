@@ -2,8 +2,8 @@
 @import '@/styles/mixins.scss';
 
 .mentionInputContainer {
-  position: relative;
   width: 100%;
+  position: relative;
 }
 
 .form {
@@ -11,6 +11,12 @@
   flex-direction: column;
   width: 100%;
 }
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
 
 .textInput {
   color: rgb(66, 66, 66);
@@ -20,7 +26,7 @@
   padding: 8px 0px 96px 8px;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
-
+  position: relative;
   &:empty:before {
     content: attr(placeholder);
     color: #999;
@@ -90,4 +96,11 @@
   margin-right: 2px;
   border-radius: 4px;
   font-weight: bold;
+}
+
+.charLimit{
+  position: absolute;
+  color : #999;
+  bottom: 1rem;
+  right : 1rem;
 }

@@ -2,8 +2,10 @@ import styles from './CommentModal.module.scss';
 import { formatDistance } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
 import MentionTextInput from '../MentionTextInput/MentionTextInput';
+import { useState } from 'react';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
+  const MAX_COMMENT_LEN = 250;
 
 
 
@@ -32,7 +34,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             : post
         )
       );
-
 
     } catch (err) {
       console.error("Failed to add comment:", err);
@@ -98,11 +99,12 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h1>Comments</h1>
 
+
         <MentionTextInput 
           placeholder='Write a comment' onSubmit={onSubmit} inputClassName={styles.textInput} 
           formClassName={styles.form} buttonContainerClassName={styles.modalButton} buttonClassName={styles.postButton}
           mentionWrapperClassName={styles.mentionWrapper} mentionClassName={styles.mention} 
-          mentionChipClassName={styles.mentionChip}
+          mentionChipClassName={styles.mentionChip} maxLength={MAX_COMMENT_LEN}
         />
 
 
@@ -140,7 +142,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
               </div>
             </div>
-          </div>          
+          </div>
           ))}
         </div>
       </div>

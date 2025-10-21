@@ -1,6 +1,7 @@
 import { useMentionInput } from '@/hooks/useMentionInput'
 import React from 'react'
 import DynamicAvatar from '../DynamicAvatar/DynamicAvatar'
+import styles from './MentionTextInput.module.scss'
 
 const MentionTextInput = ({ 
     placeholder = "Type your message...",
@@ -13,11 +14,12 @@ const MentionTextInput = ({
     mentionClassName = "",
     mentionChipClassName = "",
     showSubmitButton = true,
-    submitButtonText = "POST"
+    submitButtonText = "POST",
+    maxLength = ""
   }) => {
 
     // Destructure values from custom hook
-    const {input, divRef, showMentionUI, mentionResults, handleInput, handleMentionSelect, clearInput} = useMentionInput("", mentionChipClassName)
+    const {input, divRef, showMentionUI, mentionResults, handleInput, handleMentionSelect, clearInput, charLength} = useMentionInput("", mentionChipClassName, maxLength)
 
     // Uses the onSubmit function that was given
     const handleSubmitForm = (e) => {
@@ -31,13 +33,16 @@ const MentionTextInput = ({
   return (
     <>
         <form className={formClassName} onSubmit={handleSubmitForm}>
-            <div
-            ref={divRef}
-            contentEditable
-            className={inputClassName}
-            onInput={handleInput}
-            placeholder={placeholder}
-            />
+            <div className={styles.inputWrapper}>
+                <div
+                ref={divRef}
+                contentEditable
+                className={inputClassName}
+                onInput={handleInput}
+                placeholder={placeholder}
+                />
+                <p className={styles.charLimit}>{charLength}/{maxLength}</p>
+            </div>
             {showSubmitButton && (
             <div className={buttonContainerClassName}>
                 <button type="submit" className={buttonClassName}>

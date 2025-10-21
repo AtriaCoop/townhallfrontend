@@ -206,3 +206,36 @@
   border-radius: 4px;
   font-weight: bold;
 }
+.errorMessage {
+  color: red;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.characterCount {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: #737373; 
+}
+
+.characterCountError {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: red;
+}
+
+.textInputError {
+  color: rgb(66, 66, 66);
+  font-size: 16px;
+  border-radius: 4.5px;
+  border: 1px solid red;
+  padding: 8px 0px 96px 8px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  
+  &:focus {
+    outline: {color: red};
+  }  
+}
