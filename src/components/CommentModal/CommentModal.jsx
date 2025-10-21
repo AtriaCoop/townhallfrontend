@@ -1,9 +1,6 @@
 import styles from './CommentModal.module.scss';
-import { formatDistance, subDays } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getCookie } from '@/utils/authHelpers';
-import { useState, useRef } from 'react';
-import { fetchMentions } from '@/api/user';
-import DynamicAvatar from '../DynamicAvatar/DynamicAvatar';
 import MentionTextInput from '../MentionTextInput/MentionTextInput';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
@@ -25,7 +22,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
       });
 
       const data = await response.json();
-      console.log('data',data)
       if (!response.ok) throw new Error(data.message || "Comment failed");
 
       // Update comment list in parent post
@@ -57,7 +53,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
       const csrfData = await csrfRes.json();
       const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
   
-      console.log("CSRF for like:", csrfToken);
   
       if (!csrfToken) {
         alert("Still initializing. Please try again in a moment.");
