@@ -249,7 +249,7 @@ async function handleLikePost() {
   }
 
   return (
-    <div className={styles.post}>
+    <div className={pinned ? styles.postPinned : styles.post}>
 
       <div className={styles.postHeader}>
         {console.log({userImage})}
@@ -430,12 +430,12 @@ async function handleLikePost() {
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
-          {is_staff ?
-            <button onClick={handlePinPost}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
-            :
-            <img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/>
-          }
         </div>
+        {is_staff ?
+              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            :
+              pinned && <img className={styles.pin} src="/assets/pinned.png"/>
+        }
       </div>
 
     </div>

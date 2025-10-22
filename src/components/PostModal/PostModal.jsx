@@ -120,7 +120,7 @@ export default function Modal({
             <FaImage />
           </button>
           {profileData.is_staff ?
-            <button onClick={() => setPinned(!pinned)}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            <button className={styles.pin} onClick={() => setPinned(!pinned)}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
             :
             null
           }
