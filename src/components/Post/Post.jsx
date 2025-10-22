@@ -4,11 +4,13 @@ import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
 import { getCookie } from '@/utils/authHelpers';
+import { updatePost } from '@/api/post';
 
 export default function Post({ 
   fullName,
   organization,
   date,
+  created_at,
   content,
   postImage,
   links,
@@ -19,6 +21,8 @@ export default function Post({
   userId,
   currentUserId,
   userImage,
+  pinned,
+  is_staff,
   postId,
   setPosts,
 }) {
@@ -60,20 +64,7 @@ export default function Post({
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const formData = new FormData();
-      formData.append("content", editText);
-      if (editImage) {
-        formData.append("image", editImage);
-      }
-  
-      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
-        method: "PATCH",
-        body: formData,
-      });
-  
-      if (!response.ok) throw new Error("Failed to update post");
-  
-      const result = await response.json();
+      const result = await updatePost(postId, {content: editText, image: editImage});
       console.log("Post updated successfully:", result);
   
       setPosts((prevPosts) =>
@@ -230,6 +221,33 @@ async function handleLikePost() {
     }
   }
 
+  // PIN POST
+  const handlePinPost = async () => {
+    if (is_staff) {
+      try {
+        await updatePost(postId, {pinned: !pinned})
+
+        setPosts((prevPosts) => {
+          const updatedPosts = prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  pinned: !post.pinned
+                }
+              : post
+          );
+
+          return updatedPosts.sort((a, b) => {
+            if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+            return new Date(b.created_at) - new Date(a.created_at);
+          });
+        });
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }
+
   return (
     <div className={styles.post}>
 
@@ -249,7 +267,6 @@ async function handleLikePost() {
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
         </div>
-        
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
         </div>
@@ -413,6 +430,11 @@ async function handleLikePost() {
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
+          {is_staff ?
+            <button onClick={handlePinPost}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            :
+            <img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/>
+          }
         </div>
       </div>
 

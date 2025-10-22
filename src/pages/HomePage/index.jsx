@@ -69,6 +69,7 @@ export default function HomePage({ hasNewDm }) {
               organization: p.user.primary_organization,
               userImage: p.user.profile_image,
               date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
+              created_at: p.created_at,
               content: [p.content],
               postImage: p.image,
               links: [],
@@ -76,8 +77,8 @@ export default function HomePage({ hasNewDm }) {
               liked_by: p.liked_by,
               isLiked: userInLiked(p.liked_by,profileData.id),
               comments: p.comments,
+              pinned: p.pinned,
             }))
-            .reverse();
             
             setPosts(formattedPosts);
             setLoading(false);
@@ -132,6 +133,8 @@ export default function HomePage({ hasNewDm }) {
                         userId={post.userId}
                         currentUserId={profileData?.id}
                         userImage={post.userImage}
+                        pinned={post.pinned}
+                        is_staff={profileData?.is_staff}
                         postId={post.id}
                         setPosts={setPosts}
                     />
