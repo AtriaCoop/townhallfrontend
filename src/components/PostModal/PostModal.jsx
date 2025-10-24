@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
 import { FaImage } from 'react-icons/fa';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function Modal({
   title,
@@ -44,12 +45,11 @@ export default function Modal({
     }
 
     const formData = new FormData();
-    formData.append("user_id", profileData.id);
     formData.append("content", text);
     images.forEach((img) => formData.append("image", img));
 
     try {
-      const res = await fetch(`${BASE_URL}/post/`, {
+      const res = await authenticatedFetch(`${BASE_URL}/post/`, {
         method: "POST",
         body: formData,
       });

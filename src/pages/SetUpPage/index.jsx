@@ -2,7 +2,7 @@ import styles from '@/pages/SetUpPage/SetUpPage.module.scss'
 import { useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react';
-import { getCookie } from '@/utils/authHelpers';
+import { getCookie, authenticatedFetch } from '@/utils/authHelpers';
 
 export default function SetUpPage() {
 
@@ -75,12 +75,8 @@ export default function SetUpPage() {
         console.log("📦 Sending PATCH to backend with:", formData);
     
         try {
-            const response = await fetch(`${BASE_URL}/user/${user.id}/complete_profile/`, {
+            const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/complete_profile/`, {
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                },
                 body: form,
             });
     
