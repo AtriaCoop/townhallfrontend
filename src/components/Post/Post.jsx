@@ -88,7 +88,7 @@ export default function Post({
   // DELETE POST
   async function handleDeletePost() {
     try {
-      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
+      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
         method: "DELETE",
       });
   
@@ -109,32 +109,10 @@ export default function Post({
   // LIKE POST
 async function handleLikePost() {
   try {
-    // Step 1: Fetch CSRF from server
-    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-
-    const csrfData = await csrfRes.json();
-    const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
-
-    console.log("CSRF for like:", csrfToken);
-
-    if (!csrfToken) {
-      alert("Still initializing. Please try again in a moment.");
-      return;
-    }
-
-    // Step 2: Like post
-    const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
+    const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
       method: "PATCH",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
       },
     });
 
@@ -195,13 +173,12 @@ async function handleLikePost() {
     if (userId === currentUserId) return
 
     const reportData = {
-      user_id : currentUserId,
       post_id : postId
     }
 
     try {
       setIsLoading(true)
-      const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
+      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/report`, {
         method : 'POST',
         body : JSON.stringify(reportData),
         headers : {

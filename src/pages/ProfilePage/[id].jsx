@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { FaEdit, FaSignOutAlt } from 'react-icons/fa';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function ProfilePage({ hasNewDm }) {
   const router = useRouter();
@@ -60,9 +61,8 @@ export default function ProfilePage({ hasNewDm }) {
   if (!profileData) return null;
 
   async function userLogout() {
-    await fetch(`${BASE_URL}/auth/logout/`, {
+    await authenticatedFetch(`${BASE_URL}/auth/logout/`, {
       method: "POST",
-      credentials: "include",
     });
 
     localStorage.removeItem("user");

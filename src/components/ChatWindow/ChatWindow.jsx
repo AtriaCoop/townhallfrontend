@@ -2,7 +2,7 @@ import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import { FaImage } from 'react-icons/fa';
-import { fetchCsrfToken } from '@/utils/authHelpers';
+import { fetchCsrfToken, authenticatedFetch } from '@/utils/authHelpers';
 import MessageModal from '@/components/MessageModal/MessageModal'
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
 
@@ -111,14 +111,8 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
       formData.append("content", inputText);
       if (selectedImage) formData.append("image_content", selectedImage);
     
-      const csrfToken = await fetchCsrfToken();
-    
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/send/`, {
+      const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/send/`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRFToken": csrfToken,
-        },
         body: formData,
       });
     

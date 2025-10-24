@@ -4,6 +4,7 @@ import { formatDistance } from 'date-fns';
 import { FaImage } from 'react-icons/fa';
 import { createPost } from '@/api/post';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function Modal({
   title,

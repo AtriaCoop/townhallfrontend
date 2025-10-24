@@ -4,7 +4,7 @@ import ChatCard from "@/components/ChatCard/ChatCard"
 import ChatModal from "@/components/ChatModal/ChatModal"
 import ChatWindow from "@/components/ChatWindow/ChatWindow"
 import { useState, useEffect } from 'react';
-import { getCookie } from "@/utils/authHelpers";
+import { getCookie, authenticatedFetch } from "@/utils/authHelpers";
 
 export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewDm, unreadMap, setUnreadMap }) {
 
@@ -86,13 +86,11 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
           return;
         }
       
-        const res = await fetch(`${BASE_URL}/chats/`, {
+        const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
             },
-          credentials: 'include',
           body: JSON.stringify({
             name: `chat-${currentUserId}-${user.id}`,
             participants: [currentUserId, user.id]
@@ -138,12 +136,8 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
       }      
 
         try {
-          const res = await fetch(`${BASE_URL}/chats/${chatId}/`, {
+          const res = await authenticatedFetch(`${BASE_URL}/chats/${chatId}/`, {
             method: 'DELETE',
-            headers: {
-                'X-CSRFToken': csrfToken,
-            },
-            credentials: 'include',
           });
       
           if (res.ok) {
