@@ -1,20 +1,15 @@
 import styles from './CommentModal.module.scss';
-import { formatDistance, subDays } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getCookie, authenticatedFetch } from '@/utils/authHelpers';
+import MentionTextInput from '../MentionTextInput/MentionTextInput';
 import { useState } from 'react';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
-  const [text, setText] = useState('');
-  const [error, setError] = useState('');
   const MAX_COMMENT_LEN = 250;
 
-  async function handleSubmit(e) {
-    e.preventDefault();
 
-    if (text.length > MAX_COMMENT_LEN) {
-      setError("Comment content is over " + MAX_COMMENT_LEN + " characters.");
-      return;
-    }
+
+  async function onSubmit(inputContent) {
 
     try {
       const response = await authenticatedFetch(`${BASE_URL}/comment/`, {
@@ -22,7 +17,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           post: postId,
-          content: text,
+          content: inputContent,
           created_at: new Date().toISOString(),
         }),
       });
@@ -38,8 +33,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             : post
         )
       );
-      setText('');
-      setError('');
 
     } catch (err) {
       console.error("Failed to add comment:", err);
@@ -75,6 +68,8 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
     }
   }  
 
+ 
+
   return (
     <div className={styles.modalOverlay}>
 
@@ -82,25 +77,14 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h1>Comments</h1>
 
-        {/* Comment input */}
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <textarea
-            name="comment"
-            type="text"
-            placeholder="Enter Comment..."
-            className={text.length > MAX_COMMENT_LEN ? styles.textInputError: styles.textInput}
-            onChange={(e) => setText(e.target.value)}
-            maxLength={MAX_COMMENT_LEN}
-            required
-          />
-          <p className={text.length > MAX_COMMENT_LEN ? styles.characterCountError: styles.characterCount}>
-            {text.length}/{MAX_COMMENT_LEN}
-          </p>
-          <div className={styles.modalButton}>
-            <button type="submit" className={styles.postButton}>POST</button>
-          </div>
-        </form>
-        {error && <p className={styles.errorMessage}>{error}</p>}
+
+        <MentionTextInput 
+          placeholder='Write a comment' onSubmit={onSubmit} inputClassName={styles.textInput} 
+          formClassName={styles.form} buttonContainerClassName={styles.modalButton} buttonClassName={styles.postButton}
+          mentionWrapperClassName={styles.mentionWrapper} mentionClassName={styles.mention} 
+          mentionChipClassName={styles.mentionChip} maxLength={MAX_COMMENT_LEN}
+        />
+
 
         {/* Show existing comments */}
         <div className={styles.commentList}>
