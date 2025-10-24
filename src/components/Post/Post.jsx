@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
-import { getCookie } from '@/utils/authHelpers';
 import { updatePost } from '@/api/post';
 
 export default function Post({ 
