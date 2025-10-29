@@ -1,3 +1,4 @@
+import Activities from "@/components/Activities/Activities";
 import Navigation from "@/components/Navigation/Navigation";
 import styles from "@/pages/DashboardPage/DashboardPage.module.scss";
 
@@ -28,13 +29,15 @@ export default function DashboardPage() {
               <li>📦 Donation Drive Helper - Aug 10</li>
             </ul>
           </div>
-
           <div className={styles.card}>
             <h2>My Organizations</h2>
             <ul>
               <li>🥕 Vancouver Food Justice Coalition</li>
               <li>🌍 Climate Youth Collective</li>
             </ul>
+          </div>
+          <div className={styles.activitiesWrapper}>
+            <Activities/>
           </div>
         </div>
       </div>
