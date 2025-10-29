@@ -3,6 +3,7 @@ import { Menu, LayoutDashboard, User, Users, MessageSquare, Home } from 'lucide-
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function Navigation({ hasNewDm = false }) {
 
@@ -24,7 +25,7 @@ export default function Navigation({ hasNewDm = false }) {
           console.error("No user found in localStorage.");
           return;
         }
-        const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
+        const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`, {
           credentials: "include",
         });
         const data = await response.json();

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
 import { updatePost } from '@/api/post';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function Post({ 
   fullName,

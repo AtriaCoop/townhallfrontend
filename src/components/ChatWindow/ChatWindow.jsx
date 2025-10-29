@@ -2,7 +2,7 @@ import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import { FaImage } from 'react-icons/fa';
-import { fetchCsrfToken, authenticatedFetch } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 import MessageModal from '@/components/MessageModal/MessageModal'
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
 
@@ -65,7 +65,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     useEffect(() => {
         const fetchMessages = async () => {
           try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/${chat.id}/messages/`);
+            const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/${chat.id}/messages/`);
             const data = await res.json();
       
             const formatted = data.messages.map((m) => ({

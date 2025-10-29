@@ -5,6 +5,7 @@ import PostModal from '@/components/PostModal/PostModal';
 import Loader from '@/components/Loader/Loader';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -24,7 +25,7 @@ export default function HomePage({ hasNewDm }) {
             return;
           }
     
-          const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+          const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
     
           if (!response.ok) {
             localStorage.removeItem("user");
@@ -49,7 +50,7 @@ export default function HomePage({ hasNewDm }) {
         async function fetchPosts() {
           try {
             setLoading(true);
-            const res = await fetch(`${BASE_URL}/post/`);
+            const res = await authenticatedFetch(`${BASE_URL}/post/`);
             const data = await res.json();
 
             //Helper funciton to get user id from like_by list and compare it to current user
