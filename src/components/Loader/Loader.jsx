@@ -4,10 +4,10 @@ const Loader = () => {
 
   return (
   <div className={styles.loaderContainer}>
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <ClipLoader color="#015e22" size={150} />
-      <div className={styles.spinnerText}>Loading, please wait...</div>
-    </div>
+      <div className={styles.card} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+        <ClipLoader color="#015e22" size={150} />
+        <div className={styles.spinnerText}>Loading, please wait...</div>
+      </div>
   </div>
   );
 };
