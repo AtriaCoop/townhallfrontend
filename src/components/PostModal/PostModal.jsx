@@ -1,7 +1,7 @@
 import styles from './PostModal.module.scss';
 import { useRef, useState, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
-import { FaImage } from 'react-icons/fa';
+import Icon from '@/icons/Icon';
 import { createPost } from '@/api/post';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 
@@ -117,10 +117,12 @@ export default function Modal({
         <div className={styles.actionRow}>
           <EmojiPickerButton onSelect={(emoji) => setText(prev => prev + emoji)} />
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
-            <FaImage />
+            <Icon name="image" />
           </button>
           {profileData.is_staff ?
-            <button className={styles.pin} onClick={() => setPinned(!pinned)}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            <button className={`${styles.iconButton} ${pinned ? styles.pinned : ""}`} onClick={() => setPinned(!pinned)}>
+              <Icon name="pin" />
+            </button>
             :
             null
           }

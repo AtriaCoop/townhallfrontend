@@ -59,7 +59,7 @@ export default function Navigation({ hasNewDm = false }) {
         <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><Icon name="dashboard" /><span className={styles.linkText}>Dashboard</span></div>
         <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
         <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
-        <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="directMessages" /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
+        <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
       </div>
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
@@ -92,7 +92,7 @@ export default function Navigation({ hasNewDm = false }) {
             <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><Icon name="dashboard" /><span className={styles.linkText}>Dashboard</span></div>
             <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
             <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
-            <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="directMessages" /><span className={styles.linkText}>Direct Messages</span></div>
+            <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span></div>
           </div>
         </div>
 
