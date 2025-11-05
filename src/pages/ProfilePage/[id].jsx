@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
 
-export default function ProfilePage({ hasNewDm }) {
+export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -104,6 +104,9 @@ export default function ProfilePage({ hasNewDm }) {
         <div className={styles.name}>{profileData.full_name}</div>
         <div className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
+        </div>
+        <div>
+          <button onClick={() => setDarkMode(!darkMode)} className={`${styles.darkModeButton} ${darkMode ? styles.isDark : ""}`}>{darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}</button>
         </div>
 
         <div className={styles.sectionTitle}>👤 Details</div>
