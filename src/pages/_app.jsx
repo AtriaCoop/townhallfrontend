@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import '@/styles/globals.scss';
 
 export default function App({ Component, pageProps }) {
@@ -7,6 +8,7 @@ export default function App({ Component, pageProps }) {
 
   const [hasNewDm, setHasNewDm] = useState(false);
   const [unreadMap, setUnreadMap] = useState({});
+  const [darkMode, setDarkMode] = useDarkMode();
 
   useEffect(() => {
     fetch(`${BASE_URL}/auth/csrf/`, {
@@ -40,6 +42,8 @@ export default function App({ Component, pageProps }) {
   return (
     <Component
       {...pageProps}
+      darkMode={darkMode}
+      setDarkMode={setDarkMode}
       hasNewDm={hasNewDm}
       setHasNewDm={setHasNewDm}
       unreadMap={unreadMap}

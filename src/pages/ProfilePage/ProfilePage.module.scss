@@ -114,7 +114,7 @@
   margin-top: 1rem;
 }
 
-.editButton, .signoutButton {
+.editButton, .signoutButton, .darkModeButton {
   flex: 1 1 45%;
   padding: 0.6rem;
   font-weight: 600;
@@ -122,6 +122,16 @@
   border: none;
   cursor: pointer;
   text-align: center;
+}
+
+.darkModeButton {
+  background-color: #371950;
+  color: white;
+}
+
+.isDark {
+  background-color: rgb(243, 227, 196);
+  color: black;
 }
 
 .editButton {
