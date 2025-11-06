@@ -107,6 +107,21 @@
       color: #111;
     }
   }
+
+  .sendButton {
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #555;
+    &:hover {
+      background: #dfdfdf;
+    }
+  }
   
 .imagePreviewWrapper {
   position: relative;

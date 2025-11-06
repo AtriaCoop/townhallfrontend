@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation/Navigation'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import Icon from '@/icons/Icon';
 
 export default function EditProfilePage({ hasNewDm }) {
 
@@ -145,7 +146,7 @@ export default function EditProfilePage({ hasNewDm }) {
             <div className={styles.editProfileContainer}>
                 <div className={styles.title}>
                     <div className={styles.backBox} onClick={() => (router.push(`/ProfilePage/${profileData.id}`))}>
-                        <img src="/assets/leftArrow.png" alt="arrow"></img>
+                        <Icon name="arrowleft" />
                     </div>
                     <h1>Account Settings</h1>
                 </div>

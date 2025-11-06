@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { FaRegSmile } from "react-icons/fa";
+import Icon from '@/icons/Icon';
 import EmojiPicker from "emoji-picker-react";
 import styles from "./EmojiPickerButton.module.scss";
 
@@ -24,7 +24,7 @@ export default function EmojiPickerButton({ onSelect }) {
         className={styles.iconButton}
         onClick={() => setShowPicker((prev) => !prev)}
       >
-        <FaRegSmile />
+        <Icon name="smile" />
       </button>
 
       {showPicker && (

@@ -1,5 +1,6 @@
 import styles from './ChatCard.module.scss';
 import { parse, formatDistanceToNow } from 'date-fns';
+import Icon from '@/icons/Icon';
 
 
 export default function ChatCard({ name, title, time, imageSrc, onDelete, hasNotification}) {
@@ -27,7 +28,7 @@ export default function ChatCard({ name, title, time, imageSrc, onDelete, hasNot
             </div>
 
             <button className={styles.button} onClick={onDelete}>
-                <img src="/assets/garbage.png" alt="Garbage" />
+                <Icon name="trash" className={styles.icon}/>
             </button>
         </div>
     );

@@ -208,10 +208,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: #555;
 
-    img {
-        position: absolute;
-        height: 24px;
-        cursor: pointer;
-      }
+    &:hover {
+        color: #111;
+    }
   }
