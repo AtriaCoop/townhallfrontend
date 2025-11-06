@@ -81,7 +81,9 @@ export default function ReactionPicker({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to toggle reaction");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `Failed to toggle reaction (${response.status})`;
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
