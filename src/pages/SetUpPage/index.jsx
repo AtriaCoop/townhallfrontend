@@ -16,7 +16,7 @@ export default function SetUpPage() {
     other_networks: "",
     about_me: "",
     skills_interests: "",
-    linkedIn_url: "",
+    linkedin_url: "",
     x_url: "",
     instagram_url: "",
     facebook_url: "",
@@ -250,11 +250,11 @@ export default function SetUpPage() {
           <input
             type="text"
             placeholder="https://linkedin.com/in/username"
-            value={formData.linkedIn_url}
+            value={formData.linkedin_url}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,
-                linkedIn_url: e.target.value,
+                linkedin_url: e.target.value,
               }))
             }
           />
