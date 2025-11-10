@@ -1,9 +1,10 @@
 import styles from './Navigation.module.scss';
-import { Menu, LayoutDashboard, User, Users, MessageSquare, Home } from 'lucide-react';
+import { Menu, LayoutDashboard, User, Users, MessageSquare, Home, CircleAlert } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import ReportModal from '@/components/ReportModal/ReportModal';
 
 export default function Navigation({ hasNewDm = false }) {
 
@@ -14,8 +15,13 @@ export default function Navigation({ hasNewDm = false }) {
   const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+
+  const handleReportClick = () => {
+    setShowReportModal(true);
+  };
 
   useEffect (() => {
     async function fetchProfile() {
@@ -60,7 +66,15 @@ export default function Navigation({ hasNewDm = false }) {
         <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
         <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
         <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
+        <div className={`${styles.link} ${pathname === '/ReportModal' ? styles.active : ''}`} onClick={() => handleReportClick()}><CircleAlert /><span className={styles.linkText}>Report problem or request feature</span></div>
       </div>
+
+      {showReportModal && (
+      <ReportModal
+        onClose={() => setShowReportModal(false)}
+        handleSubmit={() => {}} // temporary empty function. Change later.
+      />
+      )}
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
         <img src={profileData?.profile_image || '/assets/ProfileImage.jpg'}
@@ -93,6 +107,7 @@ export default function Navigation({ hasNewDm = false }) {
             <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
             <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
             <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
+            <div className={`${styles.link} ${pathname === '/ReportModal' ? styles.active : ''}`} onClick={() => handleReportClick()}><CircleAlert /><span className={styles.linkText}>Report problem or request feature</span></div>
           </div>
         </div>
 
