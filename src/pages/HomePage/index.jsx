@@ -77,7 +77,7 @@ export default function HomePage({ hasNewDm }) {
               liked_by: p.liked_by,
               isLiked: userInLiked(p.liked_by,profileData.id),
               comments: p.comments,
-              reactions: p.reactions || {}, // Add this line!
+              reactions: p.reactions || {}, 
             }))
             .reverse();
             

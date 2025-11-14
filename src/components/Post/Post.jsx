@@ -43,7 +43,7 @@ export default function Post({
   const [isLoading, setIsLoading] = useState(false)
   const [showReactionPicker, setShowReactionPicker] = useState(false);
 
-  // Can make this a separate file and import but I'm lazy (this is for testing)
+  // Can make this a separate file and import but I'm lazy so this can be another Jira Ticket (this is for testing)
   const REACTIONS = [
     { type: 'love', emoji: '❤️' },
     { type: 'appreciate', emoji: '🤲' },
