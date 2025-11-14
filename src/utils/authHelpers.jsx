@@ -29,6 +29,41 @@ export async function fetchCsrfToken() {
     return data.csrfToken;
   }
 
+// Centralized API call function for authenticated requests
+export async function authenticatedFetch(url, options = {}) {
+  const { method = 'GET', body, headers = {}, ...restOptions } = options;
+  
+  // Get CSRF token for POST/PUT/PATCH/DELETE requests
+  let csrfToken = null;
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+    csrfToken = await fetchCsrfToken();
+  }
+  
+  // Prepare headers
+  const requestHeaders = {
+    ...headers,
+  };
+  
+  // Add CSRF token if available
+  if (csrfToken) {
+    requestHeaders['X-CSRFToken'] = csrfToken;
+  }
+  
+  // Prepare request options
+  const requestOptions = {
+    method,
+    credentials: 'include',
+    headers: requestHeaders,
+    ...restOptions,
+  };
+  
+  if (body) {
+    requestOptions.body = body;
+  }
+  
+  return fetch(url, requestOptions);
+}
+
 
 export const registerUser = async (formData) => {
   try {
@@ -36,15 +71,10 @@ export const registerUser = async (formData) => {
       return { error: "Please enter a valid email address." };
     }
 
-    const csrfToken = getCookie("csrftoken");
-    console.log("CSRF Token being sent:", csrfToken);
-
-    const response = await fetch(`${BASE_URL}/users/user/`, {
+    const response = await authenticatedFetch(`${BASE_URL}/users/user/`, {
       method: "POST",
-      credentials: "include", // ✅ send cookies
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken, // ✅ send csrf token
       },
       body: JSON.stringify({
         email: formData.email,

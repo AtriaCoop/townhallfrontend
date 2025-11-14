@@ -1,4 +1,5 @@
 import styles from './ReactionPicker.module.scss';
+import { authenticatedFetch } from '../../utils/authHelpers';
 
 const REACTIONS = [
   { 
@@ -50,34 +51,14 @@ export default function ReactionPicker({
   
   async function handleReactionClick(reactionType) {
     try {
-
-      const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      const csrfData = await csrfRes.json();
-      const csrfToken = csrfData.csrfToken;
-
-      if (!csrfToken) {
-        alert("Still initializing. Please try again in a moment.");
-        return;
-      }
-
-      const response = await fetch(`${BASE_URL}/post/${postId}/reaction/`, {
+      const url = `${BASE_URL}/post/${postId}/reaction/`;
+      const response = await authenticatedFetch(url, {
         method: "PATCH",
         credentials: "include",
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          reaction_type: reactionType,
-          user_id: currentUserId,
-        }),
+        body: JSON.stringify({ reaction_type: reactionType })
       });
 
       if (!response.ok) {
