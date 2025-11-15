@@ -5,11 +5,14 @@ import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
 import { getCookie } from '@/utils/authHelpers';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
+import { updatePost } from '@/api/post';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function Post({ 
   fullName,
   organization,
   date,
+  created_at,
   content,
   postImage,
   links,
@@ -20,6 +23,8 @@ export default function Post({
   userId,
   currentUserId,
   userImage,
+  pinned,
+  is_staff,
   postId,
   setPosts,
   reactions = {},
@@ -73,20 +78,7 @@ export default function Post({
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const formData = new FormData();
-      formData.append("content", editText);
-      if (editImage) {
-        formData.append("image", editImage);
-      }
-  
-      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
-        method: "PATCH",
-        body: formData,
-      });
-  
-      if (!response.ok) throw new Error("Failed to update post");
-  
-      const result = await response.json();
+      const result = await updatePost(postId, {content: editText, image: editImage});
       console.log("Post updated successfully:", result);
   
       setPosts((prevPosts) =>
@@ -110,7 +102,7 @@ export default function Post({
   // DELETE POST
   async function handleDeletePost() {
     try {
-      const response = await fetch(`${BASE_URL}/post/${postId}/`, {
+      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
         method: "DELETE",
       });
   
@@ -131,32 +123,10 @@ export default function Post({
   // LIKE POST
 async function handleLikePost() {
   try {
-    // Step 1: Fetch CSRF from server
-    const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-
-    const csrfData = await csrfRes.json();
-    const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
-
-    console.log("CSRF for like:", csrfToken);
-
-    if (!csrfToken) {
-      alert("Still initializing. Please try again in a moment.");
-      return;
-    }
-
-    // Step 2: Like post
-    const response = await fetch(`${BASE_URL}/post/${postId}/like/`, {
+    const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
       method: "PATCH",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
       },
     });
 
@@ -217,13 +187,12 @@ async function handleLikePost() {
     if (userId === currentUserId) return
 
     const reportData = {
-      user_id : currentUserId,
       post_id : postId
     }
 
     try {
       setIsLoading(true)
-      const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
+      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/report`, {
         method : 'POST',
         body : JSON.stringify(reportData),
         headers : {
@@ -250,10 +219,35 @@ async function handleLikePost() {
   const handleReactionSelect = (reactionType) => {
     // Reaction is handled in the ReactionPicker component
     // This callback can be used for any additional UI updates
+  // PIN POST
+  const handlePinPost = async () => {
+    if (is_staff) {
+      try {
+        await updatePost(postId, {pinned: !pinned})
+
+        setPosts((prevPosts) => {
+          const updatedPosts = prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  pinned: !post.pinned
+                }
+              : post
+          );
+
+          return updatedPosts.sort((a, b) => {
+            if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+            return new Date(b.created_at) - new Date(a.created_at);
+          });
+        });
+      } catch (err) {
+        console.error(err)
+      }
+    }
   }
 
   return (
-    <div className={styles.post}>
+    <div className={pinned ? styles.postPinned : styles.post}>
 
       <div className={styles.postHeader}>
         {console.log({userImage})}
@@ -271,7 +265,6 @@ async function handleLikePost() {
           <div className={styles.organizationName}>{organization}</div>
           <div className={styles.date}>{date}</div>
         </div>
-        
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
         </div>
@@ -454,6 +447,11 @@ async function handleLikePost() {
             😊 React
           </button>
         </div>
+        {is_staff ?
+              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            :
+              pinned && <img className={styles.pin} src="/assets/pinned.png"/>
+        }
       </div>
       {showReactionPicker && (
         <ReactionPicker 

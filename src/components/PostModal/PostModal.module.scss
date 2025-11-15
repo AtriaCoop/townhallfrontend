@@ -64,7 +64,7 @@
 
   &:focus {
     outline: {color: red};
-  }  
+  }
 }
 
 .imageGrid {
@@ -128,6 +128,25 @@
   &:hover {
     color: #111;
   }
+}
+
+.pin {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin img {
+  width: 100%;
+  height: 100%;
+}
+
+.pin:hover img {
+  filter: brightness(0.5);
 }
 
 .flexSpacer {

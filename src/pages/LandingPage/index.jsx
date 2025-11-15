@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './LandingPage.module.scss';
-import { registerUser, getCookie } from '@/utils/authHelpers';
+import { registerUser, getCookie, authenticatedFetch } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 import Loader from '@/components/Loader/Loader';
 
@@ -66,21 +66,10 @@ export default function LandingPage() {
     setLoading(true);
 
     try {
-      const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        headers: { Accept: "application/json" },
-      });
-
-      const csrfData = await csrfRes.json();
-      const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
-
-      const response = await fetch(`${BASE_URL}/auth/login/`, {
+      const response = await authenticatedFetch(`${BASE_URL}/auth/login/`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
         },
         body: JSON.stringify({ email, password }),
       });

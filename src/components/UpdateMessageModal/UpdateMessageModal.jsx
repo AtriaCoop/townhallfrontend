@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { fetchCsrfToken } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 import styles from './UpdateMessageModal.module.scss'
 
 export default function UpdateMessageModal({ msg, onCancel }) {
@@ -15,14 +15,9 @@ export default function UpdateMessageModal({ msg, onCancel }) {
         formData.append("message_id", id);
         formData.append("content", inputText);
         if (selectedImage) formData.append("image_content", selectedImage);
-              const csrfToken = await fetchCsrfToken();
             
-              const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/messages/${id}/`, {
+              const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/messages/${id}/`, {
                 method: "PATCH",
-                credentials: "include",
-                headers: {
-                  "X-CSRFToken": csrfToken,
-                },
                 body: formData,
               });
             

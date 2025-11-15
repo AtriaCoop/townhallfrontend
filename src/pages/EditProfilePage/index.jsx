@@ -2,6 +2,7 @@ import styles from '@/pages/EditProfilePage/EditProfilePage.module.scss'
 import Navigation from '@/components/Navigation/Navigation'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function EditProfilePage({ hasNewDm }) {
 
@@ -40,7 +41,7 @@ export default function EditProfilePage({ hasNewDm }) {
             const user = JSON.parse(localStorage.getItem("user"));
             if (!user || !user.id) return;
       
-            const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+            const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
             const data = await response.json();
             setProfileData(data.user);
             setFormData((prev) => ({
@@ -83,7 +84,7 @@ export default function EditProfilePage({ hasNewDm }) {
         }
       
         try {
-          const response = await fetch(`${BASE_URL}/user/${user.id}/`, {
+          const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`, {
             method: "PATCH",
             body: form,
           });

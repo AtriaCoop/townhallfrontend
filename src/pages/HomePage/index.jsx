@@ -6,6 +6,7 @@ import Loader from '@/components/Loader/Loader';
 import Clock from '@/components/Clock/Clock';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -25,7 +26,7 @@ export default function HomePage({ hasNewDm }) {
             return;
           }
     
-          const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+          const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
     
           if (!response.ok) {
             localStorage.removeItem("user");
@@ -50,7 +51,7 @@ export default function HomePage({ hasNewDm }) {
         async function fetchPosts() {
           try {
             setLoading(true);
-            const res = await fetch(`${BASE_URL}/post/`);
+            const res = await authenticatedFetch(`${BASE_URL}/post/`);
             const data = await res.json();
 
             //Helper funciton to get user id from like_by list and compare it to current user
@@ -70,6 +71,7 @@ export default function HomePage({ hasNewDm }) {
               organization: p.user.primary_organization,
               userImage: p.user.profile_image,
               date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
+              created_at: p.created_at,
               content: [p.content],
               postImage: p.image,
               links: [],
@@ -78,8 +80,8 @@ export default function HomePage({ hasNewDm }) {
               isLiked: userInLiked(p.liked_by,profileData.id),
               comments: p.comments,
               reactions: p.reactions || {}, 
+              pinned: p.pinned,
             }))
-            .reverse();
             
             setPosts(formattedPosts);
             setLoading(false);
@@ -140,6 +142,8 @@ export default function HomePage({ hasNewDm }) {
                         userId={post.userId}
                         currentUserId={profileData?.id}
                         userImage={post.userImage}
+                        pinned={post.pinned}
+                        is_staff={profileData?.is_staff}
                         postId={post.id}
                         setPosts={setPosts}
                     />

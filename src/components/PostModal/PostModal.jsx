@@ -2,6 +2,7 @@ import styles from './PostModal.module.scss';
 import { useRef, useState, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
 import { FaImage } from 'react-icons/fa';
+import { createPost } from '@/api/post';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 
 export default function Modal({
@@ -14,10 +15,11 @@ export default function Modal({
   setPosts,
 }) {
   const [text, setText] = useState('');
+  const [pinned, setPinned] = useState(false)
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [images, setImages] = useState([]);
-  const maxPostLen = 250;
+  const MAX_POST_LEN = 250;
 
   const postImageRef = useRef(null);
 
@@ -38,22 +40,13 @@ export default function Modal({
       return;
     }
 
-    if (text.length > maxPostLen) {
-      setError("Post content is over " + maxPostLen + " characters.");
+    if (text.length > MAX_POST_LEN) {
+      setError("Post content is over " + MAX_POST_LEN + " characters.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("user_id", profileData.id);
-    formData.append("content", text);
-    images.forEach((img) => formData.append("image", img));
-
     try {
-      const res = await fetch(`${BASE_URL}/post/`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+      const data = await createPost({content: text, images: images, pinned: pinned})
 
       const newPost = {
         id: data.post.id,
@@ -61,13 +54,22 @@ export default function Modal({
         fullName: data.post.user.full_name,
         organization: data.post.user.primary_organization,
         userImage: data.post.user.profile_image,
+        created_at: data.post.created_at,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
+        pinned: data.post.pinned,
         links: [],
       };
 
-      setPosts([newPost, ...posts]);
+      setPosts((prevPosts) => {
+        const updatedPosts = [newPost, ...prevPosts]
+
+        return updatedPosts.sort((a, b) => {
+          if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+      });
       setText('');
       setImage(null);
       setError('');
@@ -84,7 +86,7 @@ export default function Modal({
         <h2 className={styles.modalTitle}>{title}</h2>
 
         <textarea
-          className={text.length > maxPostLen ? styles.textAreaError : styles.textArea}
+          className={text.length > MAX_POST_LEN ? styles.textAreaError : styles.textArea}
           placeholder="What's on your mind?"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -117,7 +119,12 @@ export default function Modal({
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
             <FaImage />
           </button>
-          <p className={text.length > maxPostLen ? styles.characterCountError: styles.characterCount}>{text.length}/{maxPostLen}</p>
+          {profileData.is_staff ?
+            <button className={styles.pin} onClick={() => setPinned(!pinned)}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            :
+            null
+          }
+          <p className={text.length > MAX_POST_LEN ? styles.characterCountError: styles.characterCount}>{text.length}/{MAX_POST_LEN}</p>
           <input
             ref={postImageRef}
             type="file"

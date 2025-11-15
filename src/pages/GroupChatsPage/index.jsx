@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import { FaImage } from 'react-icons/fa';
-import { getCookie, fetchCsrfToken } from '@/utils/authHelpers'; 
+import { getCookie, authenticatedFetch } from '@/utils/authHelpers'; 
 
 export default function GroupChatsPage({ hasNewDm }) {
 
@@ -45,7 +45,7 @@ export default function GroupChatsPage({ hasNewDm }) {
         if (!activeGroup || !currentUserId) return;
       
         const fetchGroupMessages = async () => {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/${activeGroup}/messages/`);
+          const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/${activeGroup}/messages/`);
           const data = await res.json();
       
           const formatted = data.messages.map((msg) => ({
@@ -154,20 +154,14 @@ export default function GroupChatsPage({ hasNewDm }) {
 
     const handleSendMessage = async () => {
         if (!inputText.trim() && !selectedImage) return;
-
-        const csrfToken = await fetchCsrfToken();
       
         const formData = new FormData();
         formData.append("group_name", activeGroup);
         formData.append("content", inputText);
         if (selectedImage) formData.append("image", selectedImage);
       
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/messages/`, {
+        const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/groups/messages/`, {
             method: "POST",
-            credentials: "include",
-            headers: {
-              "X-CSRFToken": csrfToken,
-            },
             body: formData,
         });
       

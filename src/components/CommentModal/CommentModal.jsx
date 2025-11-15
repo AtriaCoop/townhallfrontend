@@ -1,21 +1,23 @@
 import styles from './CommentModal.module.scss';
-import { formatDistance, subDays } from 'date-fns';
-import { getCookie } from '@/utils/authHelpers';
+import { formatDistance } from 'date-fns';
+import { getCookie, authenticatedFetch } from '@/utils/authHelpers';
+import MentionTextInput from '../MentionTextInput/MentionTextInput';
+import { useState } from 'react';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
+  const MAX_COMMENT_LEN = 250;
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const content = e.target.comment.value;
+
+
+  async function onSubmit(inputContent) {
 
     try {
-      const response = await fetch(`${BASE_URL}/comment/`, {
+      const response = await authenticatedFetch(`${BASE_URL}/comment/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user: currentUserId,
           post: postId,
-          content: content,
+          content: inputContent,
           created_at: new Date().toISOString(),
         }),
       });
@@ -32,7 +34,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         )
       );
 
-      e.target.reset();
     } catch (err) {
       console.error("Failed to add comment:", err);
     }
@@ -40,32 +41,10 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
   async function handleDeleteComment(commentId) {
     try {
-      // Step 1: Fetch CSRF from server
-      const csrfRes = await fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-  
-      const csrfData = await csrfRes.json();
-      const csrfToken = csrfData.csrfToken || getCookie("csrftoken");
-  
-      console.log("CSRF for like:", csrfToken);
-  
-      if (!csrfToken) {
-        alert("Still initializing. Please try again in a moment.");
-        return;
-      }
-      
-      // Step 2: Delete post comment
-      const response = await fetch(`${BASE_URL}/comment/${commentId}/`, {
+      const response = await authenticatedFetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken
         },
       });
   
@@ -89,6 +68,8 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
     }
   }  
 
+ 
+
   return (
     <div className={styles.modalOverlay}>
 
@@ -96,19 +77,14 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h1>Comments</h1>
 
-        {/* Comment input */}
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <textarea
-            name="comment"
-            type="text"
-            placeholder="Enter Comment..."
-            className={styles.textInput}
-            required
-          />
-          <div className={styles.modalButton}>
-            <button type="submit" className={styles.postButton}>POST</button>
-          </div>
-        </form>
+
+        <MentionTextInput 
+          placeholder='Write a comment' onSubmit={onSubmit} inputClassName={styles.textInput} 
+          formClassName={styles.form} buttonContainerClassName={styles.modalButton} buttonClassName={styles.postButton}
+          mentionWrapperClassName={styles.mentionWrapper} mentionClassName={styles.mention} 
+          mentionChipClassName={styles.mentionChip} maxLength={MAX_COMMENT_LEN}
+        />
+
 
         {/* Show existing comments */}
         <div className={styles.commentList}>
@@ -144,7 +120,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
               </div>
             </div>
-          </div>          
+          </div>
           ))}
         </div>
       </div>

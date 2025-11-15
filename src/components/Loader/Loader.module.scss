@@ -1,4 +1,5 @@
 .loader-container {
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,4 +16,11 @@
   font-size: 1.2rem;
   font-weight: 500;
   letter-spacing: 0.05em;
+}
+
+.card {
+  background: white;
+  border: 1px solid #f1c40f;
+  border-radius: 12px;
+  padding: 12px 48px;
 }

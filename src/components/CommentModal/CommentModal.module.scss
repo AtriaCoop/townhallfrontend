@@ -66,6 +66,11 @@
   padding: 8px 0px 96px 8px;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
+
+  &:empty:before {
+    content: attr(placeholder);
+    color: #999;
+  }
 }
 
 .modalButton {
@@ -149,4 +154,88 @@
   &:hover {
     text-decoration: underline;
   }
+}
+
+.mentionWrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  border-radius: 6px;
+  padding: 5px 10px;
+  width: 200px;
+  background-color: #fff;      
+  border: 1px solid #e2e8f0;  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+              0 1px 2px rgba(0, 0, 0, 0.06);  
+
+}
+
+.mention{
+  display: flex;
+  flex-direction: row;
+  gap:10px;
+  align-items: center;
+  justify-content: start;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: smaller;
+
+  &:hover {
+    background-color: #f0f0f0; // or whatever color you want
+    cursor: pointer;
+  }
+}
+
+.mention span {
+  background-color: #dbeafe;
+  color: #1e3a8a;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+
+.mentionChip {
+  display: inline-block;
+  background-color: #e0f3ff;
+  color: #0077cc;
+  padding: 2px 6px;
+  margin-right: 2px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+.errorMessage {
+  color: red;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.characterCount {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: #737373; 
+}
+
+.characterCountError {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: red;
+}
+
+.textInputError {
+  color: rgb(66, 66, 66);
+  font-size: 16px;
+  border-radius: 4.5px;
+  border: 1px solid red;
+  padding: 8px 0px 96px 8px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  
+  &:focus {
+    outline: {color: red};
+  }  
 }
