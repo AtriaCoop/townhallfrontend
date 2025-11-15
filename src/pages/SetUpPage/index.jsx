@@ -248,7 +248,7 @@ export default function SetUpPage() {
 
           <p>Linkedin</p>
           <input
-            type="text"
+            type="url"
             placeholder="https://linkedin.com/in/username"
             value={formData.linkedin_url}
             onChange={(e) =>
@@ -261,7 +261,7 @@ export default function SetUpPage() {
 
           <p>X</p>
           <input
-            type="text"
+            type="url"
             placeholder="https://x.com/username"
             value={formData.x_url}
             onChange={(e) =>
@@ -274,7 +274,7 @@ export default function SetUpPage() {
 
           <p>Facebook</p>
           <input
-            type="text"
+            type="url"
             placeholder="https://facebook.com/username"
             value={formData.facebook_url}
             onChange={(e) =>
@@ -287,7 +287,7 @@ export default function SetUpPage() {
 
           <p>Instagram</p>
           <input
-            type="text"
+            type="url"
             placeholder="https://instagram.com/username"
             value={formData.instagram_url}
             onChange={(e) =>
