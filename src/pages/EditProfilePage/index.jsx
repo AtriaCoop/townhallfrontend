@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation/Navigation";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import { validateUrl } from "@/utils/validateUrl";
 
 export default function EditProfilePage({ hasNewDm }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -28,6 +29,8 @@ export default function EditProfilePage({ hasNewDm }) {
   });
   const [saveStatus, setSaveStatus] = useState(null); // 'success' | 'error' | null
   const [saveMessage, setSaveMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+
   const dismissTimerRef = useRef(null);
 
   const handleDeleteClick = () => {
@@ -60,15 +63,18 @@ export default function EditProfilePage({ hasNewDm }) {
     fetchProfile();
   }, []);
 
-  async function updateProfile() {
+  async function handleUpdateProfile() {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user?.id) {
-      console.error("No user ID found.");
+    if (!user || !user.id) {
       setSaveStatus("error");
       setSaveMessage("No user found. Please sign in again.");
-      return { ok: false, message: "No user ID found" };
+      return;
     }
 
+    // prevent profile update if any social media URLs are invalid
+    if (!isUrlsValid()) return;
+
+    // create form data payload
     const form = new FormData();
 
     form.append("full_name", formData.full_name);
@@ -102,9 +108,11 @@ export default function EditProfilePage({ hasNewDm }) {
       );
 
       const data = await response.json();
+
       if (!response.ok) {
         // Use backend error message or create specific message based on status
         let errorMessage = data.message || data.error || data.detail;
+
         if (!errorMessage) {
           switch (response.status) {
             case 400:
@@ -126,16 +134,25 @@ export default function EditProfilePage({ hasNewDm }) {
               errorMessage = `Update failed (${response.status})`;
           }
         }
-        throw new Error(errorMessage);
+        setSaveStatus("error");
+        setSaveMessage(errorMessage);
+        return;
       }
-      console.log("Profile updated", data);
-      return {
-        ok: true,
-        message: data.message || "Profile saved successfully.",
-      };
+
+      // store success toast data to show after page navigation
+      sessionStorage.setItem(
+        "toastAfterNav",
+        JSON.stringify({
+          type: "success",
+          message: "Profile saved successfully.",
+        })
+      );
+
+      // redirect to profile page
+      router.push(`/ProfilePage/${profileData.id}`);
     } catch (err) {
+      console.log({ err });
       console.error("Failed to update profile:", err);
-      return { ok: false, message: err?.message || "Failed to save profile." };
     }
   }
 
@@ -152,6 +169,42 @@ export default function EditProfilePage({ hasNewDm }) {
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
     };
   }, [saveStatus]);
+
+  function isUrlsValid() {
+    // skip validation if all social media URLs are empty (optional fields)
+    if (
+      !formData.linkedin_url &&
+      !formData.facebook_url &&
+      !formData.instagram_url &&
+      !formData.x_url
+    ) {
+      return true;
+    }
+
+    const urlErrors = {};
+    const urlFields = [
+      "linkedin_url",
+      "x_url",
+      "instagram_url",
+      "facebook_url",
+    ];
+
+    // validate each url
+    urlFields.forEach((field) => {
+      const error = validateUrl(formData[field], field);
+      if (error) urlErrors[field] = error;
+    });
+
+    // if any url has an error, show error messages
+    if (Object.keys(urlErrors).length > 0) {
+      setFieldErrors(urlErrors);
+      setSaveStatus("error");
+      setSaveMessage("Please fix the errors below before saving.");
+      return false;
+    }
+
+    return true;
+  }
 
   function handleFieldChange(patch) {
     setFormData({ ...formData, ...patch });
@@ -339,28 +392,7 @@ export default function EditProfilePage({ hasNewDm }) {
           onChange={(e) => handleFieldChange({ instagram_url: e.target.value })}
         />
 
-        <button
-          className={styles.saveButton}
-          onClick={async () => {
-            const result = await updateProfile();
-            if (result?.ok) {
-              const message = result.message || "Profile saved successfully.";
-              console.log("✅ Success:", message);
-              try {
-                sessionStorage.setItem(
-                  "toastAfterNav",
-                  JSON.stringify({ type: "success", message })
-                );
-              } catch (e) {}
-              router.push(`/ProfilePage/${profileData.id}`);
-            } else {
-              const errorMessage = result?.message || "Failed to save profile.";
-              setSaveStatus("error");
-              setSaveMessage(errorMessage);
-              console.error("❌ Error:", errorMessage);
-            }
-          }}
-        >
+        <button className={styles.saveButton} onClick={handleUpdateProfile}>
           SAVE
         </button>
       </div>
