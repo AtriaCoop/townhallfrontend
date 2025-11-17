@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { validateUrl } from "@/utils/validateUrl";
+import FormInputText from "@/components/FormInputText/FormInputText";
 
 export default function EditProfilePage({ hasNewDm }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -217,6 +218,21 @@ export default function EditProfilePage({ hasNewDm }) {
     }
   }
 
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+
+    setFormData({ ...formData, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
+
+    if (saveStatus) {
+      setSaveStatus(null);
+      setSaveMessage("");
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+      }
+    }
+  }
+
   return (
     <div className={styles.container}>
       <Navigation hasNewDm={hasNewDm} />
@@ -360,36 +376,44 @@ export default function EditProfilePage({ hasNewDm }) {
           style={{ display: "none" }}
         />
 
-        <p>Linkedin</p>
-        <input
+        <FormInputText
+          name="linkedin_url"
+          label="Linkedin"
           type="url"
           placeholder="https://linkedin.com/in/username"
           value={formData.linkedin_url}
-          onChange={(e) => handleFieldChange({ linkedin_url: e.target.value })}
+          onChange={handleInputChange}
+          error={fieldErrors.linkedin_url}
         />
 
-        <p>X</p>
-        <input
+        <FormInputText
+          name="x_url"
+          label="X/Twitter"
           type="url"
           placeholder="https://x.com/username"
           value={formData.x_url}
-          onChange={(e) => handleFieldChange({ x_url: e.target.value })}
+          onChange={handleInputChange}
+          error={fieldErrors.x_url}
         />
 
-        <p>Facebook</p>
-        <input
+        <FormInputText
+          name="facebook_url"
+          label="Facebook"
           type="url"
           placeholder="https://facebook.com/username"
           value={formData.facebook_url}
-          onChange={(e) => handleFieldChange({ facebook_url: e.target.value })}
+          onChange={handleInputChange}
+          error={fieldErrors.facebook_url}
         />
 
-        <p>Instagram</p>
-        <input
+        <FormInputText
+          name="instagram_url"
+          label="Instagram"
           type="url"
           placeholder="https://instagram.com/username"
           value={formData.instagram_url}
-          onChange={(e) => handleFieldChange({ instagram_url: e.target.value })}
+          onChange={handleInputChange}
+          error={fieldErrors.instagram_url}
         />
 
         <button className={styles.saveButton} onClick={handleUpdateProfile}>
