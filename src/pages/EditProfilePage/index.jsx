@@ -78,18 +78,10 @@ export default function EditProfilePage({ hasNewDm }) {
     // create form data payload
     const form = new FormData();
 
-    form.append("full_name", formData.full_name);
-    form.append("pronouns", formData.pronouns);
-    form.append("title", formData.title);
-    form.append("primary_organization", formData.primary_organization);
-    form.append("other_organizations", formData.other_organizations);
-    form.append("other_networks", formData.other_networks);
-    form.append("about_me", formData.about_me);
-    form.append("skills_interests", formData.skills_interests);
-    form.append("linkedin_url", formData.linkedin_url);
-    form.append("x_url", formData.x_url);
-    form.append("instagram_url", formData.instagram_url);
-    form.append("facebook_url", formData.facebook_url);
+    for (const key in formData) {
+      if (key !== "profile_image" && key !== "profile_header")
+        form.append(key, formData[key]);
+    }
 
     // Handle image files (if added)
     if (formData.profile_image instanceof File) {
@@ -171,34 +163,23 @@ export default function EditProfilePage({ hasNewDm }) {
     };
   }, [saveStatus]);
 
+  function getUrlError(urlErrors, field) {
+    const error = validateUrl(formData[field], field);
+    if (error) urlErrors[field] = error;
+  }
+
   function isUrlsValid() {
-    // skip validation if all social media URLs are empty (optional fields)
-    if (
-      !formData.linkedin_url &&
-      !formData.facebook_url &&
-      !formData.instagram_url &&
-      !formData.x_url
-    ) {
-      return true;
-    }
+    const errors = {};
 
-    const urlErrors = {};
-    const urlFields = [
-      "linkedin_url",
-      "x_url",
-      "instagram_url",
-      "facebook_url",
-    ];
-
-    // validate each url
-    urlFields.forEach((field) => {
-      const error = validateUrl(formData[field], field);
-      if (error) urlErrors[field] = error;
-    });
+    // validate urls
+    if (formData.linkedin_url) getUrlError(errors, "linkedin_url");
+    if (formData.x_url) getUrlError(errors, "x_url");
+    if (formData.instagram_url) getUrlError(errors, "instagram_url");
+    if (formData.facebook_url) getUrlError(errors, "facebook_url");
 
     // if any url has an error, show error messages
-    if (Object.keys(urlErrors).length > 0) {
-      setFieldErrors(urlErrors);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       setSaveStatus("error");
       setSaveMessage("Please fix the errors below before saving.");
       return false;
@@ -289,69 +270,68 @@ export default function EditProfilePage({ hasNewDm }) {
       </div>
 
       <div className={styles.inputs}>
-        <p>Full Name</p>
-        <input
-          type="text"
+        <FormInputText
+          name="full_name"
+          label="Full Name"
           placeholder="Enter full name..."
           value={formData.full_name}
-          onChange={(e) => handleFieldChange({ full_name: e.target.value })}
+          onChange={handleInputChange}
         />
-        <p>Preferred Pronouns</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="pronouns"
+          label="Preferred Pronouns"
           placeholder="Share your pronouns (Optional)"
           value={formData.pronouns}
-          onChange={(e) => handleFieldChange({ pronouns: e.target.value })}
+          onChange={handleInputChange}
         />
-        <p>Title</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="title"
+          label="Title"
           placeholder="Enter title..."
           value={formData.title}
-          onChange={(e) => handleFieldChange({ title: e.target.value })}
+          onChange={handleInputChange}
         />
-        <p>Primary Organization</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="primary_organization"
+          label="Primary Organization"
           placeholder="What is the main organization you work for?"
           value={formData.primary_organization}
-          onChange={(e) =>
-            handleFieldChange({ primary_organization: e.target.value })
-          }
+          onChange={handleInputChange}
         />
-        <p>Other Organizations</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="other_organizations"
+          label="Other Organization"
           placeholder="Enter other organizations you are a part of..."
           value={formData.other_organizations}
-          onChange={(e) =>
-            handleFieldChange({ other_organizations: e.target.value })
-          }
+          onChange={handleInputChange}
         />
-        <p>Other Networks</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="other_networks"
+          label="Other Networks"
           placeholder="List any coalitions or networks you are connected to other than the VFJC."
           value={formData.other_networks}
-          onChange={(e) =>
-            handleFieldChange({ other_networks: e.target.value })
-          }
+          onChange={handleInputChange}
         />
-        <p>About Me</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="about_me"
+          label="About Me"
           placeholder="Tell us about yourself!"
           value={formData.about_me}
-          onChange={(e) => handleFieldChange({ about_me: e.target.value })}
+          onChange={handleInputChange}
         />
-        <p>Skills & Interests</p>
-        <input
-          type="text"
+
+        <FormInputText
+          name="skills_interests"
+          label="Skills & Interests"
           placeholder="Enter any skills & interests that may benfeit the coalition."
           value={formData.skills_interests}
-          onChange={(e) =>
-            handleFieldChange({ skills_interests: e.target.value })
-          }
+          onChange={handleInputChange}
         />
 
         <p>Profile Header</p>
