@@ -3,6 +3,8 @@ import { useRef } from "react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import FormInputText from "@/components/FormInputText/FormInputText";
+import { validateUrl } from "@/utils/validateUrl";
 
 export default function SetUpPage() {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -22,6 +24,7 @@ export default function SetUpPage() {
     facebook_url: "",
   });
   const [profilePreview, setProfilePreview] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const router = useRouter();
 
@@ -48,14 +51,8 @@ export default function SetUpPage() {
   };
 
   const handleCompleteClick = async () => {
-    if (
-      !formData.full_name.trim() ||
-      !formData.title.trim() ||
-      !formData.primary_organization.trim()
-    ) {
-      alert("Please fill out the required fields");
-      return;
-    }
+    // prevent profile update if form inputs are invalid
+    if (!isFormValid()) return;
 
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user || !user.id) {
@@ -75,7 +72,7 @@ export default function SetUpPage() {
       form.append("profile_image", profilePicRef.current.files[0]);
     }
 
-    console.log("📦 Sending PATCH to backend with:", formData);
+    // console.log("📦 Sending PATCH to backend with:", formData);
 
     try {
       const response = await authenticatedFetch(
@@ -98,6 +95,43 @@ export default function SetUpPage() {
     }
   };
 
+  function getUrlError(urlErrors, field) {
+    const error = validateUrl(formData[field], field);
+    if (error) urlErrors[field] = error;
+  }
+
+  function isFormValid() {
+    const errors = {};
+
+    // validate required fields
+    if (!formData.full_name.trim())
+      errors["full_name"] = "Full name is required";
+    if (!formData.title.trim()) errors["title"] = "Title is required";
+    if (!formData.primary_organization.trim())
+      errors["primary_organization"] = "Primary organization is required";
+
+    // validate urls
+    if (formData.linkedin_url) getUrlError(errors, "linkedin_url");
+    if (formData.x_url) getUrlError(errors, "x_url");
+    if (formData.instagram_url) getUrlError(errors, "instagram_url");
+    if (formData.facebook_url) getUrlError(errors, "facebook_url");
+
+    // if any url has an error, show error messages
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return false;
+    }
+
+    return true;
+  }
+
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+
+    setFormData({ ...formData, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
+  }
+
   return (
     <div>
       {/* Navigation */}
@@ -119,96 +153,76 @@ export default function SetUpPage() {
           <p>We'll start with the basics:</p>
         </div>
         <div className={styles.inputs}>
-          <p>
-            Full Name <span style={{ color: "red" }}>*</span>
-          </p>
-          <input
-            type="text"
+          <FormInputText
+            isRequired
+            name="full_name"
+            label="Full Name"
             placeholder="Enter full name..."
             value={formData.full_name}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, full_name: e.target.value }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.full_name}
           />
-          <p>Preferred Pronouns</p>
-          <input
-            type="text"
-            placeholder="What are your pronouns?"
+
+          <FormInputText
+            name="pronouns"
+            label="What are your pronouns?"
+            placeholder="Share your pronouns (Optional)"
             value={formData.pronouns}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, pronouns: e.target.value }))
-            }
+            onChange={handleInputChange}
           />
-          <p>
-            Title <span style={{ color: "red" }}>*</span>
-          </p>
-          <input
-            type="text"
+
+          <FormInputText
+            isRequired
+            name="title"
+            label="Title"
             placeholder="What is your job title?"
             value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.title}
           />
-          <p>
-            Primary Organization <span style={{ color: "red" }}>*</span>
-          </p>
-          <input
-            type="text"
+
+          <FormInputText
+            isRequired
+            name="primary_organization"
+            label="Primary Organization"
             placeholder="What organization do you work for?"
             value={formData.primary_organization}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                primary_organization: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.primary_organization}
           />
-          <p>Other Organizations</p>
-          <input
-            type="text"
+
+          <FormInputText
+            name="other_organizations"
+            label="Other Organization"
             placeholder="Are there other organizations you work for?"
             value={formData.other_organizations}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                other_organizations: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
           />
-          <p>Other Networks</p>
-          <input
-            type="text"
-            placeholder="List any coalitions or networks you are a part of"
+
+          <FormInputText
+            name="other_networks"
+            label="Other Networks"
+            placeholder="List any coalitions or networks you are connected to other than the VFJC."
             value={formData.other_networks}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                other_networks: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
           />
-          <p>About Me</p>
-          <input
-            type="text"
+
+          <FormInputText
+            name="about_me"
+            label="About Me"
             placeholder="Where are you from? What do you like to do outside of work? Why is food security important to you?"
             value={formData.about_me}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, about_me: e.target.value }))
-            }
+            onChange={handleInputChange}
           />
-          <p>Skills & Interests</p>
-          <input
-            type="text"
+
+          <FormInputText
+            name="skills_interests"
+            label="Skills & Interests"
             placeholder="Are there specific ways you’d like to contribute to the coalition?"
             value={formData.skills_interests}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                skills_interests: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
           />
+
           <p>Profile Picture</p>
           <div
             className={styles.uploadButton}
@@ -246,56 +260,44 @@ export default function SetUpPage() {
             style={{ display: "none " }}
           />
 
-          <p>Linkedin</p>
-          <input
+          <FormInputText
+            name="linkedin_url"
+            label="Linkedin"
             type="url"
             placeholder="https://linkedin.com/in/username"
             value={formData.linkedin_url}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                linkedin_url: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.linkedin_url}
           />
 
-          <p>X</p>
-          <input
+          <FormInputText
+            name="x_url"
+            label="X/Twitter"
             type="url"
             placeholder="https://x.com/username"
             value={formData.x_url}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                x_url: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.x_url}
           />
 
-          <p>Facebook</p>
-          <input
+          <FormInputText
+            name="facebook_url"
+            label="Facebook"
             type="url"
             placeholder="https://facebook.com/username"
             value={formData.facebook_url}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                facebook_url: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.facebook_url}
           />
 
-          <p>Instagram</p>
-          <input
+          <FormInputText
+            name="instagram_url"
+            label="Instagram"
             type="url"
             placeholder="https://instagram.com/username"
             value={formData.instagram_url}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                instagram_url: e.target.value,
-              }))
-            }
+            onChange={handleInputChange}
+            error={fieldErrors.instagram_url}
           />
 
           <button
