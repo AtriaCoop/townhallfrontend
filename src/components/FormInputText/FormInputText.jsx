@@ -8,10 +8,13 @@ export default function FormInputText({
   onChange,
   placeholder,
   error,
+  isRequired,
 }) {
   return (
     <>
-      <p className={styles.inputLabel}>{label}</p>
+      <p className={styles.inputLabel}>
+        {label} {isRequired && <span style={{ color: "red" }}>*</span>}
+      </p>
       <input
         name={name}
         type={type}
