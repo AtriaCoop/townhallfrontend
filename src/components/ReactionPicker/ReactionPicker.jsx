@@ -54,7 +54,6 @@ export default function ReactionPicker({
       const url = `${BASE_URL}/post/${postId}/reaction/`;
       const response = await authenticatedFetch(url, {
         method: "PATCH",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },

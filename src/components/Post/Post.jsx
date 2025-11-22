@@ -219,6 +219,8 @@ async function handleLikePost() {
   const handleReactionSelect = (reactionType) => {
     // Reaction is handled in the ReactionPicker component
     // This callback can be used for any additional UI updates
+  };
+
   // PIN POST
   const handlePinPost = async () => {
     if (is_staff) {
@@ -250,8 +252,8 @@ async function handleLikePost() {
     <div className={pinned ? styles.postPinned : styles.post}>
 
       <div className={styles.postHeader}>
-        {console.log({userImage})}
-        <img src={userImage}
+        <img 
+          src={userImage || '/assets/ProfileImage.jpg'}
           alt="User profile"
           className={styles.profilePic}
           onClick={() => router.push(`/ProfilePage/${userId}`)}
