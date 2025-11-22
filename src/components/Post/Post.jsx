@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
+import { getCookie } from '@/utils/authHelpers';
+import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
 
@@ -25,6 +27,7 @@ export default function Post({
   is_staff,
   postId,
   setPosts,
+  reactions = {},
 }) {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -43,6 +46,17 @@ export default function Post({
   const [isMyOwnPost, setIsMyOwnPost] = useState(false)
   const [reportResponse, setReportResponse] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+
+  // Can make this a separate file and import but I'm lazy so this can be another Jira Ticket (this is for testing)
+  const REACTIONS = [
+    { type: 'love', emoji: '❤️' },
+    { type: 'appreciate', emoji: '🤲' },
+    { type: 'respect', emoji: '👌' },
+    { type: 'support', emoji: '🤝' },
+    { type: 'inspired', emoji: '☀️' },
+    { type: 'helpful', emoji: '✅' },
+  ];
 
     // 🧠 GET CSRF COOKIE ON LOAD
     useEffect(() => {
@@ -198,6 +212,15 @@ async function handleLikePost() {
     }
   }
 
+  const handleReactionClick = () => {
+    setShowReactionPicker(prev => !prev);
+  }
+
+  const handleReactionSelect = (reactionType) => {
+    // Reaction is handled in the ReactionPicker component
+    // This callback can be used for any additional UI updates
+  };
+
   // PIN POST
   const handlePinPost = async () => {
     if (is_staff) {
@@ -229,8 +252,8 @@ async function handleLikePost() {
     <div className={pinned ? styles.postPinned : styles.post}>
 
       <div className={styles.postHeader}>
-        {console.log({userImage})}
-        <img src={userImage}
+        <img 
+          src={userImage || '/assets/ProfileImage.jpg'}
           alt="User profile"
           className={styles.profilePic}
           onClick={() => router.push(`/ProfilePage/${userId}`)}
@@ -401,12 +424,30 @@ async function handleLikePost() {
         />
       )}
 
+      {Object.keys(reactions).length > 0 && (
+        <div className={styles.reactionsDisplay}>
+          {Object.entries(reactions).map(([reactionType, userIds]) => (
+            userIds.length > 0 && (
+              <div key={reactionType} className={styles.reactionGroup}>
+                <span className={styles.reactionEmoji}>
+                {REACTIONS.find(r => r.type === reactionType)?.emoji}
+                </span>
+                <span className={styles.reactionCount}>{userIds.length}</span>
+              </div>
+            )
+          ))}
+        </div>
+      )}
+      
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
           <img src={liked ? "/assets/liked.png" : "/assets/like.png"} alt="like" onClick={handleLikePost}/>
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
           <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
+          <button className={styles.reactButton} onClick={handleReactionClick}>
+            😊 React
+          </button>
         </div>
         {is_staff ?
               <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
@@ -414,7 +455,16 @@ async function handleLikePost() {
               pinned && <img className={styles.pin} src="/assets/pinned.png"/>
         }
       </div>
-
+      {showReactionPicker && (
+        <ReactionPicker 
+          onReactionSelect={handleReactionSelect}
+          currentReactions={reactions}
+          currentUserId={currentUserId}
+          postId={postId}
+          BASE_URL={BASE_URL}
+          setPosts={setPosts}
+        />
+      )}
     </div>
   );
 }
