@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { fetchCsrfToken, authenticatedFetch } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 import styles from './UpdateMessageModal.module.scss'
 
 export default function UpdateMessageModal({ msg, onCancel }) {

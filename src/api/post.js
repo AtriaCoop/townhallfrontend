@@ -1,4 +1,4 @@
-import { getCookie } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export async function updatePost(postId, { content, image, pinned }) {
 	const formData = new FormData();
@@ -7,13 +7,8 @@ export async function updatePost(postId, { content, image, pinned }) {
 	if (image !== undefined && image !== null) formData.append("image", image);
 	if (pinned !== undefined) formData.append("pinned", pinned);
   
-	const csrfToken = getCookie("csrftoken")
-	const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/${postId}/`, {
+	const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/${postId}/`, {
 	  method: "PATCH",
-	  credentials: "include",
-	  headers: {
-		"X-CSRFToken": csrfToken
-	  },
 	  body: formData,
 	});
   
@@ -31,13 +26,8 @@ export async function createPost({content, images = [], pinned}) {
 	images.forEach((img) => formData.append("image", img));
     if(pinned) {formData.append("pinned", pinned)};
 
-	const csrfToken = getCookie("csrftoken")
-	const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/`, {
+	const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/`, {
 		method: "POST",
-		credentials: "include",
-		headers: {
-			"X-CSRFToken": csrfToken
-		},
 		body: formData,
 	});
 

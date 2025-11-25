@@ -3,16 +3,23 @@ import styles from '@/pages/HomePage/HomePage.module.scss'
 import Post from '@/components/Post/Post';
 import PostModal from '@/components/PostModal/PostModal';
 import Loader from '@/components/Loader/Loader';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
+    const POSTS_PER_PAGE = 10;
+    const MAX_PAGINATION_BUTTONS = 5;
+      
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const [profileData, setProfileData] = useState(null)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const [profileData, setProfileData] = useState(null);
 
     useEffect(() => {
       async function fetchProfile() {
@@ -24,7 +31,7 @@ export default function HomePage({ hasNewDm }) {
             return;
           }
     
-          const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+          const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
     
           if (!response.ok) {
             localStorage.removeItem("user");
@@ -45,57 +52,114 @@ export default function HomePage({ hasNewDm }) {
     }, []);    
 
 
-      useEffect(() => {
-        async function fetchPosts() {
-          try {
-            setLoading(true);
-            const res = await fetch(`${BASE_URL}/post/`);
-            const data = await res.json();
+    useEffect(() => {
+      async function fetchPosts() {
+        try {
+          setLoading(true);
+          // Add query parameters for pagination
+          const baseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+          const url = new URL(`${baseUrl}/post/`);
+          url.searchParams.append('limit', POSTS_PER_PAGE.toString());
+          url.searchParams.append('page', currentPage.toString());
+          
+          const res = await authenticatedFetch(url.toString());
+          const data = await res.json();
 
-            //Helper funciton to get user id from like_by list and compare it to current user
-            function userInLiked(list, curr_uid){
-              for (const user of list){
-                if(user.id == curr_uid){
-                  return true;
-                }
+          //Helper function to get user id from like_by list and compare it to current user
+          function userInLiked(list, curr_uid){
+            for (const user of list){
+              if(user.id === curr_uid){
+                return true;
               }
-              return false;
             }
-
-            const formattedPosts = data.posts.map((p) => ({
-              id: p.id,
-              userId: p.user.id,
-              fullName: `${p.user.full_name}`,
-              organization: p.user.primary_organization,
-              userImage: p.user.profile_image,
-              date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
-              created_at: p.created_at,
-              content: [p.content],
-              postImage: p.image,
-              links: [],
-              likes: p.likes,
-              liked_by: p.liked_by,
-              isLiked: userInLiked(p.liked_by,profileData.id),
-              comments: p.comments,
-              pinned: p.pinned,
-            }))
-            
-            setPosts(formattedPosts);
-            setLoading(false);
-          } catch (err) {
-            console.error("Failed to fetch posts", err);
-            setLoading(false);
+            return false;
           }
+
+          const formattedPosts = data.posts.map((p) => ({
+            id: p.id,
+            userId: p.user.id,
+            fullName: `${p.user.full_name}`,
+            organization: p.user.primary_organization,
+            userImage: p.user.profile_image,
+            date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
+            created_at: p.created_at,
+            content: [p.content],
+            postImage: p.image,
+            links: [],
+            likes: p.likes,
+            liked_by: p.liked_by,
+            isLiked: userInLiked(p.liked_by,profileData.id),
+            comments: p.comments,
+            pinned: p.pinned,
+          }))
+          
+          setPosts(formattedPosts);
+          setTotalPages(data.total_pages || 1);
+          setLoading(false);
+        } catch (err) {
+          console.error("Failed to fetch posts", err);
+          setLoading(false);
         }
-      
-        if (profileData) {
-          fetchPosts();
-        }
-      }, [profileData]);      
+      }
     
+      if (profileData) {
+        fetchPosts();
+      }
+    }, [profileData, currentPage]);      
+  
     const handlePostClick = () => {
         setShowModal(true);
     }
+
+    // Handle pagination previous page button
+    const handlePreviousPage = () => {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    }
+
+    // Handle pagination next page button
+    const handleNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+      }
+    }
+
+    // Handle pagination index page buttons
+    const handlePageChange = (page) => {
+      setCurrentPage(page);
+    }
+
+    // Calculate which page buttons to display
+    const getPageNumbers = () => {
+      // Calculate dynamic thresholds based on MAX_PAGINATION_BUTTONS
+      const halfButtons = Math.floor(MAX_PAGINATION_BUTTONS / 2);
+      const startThreshold = halfButtons + 1; // When to start showing first N pages
+      const endThreshold = totalPages - halfButtons; // When to show last N pages
+      const centerOffset = Math.floor((MAX_PAGINATION_BUTTONS - 1) / 2); // Pages before/after current when centered
+      
+      // If total pages is less than or equal to max buttons, show all pages
+      if (totalPages <= MAX_PAGINATION_BUTTONS) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+      }
+      
+      // If current page is near the start, show first N pages
+      if (currentPage < startThreshold) {
+        return Array.from({ length: MAX_PAGINATION_BUTTONS }, (_, i) => i + 1);
+      }
+      
+      // If current page is near the end, show last N pages
+      if (currentPage > endThreshold) {
+        return Array.from({ length: MAX_PAGINATION_BUTTONS }, (_, i) => totalPages - MAX_PAGINATION_BUTTONS + i + 1);
+      }
+      
+      // For pages in the middle, center the current page
+      // Show equal pages before and after (when possible)
+      const startPage = currentPage - centerOffset;
+      return Array.from({ length: MAX_PAGINATION_BUTTONS }, (_, i) => startPage + i);
+    };
+
+    const pageNumbers = getPageNumbers();
 
     return (
         <div className={styles.container}>
@@ -139,6 +203,21 @@ export default function HomePage({ hasNewDm }) {
                         setPosts={setPosts}
                     />
                 ))}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className={styles.pagination}>
+                    <button disabled={currentPage === 1} onClick={handlePreviousPage}>PREV</button>
+                    {pageNumbers.map((pageNum) => (
+                      <button 
+                          key={pageNum} 
+                          onClick={() => handlePageChange(pageNum)}
+                          className={currentPage === pageNum ? styles.activePage : ''}
+                      >{pageNum}</button>
+                    ))}
+                    <button disabled={currentPage === totalPages} onClick={handleNextPage}>NEXT</button>
+                  </div>
+                )}
 
                 {/* New Post Modal */}
                 {showModal && (

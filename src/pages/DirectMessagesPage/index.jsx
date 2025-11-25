@@ -37,7 +37,7 @@ export default function DirectMessagesPage({ currentUserId, hasNewDm, setHasNewD
     useEffect(() => {
       const fetchChats = async () => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const res = await fetch(`${BASE_URL}/chats/?user_id=${userData.id}`, {
+        const res = await authenticatedFetch(`${BASE_URL}/chats/?user_id=${userData.id}`, {
           credentials: 'include',
         });
         const data = await res.json();

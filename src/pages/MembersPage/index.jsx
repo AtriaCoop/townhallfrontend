@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation/Navigation";
 import styles from '@/pages/MembersPage/MembersPage.module.scss';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function MembersPage({ hasNewDm }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -19,7 +20,7 @@ export default function MembersPage({ hasNewDm }) {
   useEffect(() => {
     async function fetchMembers() {
       try {
-        const res = await fetch(`${BASE_URL}/user`);
+        const res = await authenticatedFetch(`${BASE_URL}/user`);
         const data = await res.json();
         setMembers(data.data || []);
       } catch (err) {

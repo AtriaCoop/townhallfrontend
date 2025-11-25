@@ -26,7 +26,7 @@ export default function ProfilePage({ hasNewDm }) {
 
     async function fetchProfile() {
       try {
-        const response = await fetch(`${BASE_URL}/user/${id}/`);
+        const response = await authenticatedFetch(`${BASE_URL}/user/${id}/`);
         const data = await response.json();
         setProfileData(data.user);
       } catch (error) {

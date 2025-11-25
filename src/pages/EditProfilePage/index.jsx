@@ -41,7 +41,7 @@ export default function EditProfilePage({ hasNewDm }) {
             const user = JSON.parse(localStorage.getItem("user"));
             if (!user || !user.id) return;
       
-            const response = await fetch(`${BASE_URL}/user/${user.id}/`);
+            const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
             const data = await response.json();
             setProfileData(data.user);
             setFormData((prev) => ({

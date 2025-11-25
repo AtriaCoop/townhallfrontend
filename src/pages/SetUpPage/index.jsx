@@ -2,7 +2,7 @@ import styles from '@/pages/SetUpPage/SetUpPage.module.scss'
 import { useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useState } from 'react';
-import { getCookie, authenticatedFetch } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 
 export default function SetUpPage() {
 
@@ -51,8 +51,6 @@ export default function SetUpPage() {
             alert("Please fill out the required fields");
             return;
         }
-        
-        const csrfToken = getCookie("csrftoken");
         
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user || !user.id) {
