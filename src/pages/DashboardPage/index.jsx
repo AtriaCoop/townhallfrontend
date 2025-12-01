@@ -11,7 +11,7 @@ export default function DashboardPage() {
         <h1 className={styles.title}>My Dashboard</h1>
 
         <div className={styles.grid}>
-          <div className={styles.card}>
+          <div className={styles.cardWide}>
             <h2>Upcoming Events</h2>
             <div className={styles.calendar}>📅 Calendar View Placeholder</div>
           </div>

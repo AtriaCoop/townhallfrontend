@@ -25,12 +25,26 @@ const Activities = () => {
         <h2>Recent Activities</h2>
             <div className={styles.timeline}>
                 {activities && activities.length > 0 ? (
-                    activities.map( activity => {
+                    activities.map( (activity, index) => {
                         const { shortenedDate, time } = formatReadableDateTime(activity.activity.history_date);
+
+                         // Get previous activity date
+                        const prevActivity = activities[index - 1];
+                        const prevDate =
+                            prevActivity
+                                ? formatReadableDateTime(prevActivity.activity.history_date).shortenedDate
+                                : null;
+
+                        // Only show date label if different from previous
+                        const showDate = shortenedDate !== prevDate;
+
+
                         
                         return (
                             <div key={activity.id} className={styles.dateGroup}>
-                                <div className={styles.dateLabel}>{shortenedDate}</div>
+                                { showDate && (
+                                    <div className={styles.dateLabel}>{shortenedDate}</div>
+                                ) }
                                         <div  className={styles.activityCard}>
                                             <div className={styles.date}>
                                                 <p>{time}</p>
