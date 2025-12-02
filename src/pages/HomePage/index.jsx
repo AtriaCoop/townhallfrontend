@@ -7,6 +7,7 @@ import Clock from '@/components/Clock/Clock';
 import { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import Icon from '@/icons/Icon';
 
 export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -302,7 +303,8 @@ export default function HomePage({ hasNewDm }) {
                 )}
                 {!showModal && (
                 <div className={styles.newPostButton} onClick={handlePostClick}>
-                   <img src={"/assets/pencilIcon.png"} alt="Pencil Icon" className={styles.pencilImage} /> NEW POST
+                   <Icon name="pencil" />
+                   NEW POST
                 </div>
                 )}
                 

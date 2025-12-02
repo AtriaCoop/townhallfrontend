@@ -1,7 +1,7 @@
 import styles from './ChatWindow.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
-import { FaImage } from 'react-icons/fa';
+import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import MessageModal from '@/components/MessageModal/MessageModal'
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
@@ -212,7 +212,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
             <div className={styles.inputArea}>
             <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
             <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
-              <FaImage />
+              <Icon name="image" />
             </button>
 
             <input
@@ -249,7 +249,9 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 />
-                <button onClick={handleSend}>Send</button>
+                <button className={styles.sendButton} onClick={handleSend}>
+                  <Icon name="send" />
+                </button>
             </div>
 
         </div>

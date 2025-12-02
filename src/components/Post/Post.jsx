@@ -7,6 +7,7 @@ import { getCookie } from '@/utils/authHelpers';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import Icon from '@/icons/Icon';
 
 export default function Post({ 
   fullName,
@@ -441,18 +442,20 @@ async function handleLikePost() {
       
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <img src={liked ? "/assets/liked.png" : "/assets/like.png"} alt="like" onClick={handleLikePost}/>
+          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ""}`} onClick={handleLikePost}/>
           <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
-          <img src="/assets/comment.png" alt="comment" onClick={handleCommentClick}/>
+          <Icon name="message" className={styles.postIcon} onClick={handleCommentClick}/>
           <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
           <button className={styles.reactButton} onClick={handleReactionClick}>
             😊 React
           </button>
         </div>
         {is_staff ?
-              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}>
+                <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ""}`}/>
+              </button>
             :
-              pinned && <img className={styles.pin} src="/assets/pinned.png"/>
+              pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
         }
       </div>
       {showReactionPicker && (

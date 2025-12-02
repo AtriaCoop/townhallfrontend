@@ -5,7 +5,7 @@ import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal"
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
-import { FaImage } from 'react-icons/fa';
+import Icon from '@/icons/Icon';
 import { getCookie, authenticatedFetch } from '@/utils/authHelpers'; 
 
 export default function GroupChatsPage({ hasNewDm }) {
@@ -242,18 +242,12 @@ export default function GroupChatsPage({ hasNewDm }) {
                             }}
                             />
                         )}
-                        <img
-                            className={styles.search}
-                            src="/assets/search.png"
-                            alt="Search"
-                            onClick={() => setSearchMode((prev) => !prev)}
-                        />
-                        <img
-                            className={styles.exit}
-                            src="/assets/exit.png"
-                            alt="Exit"
-                            onClick={handleLeaveGroup}
-                        />
+                        <button className={styles.iconButton} onClick={() => setSearchMode((prev) => !prev)}>
+                            <Icon name="search" />
+                        </button>
+                        <button className={styles.iconButton} onClick={handleLeaveGroup}>
+                            <Icon name="leave" />
+                        </button>
                     </div>
                 </div>
 
@@ -320,7 +314,7 @@ export default function GroupChatsPage({ hasNewDm }) {
                 <div className={styles.chatInputContainer}>
                 <EmojiPickerButton onSelect={(emoji) => setInputText(prev => prev + emoji)} />
                 <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
-                    <FaImage />
+                    <Icon name="image" />
                 </button>
                 <input
                     type="file"
@@ -359,7 +353,7 @@ export default function GroupChatsPage({ hasNewDm }) {
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     />
                     <button className={styles.sendButton} onClick={handleSendMessage}>
-                        <img src="/assets/send.png" alt="Send" />
+                        <Icon name="send" />
                     </button>
                 </div>
             </div>

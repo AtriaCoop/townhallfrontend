@@ -122,6 +122,24 @@
   }
 }
 
+.postIcon {
+  color: #5a5a5a;
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.2s;
+  &:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+  }
+}
+
+.liked {
+  color: #e44e4e;
+}
+
+.pinned {
+  color: #e44e4e;
+}
+
 .likesComments {
   font-size: 0.85rem;
   color: #555;

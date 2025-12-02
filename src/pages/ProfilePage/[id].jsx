@@ -3,10 +3,10 @@ import Navigation from '@/components/Navigation/Navigation';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { FaEdit, FaSignOutAlt } from 'react-icons/fa';
+import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
 
-export default function ProfilePage({ hasNewDm }) {
+export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -96,7 +96,7 @@ export default function ProfilePage({ hasNewDm }) {
             onClick={() => router.push('/EditProfilePage')}
             className={styles.editButtonInline}
           >
-            <FaEdit style={{ marginRight: '0.4rem' }} />
+            <Icon name="edit" className={styles.icon}/>
             Edit Profile
           </button>
         )}
@@ -105,6 +105,11 @@ export default function ProfilePage({ hasNewDm }) {
         <div className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
         </div>
+        {isCurrentUser && (
+          <div>
+            <button onClick={() => setDarkMode(!darkMode)} className={`${styles.darkModeButton} ${darkMode ? styles.isDark : ""}`}>{darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}</button>
+          </div>
+        )}
 
         <div className={styles.sectionTitle}>👤 Details</div>
         <div className={styles.profileInfo}>
@@ -126,7 +131,7 @@ export default function ProfilePage({ hasNewDm }) {
               onClick={userLogout}
               className={styles.signoutFloatingButton}
             >
-              <FaSignOutAlt />
+              <Icon name="leave" className={styles.icon} />
               Sign Out
             </button>
           </>
