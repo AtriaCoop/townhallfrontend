@@ -105,9 +105,11 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
         <div className={styles.dateJoined}>
           Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
         </div>
-        <div>
-          <button onClick={() => setDarkMode(!darkMode)} className={`${styles.darkModeButton} ${darkMode ? styles.isDark : ""}`}>{darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}</button>
-        </div>
+        {isCurrentUser && (
+          <div>
+            <button onClick={() => setDarkMode(!darkMode)} className={`${styles.darkModeButton} ${darkMode ? styles.isDark : ""}`}>{darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}</button>
+          </div>
+        )}
 
         <div className={styles.sectionTitle}>👤 Details</div>
         <div className={styles.profileInfo}>
