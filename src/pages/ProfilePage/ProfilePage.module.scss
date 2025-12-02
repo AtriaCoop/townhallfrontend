@@ -6,7 +6,6 @@
 }
 
 .profileContainer {
-  background: #ffffff;
   margin: 1rem auto;
   padding: 1rem 2rem 1rem 2rem;
   border-radius: 12px;
@@ -16,6 +15,14 @@
   justify-content: space-around;
   align-items: center;
   gap: 1rem;
+
+  --text-color: #111827;
+  --text-color-secondary: #6b7280;
+}
+
+:global(body.dark) .profileContainer {
+  --text-color: #e7e7e7;
+  --text-color-secondary: #d1d1d1;
 }
 
 .toast {
@@ -45,7 +52,7 @@
   font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-color-secondary);
   letter-spacing: 0.05em;
   align-self: flex-start;
 }
@@ -62,13 +69,13 @@
 .name {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-color);
   text-align: center;
 }
 
 .dateJoined {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-color-secondary);
   text-align: center;
   margin-bottom: 0.5rem;
 }
@@ -76,7 +83,7 @@
 .sectionTitle {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-color-secondary);
   width: 100%;
   border-bottom: 1px solid #e5e7eb;
   padding-bottom: 0.25rem;
@@ -86,7 +93,7 @@
 .profileInfo {
   width: 100%;
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -95,10 +102,9 @@
 
 .aboutBox {
   width: 100%;
-  background: #f3f4f6;
   padding: 1rem;
   border-radius: 8px;
-  color: #374151;
+  color: var(--text-color);
   font-size: 0.95rem;
   display: flex;
   flex-direction: column;
