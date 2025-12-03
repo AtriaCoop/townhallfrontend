@@ -7,6 +7,15 @@
 
 .main {
   padding: 1rem 2rem;
+  --text-color: #111827;
+  --text-color-secondary: #6b7280;
+  --bg-color-secondary: #f5f5f5;
+}
+
+:global(body.dark) .main {
+  --text-color: #e7e7e7;
+  --text-color-secondary: #d1d1d1;
+  --bg-color-secondary: #3d3d3d;
 }
 
 .header {
@@ -20,12 +29,12 @@
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-color);
     margin-bottom: 0.25rem;
   }
 
   p {
-    color: #6b7280;
+    color: var(--text-color-secondary);
     font-size: 0.95rem;
   }
 }
@@ -38,6 +47,8 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   transition: border 0.2s ease;
+  color: var(--text-color);
+  background-color: var(--bg-color-secondary);
 
   &:focus {
     outline: none;
@@ -52,7 +63,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--bg-color-secondary);
   padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -71,12 +82,12 @@
     font-size: 1rem;
     font-weight: 600;
     margin: 0;
-    color: #111827;
+    color: var(--text-color);
   }
 
   .meta {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--text-color-secondary);
     margin-top: 0.25rem;
   }
 }
@@ -92,6 +103,6 @@
 .noResults {
   text-align: center;
   font-style: italic;
-  color: #9ca3af;
+  color: var(--text-color-secondary);
   grid-column: 1 / -1;
 }
