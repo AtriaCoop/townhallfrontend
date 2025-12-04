@@ -1,11 +1,13 @@
 :root {
     --bg-color: #ffffff;
     --text-color: #000000;
+    --modal-bg: white;
 }
 
 body.dark {
     --bg-color: #2c2c2c;
     --text-color: #ffffff;
+    --modal-bg: #222222;
 }
 
 body {

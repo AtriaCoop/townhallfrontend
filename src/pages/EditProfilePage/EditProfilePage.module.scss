@@ -16,6 +16,14 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+
+    --icons: #444;
+    --icons-hover: #000;
+}
+
+:global(body.dark) .editProfileContainer {
+  --icons: #bbbbbb;
+  --icons-hover: #eeeeee;
 }
 
 .title {
@@ -156,7 +164,7 @@
 .modalContent {
     display: flex;
     flex-direction: column;
-    background: white;
+    background: var(--modal-bg);
     padding: 2rem;
     margin: 1rem;
     border-radius: 10px;
@@ -208,9 +216,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #555;
+    color: var(--icons);
 
     &:hover {
-        color: #111;
+        color: var(--icons-hover);
     }
   }
