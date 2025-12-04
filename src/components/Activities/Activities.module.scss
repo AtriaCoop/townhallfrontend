@@ -1,0 +1,72 @@
+.dateGroup {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 20px;
+  }
+  
+  .dateLabel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+    background-color: #F9F9F9;
+    padding: 15px 0;
+  }
+  
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      #ccc,
+      #ccc 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+  
+  .activityCard {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-left: 50px; /* Space for horizontal line */
+    margin-top: 10px;
+  }
+  
+  .activityCard::before {
+    content: '';
+    position: absolute;
+    left: -70px; /* Align with vertical line */
+    top: 50px;   /* Center vertically with card content */
+    width: 60px; /* Length of horizontal line */
+    height: 2px; /* Thickness of horizontal line */
+    background: repeating-linear-gradient(
+        to right,
+        #ccc,
+        #ccc 4px,
+        transparent 4px,
+        transparent 8px
+      );
+  }
+
+  .date{
+    width: 100%;
+    display: flex;
+    font-size: small;
+    padding: 0;
+  }
