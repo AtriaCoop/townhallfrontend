@@ -3,12 +3,20 @@
   flex-direction: column;
   align-items: center;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --time-color: #333;
+  --timezone-color: #666;
+}
+
+:global(body.dark) .clock {
+  --time-color: #ffffff;
+  --timezone-color: #bbbbbb;
 }
 
 .time {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--time-color);
   margin-bottom: 0.1rem;
   min-width: 180px;
   text-align: center;
@@ -16,7 +24,7 @@
 
 .timezone {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--timezone-color);
   font-weight: 500;
 }
 

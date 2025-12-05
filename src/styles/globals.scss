@@ -2,12 +2,16 @@
     --bg-color: #ffffff;
     --text-color: #000000;
     --modal-bg: white;
+    --icons: #444;
+    --icons-hover: #000;
 }
 
 body.dark {
     --bg-color: #2c2c2c;
     --text-color: #ffffff;
-    --modal-bg: #222222;
+    --modal-bg: #2e2e2e;
+    --icons: #bbbbbb;
+    --icons-hover: #eeeeee;
 }
 
 body {

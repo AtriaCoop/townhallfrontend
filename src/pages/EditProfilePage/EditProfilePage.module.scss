@@ -16,14 +16,6 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
-
-    --icons: #444;
-    --icons-hover: #000;
-}
-
-:global(body.dark) .editProfileContainer {
-  --icons: #bbbbbb;
-  --icons-hover: #eeeeee;
 }
 
 .title {

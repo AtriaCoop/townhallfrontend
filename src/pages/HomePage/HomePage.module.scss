@@ -11,11 +11,17 @@
     @include laptop {
         margin-left: 289px;
     }
+
+    --text-color-secondary: #777;
+}
+
+:global(body.dark) .homeContainer {
+  --text-color-secondary: #bebebe;
 }
 
 .title {
     p {
-        color: rgb(117, 117, 117);
+        color: var(--text-color-secondary);
     }
 }
 
