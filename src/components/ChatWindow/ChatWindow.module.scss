@@ -1,14 +1,21 @@
 .chatWindow {
+
+    --header-bg: #f7f7f7;
+
     position: fixed;
     bottom: 0;
     right: 0;
     width: 400px;
     height: 500px;
-    background: #fff;
+    background: var(--modal-bg);
     border: 1px solid #ccc;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+
+  :global(body.dark) .chatWindow {
+    --header-bg: #444444;
   }
   
   .header {
@@ -16,7 +23,7 @@
     align-items: center;
     padding: 10px;
     gap: 8px;
-    background: #f7f7f7;
+    background: var(--header-bg);
     border-bottom: 1px solid #ddd;
   }
   
@@ -33,6 +40,11 @@
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
+    color: var(--icons);
+
+    &:hover {
+      color: var(--icons-hover);
+    }
   }
   
   .messages {
@@ -43,6 +55,7 @@
   
   .messageIncoming {
     background: #eee;
+    color: rgb(32, 32, 32);
     padding: 8px;
     margin-bottom: 5px;
     border-radius: 8px;
@@ -58,6 +71,7 @@
   }
   
   .messageOutgoing {
+    color: rgb(32, 32, 32);
     background: #cce5ff;
     padding: 8px;
     margin-bottom: 5px;
@@ -101,10 +115,10 @@
     border: none;
     font-size: 1.25rem;
     cursor: pointer;
-    color: #555;
+    color: var(--icons);
   
     &:hover {
-      color: #111;
+      color: var(--icons-hover);
     }
   }
 
@@ -117,9 +131,9 @@
     border: 1px solid #ccc;
     font-size: 1.25rem;
     cursor: pointer;
-    color: #555;
+    color: var(--icons);
     &:hover {
-      background: #dfdfdf;
+      color: var(--icons-hover);
     }
   }
   
@@ -175,7 +189,7 @@
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0 0.5rem;
-  color: #888;
+  color: #5e5e5e;
 }
 
 .optionsButton:hover {

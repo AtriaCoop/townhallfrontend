@@ -8,7 +8,7 @@
 }
 
 .icon {
-  color: #5a5a5a;
+  color: var(--icons);
 }
 
 .profilePic {
@@ -40,7 +40,11 @@
 }
 
 .button {
+
+    --button-color: rgb(224, 224, 224);
+
     color: white;
+    background-color: var(--button-color);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -55,6 +59,10 @@
     img {
         width: 20px;
     }
+}
+
+:global(body.dark) .button {
+  --button-color: rgb(63, 63, 63);
 }
 
 .badge {
