@@ -143,9 +143,12 @@
   background: none;
   border: none;
   cursor: pointer;
-
+  color: #555;
   img {
     width: 20px;
+  }
+  &:hover {
+    color: #111;
   }
 }
 

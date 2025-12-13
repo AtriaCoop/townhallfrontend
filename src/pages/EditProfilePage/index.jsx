@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation/Navigation";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import Icon from "@/icons/Icon";
 import { validateUrl } from "@/utils/validateUrl";
 import FormInputText from "@/components/FormInputText/FormInputText";
 
@@ -101,6 +102,7 @@ export default function EditProfilePage({ hasNewDm }) {
       );
 
       const data = await response.json();
+      console.log({ data });
 
       if (!response.ok) {
         // Use backend error message or create specific message based on status
@@ -165,6 +167,7 @@ export default function EditProfilePage({ hasNewDm }) {
 
   function getUrlError(urlErrors, field) {
     const error = validateUrl(formData[field], field);
+    console.log({ error });
     if (error) urlErrors[field] = error;
   }
 
@@ -224,7 +227,7 @@ export default function EditProfilePage({ hasNewDm }) {
             className={styles.backBox}
             onClick={() => router.push(`/ProfilePage/${profileData.id}`)}
           >
-            <img src="/assets/leftArrow.png" alt="arrow"></img>
+            <Icon name="arrowleft" />
           </div>
           <h1>Account Settings</h1>
         </div>

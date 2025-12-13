@@ -19,13 +19,36 @@
     }
 }
 
-.header {
+.headerSection {
     display: flex;
     justify-content: space-between;
-    
-    img {
-        width: 85px;
-    }
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.atriaLogo {
+    width: 90px;
+    height: auto;
+}
+
+.logoAndClockContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 16px;
+}
+
+.clock {
+    margin-bottom: 0;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .newPostButton {
@@ -35,12 +58,13 @@
   background-color: #24873d;
   color: white;
   font-weight: bold;
+  gap: 0.3rem;
   padding: 0.75rem 1.25rem;
   border-radius: 999px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
   cursor: pointer;
 
   &:hover {
@@ -65,3 +89,31 @@
     transform: scale(0.8);
     transform-origin: center;
 }  
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+
+  button {
+    background-color: #24873d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: default;
+  }
+
+  .activePage {
+    background-color: rgba(0, 168, 152, 0.15);
+    color: #24873d;
+    cursor: default;
+  }
+}
