@@ -1,15 +1,16 @@
-import styles from '@/pages/ProfilePage/ProfilePage.module.scss';
-import Navigation from '@/components/Navigation/Navigation';
-import { useRouter } from 'next/router';
-import { useState, useEffect, useRef } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import Icon from '@/icons/Icon';
-import { authenticatedFetch } from '@/utils/authHelpers';
+import styles from "@/pages/ProfilePage/ProfilePage.module.scss";
+import Navigation from "@/components/Navigation/Navigation";
+import { useRouter } from "next/router";
+import { useState, useEffect, useRef } from "react";
+import { formatDistanceToNow } from "date-fns";
+import Icon from "@/icons/Icon";
+import { authenticatedFetch } from "@/utils/authHelpers";
+import SocialLinks from "@/components/SocialLinks/SocialLinks";
 
 export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
   const router = useRouter();
   const { id } = router.query;
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
 
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
@@ -19,7 +20,7 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
   useEffect(() => {
     if (!router.isReady) return;
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem("user"));
     if (user?.id?.toString() === id?.toString()) {
       setIsCurrentUser(true);
     }
@@ -30,7 +31,7 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
         const data = await response.json();
         setProfileData(data.user);
       } catch (error) {
-        console.error('Error fetching profile data:', error);
+        console.error("Error fetching profile data:", error);
       }
     }
 
@@ -38,11 +39,11 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
 
     // Check for deferred toast from previous page
     try {
-      const queued = sessionStorage.getItem('toastAfterNav');
+      const queued = sessionStorage.getItem("toastAfterNav");
       if (queued) {
         const parsed = JSON.parse(queued);
         setToast(parsed);
-        sessionStorage.removeItem('toastAfterNav');
+        sessionStorage.removeItem("toastAfterNav");
       }
     } catch (e) {
       // no-op
@@ -66,7 +67,7 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
     });
 
     localStorage.removeItem("user");
-    router.push('/');
+    router.push("/");
   }
 
   return (
@@ -75,7 +76,13 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
 
       <div className={styles.profileContainer}>
         {toast && (
-          <div className={`${styles.toast} ${toast.type === 'success' ? styles.toastSuccess : styles.toastError}`} role="status" aria-live="assertive">
+          <div
+            className={`${styles.toast} ${
+              toast.type === "success" ? styles.toastSuccess : styles.toastError
+            }`}
+            role="status"
+            aria-live="assertive"
+          >
             {toast.message}
           </div>
         )}
@@ -83,47 +90,88 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
 
         <img
           className={styles.profilePic}
-          src={profileData.profile_image || '/assets/ProfileImage.jpg'}
+          src={profileData.profile_image || "/assets/ProfileImage.jpg"}
           alt="Profile"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/assets/ProfileImage.jpg';
+            e.target.src = "/assets/ProfileImage.jpg";
           }}
         />
 
         {isCurrentUser && (
           <button
-            onClick={() => router.push('/EditProfilePage')}
+            onClick={() => router.push("/EditProfilePage")}
             className={styles.editButtonInline}
           >
-            <Icon name="edit" className={styles.icon}/>
+            <Icon name="edit" className={styles.icon} />
             Edit Profile
           </button>
         )}
 
         <div className={styles.name}>{profileData.full_name}</div>
         <div className={styles.dateJoined}>
-          Joined {formatDistanceToNow(new Date(profileData.date_joined), { addSuffix: true })}
+          Joined{" "}
+          {formatDistanceToNow(new Date(profileData.date_joined), {
+            addSuffix: true,
+          })}
         </div>
         {isCurrentUser && (
           <div>
-            <button onClick={() => setDarkMode(!darkMode)} className={`${styles.darkModeButton} ${darkMode ? styles.isDark : ""}`}>{darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}</button>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`${styles.darkModeButton} ${
+                darkMode ? styles.isDark : ""
+              }`}
+            >
+              {darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}
+            </button>
           </div>
         )}
 
         <div className={styles.sectionTitle}>👤 Details</div>
         <div className={styles.profileInfo}>
-          <div><strong>Title:</strong> {profileData.title}</div>
-          <div><strong>Primary Organization:</strong> {profileData.primary_organization}</div>
-          <div><strong>Other Organizations:</strong> {profileData.other_organizations}</div>
-          <div><strong>Other Networks:</strong> {profileData.other_networks}</div>
+          <div>
+            <strong>Title:</strong> {profileData.title}
+          </div>
+          <div>
+            <strong>Primary Organization:</strong>{" "}
+            {profileData.primary_organization}
+          </div>
+          <div>
+            <strong>Other Organizations:</strong>{" "}
+            {profileData.other_organizations}
+          </div>
+          <div>
+            <strong>Other Networks:</strong> {profileData.other_networks}
+          </div>
         </div>
 
         <div className={styles.sectionTitle}>📝 About</div>
         <div className={styles.aboutBox}>
-          <div><strong>About Me:</strong> {profileData.about_me}</div>
-          <div><strong>Skills & Interests:</strong> {profileData.skills_interests}</div>
+          <div>
+            <strong>About Me:</strong> {profileData.about_me}
+          </div>
+          <div>
+            <strong>Skills & Interests:</strong> {profileData.skills_interests}
+          </div>
         </div>
+
+        {(profileData.linkedin_url ||
+          profileData.x_url ||
+          profileData.facebook_url ||
+          profileData.instagram_url) && (
+          <>
+            <div className={styles.sectionTitle}>🔗 Social Links</div>
+            <SocialLinks
+              socialLinks={{
+                linkedin_url: profileData.linkedin_url,
+                x_url: profileData.x_url,
+                facebook_url: profileData.facebook_url,
+                instagram_url: profileData.instagram_url,
+              }}
+            />
+          </>
+        )}
 
         {isCurrentUser && (
           <>
@@ -136,7 +184,6 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
             </button>
           </>
         )}
-
       </div>
     </div>
   );
