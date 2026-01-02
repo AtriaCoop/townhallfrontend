@@ -179,7 +179,49 @@
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+  
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    background: var(--modal-bg);
+    padding: 2rem;
+    margin: 1rem;
+    border-radius: 10px;
+    text-align: center;
+}
+  
+.modalButton {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .delete {
+        background-color: #24873d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+    
+        &:hover {
+          background-color: rgb(30, 100, 50);
+        }  
+    }
 
     &:hover {
       background-color: #88071c;
@@ -188,19 +230,20 @@
 }
 
 .backBox {
-  position: absolute;
-  left: 0;
-  width: 3rem;
-  height: 3rem;
-  border: 1px solid #c5c5c5;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #555;
+    position: absolute;
+    left: 0;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid #C5C5C5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--icons);
 
-  &:hover {
-    color: #111;
+    &:hover {
+        color: var(--icons-hover);
+    }
   }
 }

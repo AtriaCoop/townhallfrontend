@@ -14,9 +14,13 @@
 }
 
 .modalContent {
+
+  --text-secondary: #2e2e2e;
+  --text-tertiary: #777777;
+
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--modal-bg);
   border: 2px solid #f9b233;
   padding: 2rem 1.25rem;
   border-radius: 12px;
@@ -37,6 +41,11 @@
   }
 }
 
+:global(body.dark) .modalContent {
+  --text-secondary: #d1d1d1;
+  --text-tertiary: #9c9c9c;
+}
+
 .closeButton {
     position: absolute;
     top: 1rem;
@@ -44,11 +53,11 @@
     background: transparent;
     border: none;
     font-size: 1.5rem;
-    color: #666;
+    color: var(--icons);
     cursor: pointer;
   
     &:hover {
-      color: black;
+      color: var(--icons-hover);
     }
 }
 
@@ -75,7 +84,7 @@
     display: flex;
     flex-direction: column;
     font-size: 14px;
-    color: #333;
+    color: var(--text-secondary);
 
     strong {
       font-weight: bold;
@@ -84,7 +93,7 @@
     p {
       margin: 0;
       font-size: 0.85rem;
-      color: #666;
+      color: var(--text-tertiary);
     }
   }
 }

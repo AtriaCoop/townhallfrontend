@@ -11,7 +11,8 @@
 }
 
 .modalCard {
-  background: #fff;
+
+  background: var(--modal-bg);
   border-radius: 16px;
   padding: 1.5rem;
   width: 90%;
@@ -38,10 +39,10 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #888;
+  color: var(--icons);
 
   &:hover {
-    color: #000;
+    color: var(--icons-hover);
   }
 }
 
@@ -123,10 +124,10 @@
   border: none;
   font-size: 1.25rem;
   cursor: pointer;
-  color: #555;
+  color: var(--icons);
 
   &:hover {
-    color: #111;
+    color: var(--icons-hover);
   }
 }
 
