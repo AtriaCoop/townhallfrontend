@@ -5,8 +5,6 @@ import styles from "@/pages/DashboardPage/DashboardPage.module.scss";
 export default function DashboardPage() {
   return (
     <div className={styles.dashboard}>
-      <Navigation />
-
       <div className={styles.content}>
         <h1 className={styles.title}>My Dashboard</h1>
 
@@ -18,7 +16,9 @@ export default function DashboardPage() {
 
           <div className={styles.card}>
             <h2>Activity Overview</h2>
-            <div className={styles.graph}>📈 Graph Placeholder (e.g. posts, messages, tasks)</div>
+            <div className={styles.graph}>
+              📈 Graph Placeholder (e.g. posts, messages, tasks)
+            </div>
           </div>
 
           <div className={styles.cardWide}>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
             </ul>
           </div>
           <div className={styles.activitiesWrapper}>
-            <Activities/>
+            <Activities />
           </div>
         </div>
       </div>
