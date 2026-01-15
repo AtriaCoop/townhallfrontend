@@ -1,3 +1,4 @@
+import Activities from "@/components/Activities/Activities";
 import Navigation from "@/components/Navigation/Navigation";
 import styles from "@/pages/DashboardPage/DashboardPage.module.scss";
 
@@ -10,7 +11,7 @@ export default function DashboardPage() {
         <h1 className={styles.title}>My Dashboard</h1>
 
         <div className={styles.grid}>
-          <div className={styles.card}>
+          <div className={styles.cardWide}>
             <h2>Upcoming Events</h2>
             <div className={styles.calendar}>📅 Calendar View Placeholder</div>
           </div>
@@ -28,13 +29,15 @@ export default function DashboardPage() {
               <li>📦 Donation Drive Helper - Aug 10</li>
             </ul>
           </div>
-
           <div className={styles.card}>
             <h2>My Organizations</h2>
             <ul>
               <li>🥕 Vancouver Food Justice Coalition</li>
               <li>🌍 Climate Youth Collective</li>
             </ul>
+          </div>
+          <div className={styles.activitiesWrapper}>
+            <Activities/>
           </div>
         </div>
       </div>

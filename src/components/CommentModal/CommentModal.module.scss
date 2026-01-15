@@ -14,9 +14,13 @@
 }
 
 .modalContent {
+
+  --text-secondary: #333333;
+  --text-tertiary: #5c5c5c;
+
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--modal-bg);
   border: 2px solid #f9b233;
   padding: 2rem 1.25rem;
   border-radius: 12px;
@@ -37,6 +41,11 @@
   }
 }
 
+:global(body.dark) .modalContent {
+  --text-secondary: #929292;
+  --text-tertiary: #e7e7e7;
+}
+
 .closeButton {
   position: absolute;
   top: 1rem;
@@ -44,11 +53,11 @@
   background: transparent;
   border: none;
   font-size: 1.5rem;
-  color: #666;
+  color: var(--icons);
   cursor: pointer;
 
   &:hover {
-    color: black;
+    color: var(--icons-hover);
   }
 }
 
@@ -59,6 +68,7 @@
 }
 
 .textInput {
+  background-color: white;
   color: rgb(66, 66, 66);
   font-size: 16px;
   border-radius: 4.5px;
@@ -114,11 +124,11 @@
 
   div {
     font-size: 14px;
-    color: #444;
+    color: var(--text-secondary);
     line-height: 1.3;
 
     p {
-      color: rgb(117, 117, 117);
+      color: var(--text-tertiary);
       word-break: break-word;
       white-space: pre-wrap;
     }
@@ -162,8 +172,7 @@
   align-items: start;
   border-radius: 6px;
   padding: 5px 10px;
-  width: 200px;
-  background-color: #fff;      
+  width: 200px;      
   border: 1px solid #e2e8f0;  
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
               0 1px 2px rgba(0, 0, 0, 0.06);  
@@ -184,7 +193,8 @@
   font-size: smaller;
 
   &:hover {
-    background-color: #f0f0f0; // or whatever color you want
+    background-color: #f0f0f0;
+    color: black;
     cursor: pointer;
   }
 }

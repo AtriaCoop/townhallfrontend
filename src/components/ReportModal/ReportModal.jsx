@@ -1,5 +1,6 @@
 import styles from './ReportModal.module.scss';
 import { useState } from 'react';
+import { createReport } from '@/api/'
 
 export default function ReportModal({
     onClose,
@@ -7,6 +8,22 @@ export default function ReportModal({
  }) {
     const [text, setText] = useState('');
     const MAX_POST_LEN = 250;
+    const [error, setError] = useState('');
+    const handleSubmit = async () => {
+      if (!text.trim()) {
+        setError("Content is empty");
+        return;
+      }
+      if (text.length > MAX_POST_LEN) {
+        setError("Post content is over " + MAX_POST_LEN + " characters.");
+        return;
+      }
+
+      try {
+        const data = await create
+      }
+    }
+
     return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalCard}>
@@ -22,7 +39,7 @@ export default function ReportModal({
         <p className={text.length > MAX_POST_LEN ? styles.characterCountError: styles.characterCount}>{text.length}/{MAX_POST_LEN}</p>
         <button className={styles.postButton} onClick={handleSubmit}>
             Submit
-        </button>        
+        </button>
     </div></div>
     );
 }

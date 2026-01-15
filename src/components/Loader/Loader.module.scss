@@ -5,7 +5,6 @@
   align-items: center;
   min-height: 60vh;
   width: 100%;
-  background: rgba(255,255,255,0.85); // subtle overlay
   z-index: 2000;
 }
 
@@ -19,7 +18,9 @@
 }
 
 .card {
-  background: white;
+
+  background: var(--bg-color);
+  color: var(--text-color);
   border: 1px solid #f1c40f;
   border-radius: 12px;
   padding: 12px 48px;

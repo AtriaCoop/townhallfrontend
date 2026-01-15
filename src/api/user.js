@@ -14,3 +14,10 @@ export const fetchMentions = async (query) => {
         return []
     }
 }
+
+export async function createReport({content}) {
+    const formData = new FormData();
+    formData.append("content", content)
+
+    const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/user`)
+}

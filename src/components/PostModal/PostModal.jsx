@@ -1,7 +1,7 @@
 import styles from './PostModal.module.scss';
 import { useRef, useState, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
-import { FaImage } from 'react-icons/fa';
+import Icon from '@/icons/Icon';
 import { createPost } from '@/api/post';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 
@@ -9,6 +9,7 @@ export default function Modal({
   title,
   buttonText = "Post",
   onClose,
+  onPostCreated,
   profileData,
   BASE_URL,
   posts,
@@ -58,22 +59,36 @@ export default function Modal({
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
-        pinned: data.post.pinned,
+        pinned: data.post.pinned || false,
         links: [],
+        likes: data.post.likes || 0,
+        liked_by: data.post.liked_by || [],
+        isLiked: false,
+        comments: data.post.comments || [],
+        reactions: data.post.reactions || {},
       };
 
+      // Optimistically add the new post to the list
       setPosts((prevPosts) => {
         const updatedPosts = [newPost, ...prevPosts]
-
         return updatedPosts.sort((a, b) => {
           if (a.pinned !== b.pinned) return b.pinned - a.pinned;
           return new Date(b.created_at) - new Date(a.created_at);
         });
       });
+      
       setText('');
       setImage(null);
+      setImages([]);
       setError('');
       onClose();
+      
+      // Reset to page 1 after a short delay to refetch and ensure consistency
+      if (onPostCreated) {
+        setTimeout(() => {
+          onPostCreated();
+        }, 500);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -117,10 +132,12 @@ export default function Modal({
         <div className={styles.actionRow}>
           <EmojiPickerButton onSelect={(emoji) => setText(prev => prev + emoji)} />
           <button className={styles.iconButton} onClick={() => postImageRef.current.click()}>
-            <FaImage />
+            <Icon name="image" />
           </button>
           {profileData.is_staff ?
-            <button className={styles.pin} onClick={() => setPinned(!pinned)}><img src={pinned ? "/assets/pinned.png" : "/assets/unpinned.png"}/></button>
+            <button className={`${styles.iconButton} ${pinned ? styles.pinned : ""}`} onClick={() => setPinned(!pinned)}>
+              <Icon name="pin" />
+            </button>
             :
             null
           }

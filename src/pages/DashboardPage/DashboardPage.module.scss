@@ -1,8 +1,14 @@
 @import '@/styles/mixins.scss';
 
 .dashboard {
+
+  --bg-color: #f9f9f9;
+  --bg-color-secondary: white;
+  --bg-placeholder: #e9ecef;
+  --text-color-secondary: #555;
+  
   display: flex;
-  background-color: #f9f9f9;
+  background-color: var(--bg-color);
   min-height: 100vh;
   padding: 0 1rem;
   flex-direction: column;
@@ -15,6 +21,13 @@
   @include laptop {
     margin-left: 289px;
   }
+}
+
+:global(body.dark) .dashboard {
+  --bg-color: #222222;
+  --bg-color-secondary: #2e2e2e;
+  --bg-placeholder: #3a3a3a;
+  --text-color-secondary: #d1d1d1;
 }
 
 .content {
@@ -30,7 +43,7 @@
   font-weight: bold;
 
   p {
-    color: rgb(117, 117, 117);
+    color: var(--text-color-secondary);
   }
 
   @include tablet {
@@ -54,7 +67,7 @@
 }
 
 .card {
-  background: white;
+  background: var(--bg-color-secondary);
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -74,13 +87,13 @@
 
 .calendar,
 .graph {
-  background-color: #e9ecef;
+  background-color: var(--bg-placeholder);
   height: 180px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #555;
+  color: var(--text-color-secondary);
   font-size: 1rem;
 
   @include tablet {
@@ -97,4 +110,9 @@
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
   }
+}
+
+
+.activitiesWrapper{
+  grid-column: span 3;
 }

@@ -10,7 +10,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
 
 
   async function onSubmit(inputContent) {
-
     try {
       const response = await authenticatedFetch(`${BASE_URL}/comment/`, {
         method: "POST",
@@ -21,8 +20,10 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
           created_at: new Date().toISOString(),
         }),
       });
-
+      console.log(postId, inputContent)
+      console.log('response is ', response)
       const data = await response.json();
+      console.log('data', data)
       if (!response.ok) throw new Error(data.message || "Comment failed");
 
       // Update comment list in parent post

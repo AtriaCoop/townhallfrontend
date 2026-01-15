@@ -1,5 +1,6 @@
 import styles from './Navigation.module.scss';
 import { Menu, LayoutDashboard, User, Users, MessageSquare, Home, CircleAlert } from 'lucide-react';
+import Icon from '@/icons/Icon';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -49,7 +50,7 @@ export default function Navigation({ hasNewDm = false }) {
     <div className={styles.nav}>
 
       {/* Mobile burger menu */}
-      <div className={styles.menu} onClick={toggleSidebar}><Menu /></div>
+      <div className={styles.menu} onClick={toggleSidebar}><Icon name="menu" /></div>
 
       {/* Desktop logo */}
       <img src="/assets/VFJC.png" alt="VFJC Logo" className={styles.logo} onClick={() => router.push('/HomePage')} />
