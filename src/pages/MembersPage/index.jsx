@@ -35,7 +35,7 @@ export default function MembersPage() {
       <div className={styles.main}>
         <header className={styles.header}>
           <div>
-            <h1>🌟 Our Members</h1>
+            <h1>👥 Our Members</h1>
             <p>
               Explore and connect with people across the coalition community.
             </p>
