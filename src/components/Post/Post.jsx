@@ -3,13 +3,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
+import Tag from '@/components/Tag/Tag';
 import { getCookie } from '@/utils/authHelpers';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import Icon from '@/icons/Icon';
 
-export default function Post({ 
+export default function Post({
   fullName,
   organization,
   date,
@@ -25,6 +26,7 @@ export default function Post({
   currentUserId,
   userImage,
   pinned,
+  tags,
   is_staff,
   postId,
   setPosts,
@@ -48,6 +50,9 @@ export default function Post({
   const [reportResponse, setReportResponse] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [tag, setTag] = useState("");
+  const [editTags, setEditTags] = useState(tags);
+  const MAX_TAGS = 5;
 
   // Can make this a separate file and import but I'm lazy so this can be another Jira Ticket (this is for testing)
   const REACTIONS = [
@@ -59,61 +64,74 @@ export default function Post({
     { type: 'helpful', emoji: '✅' },
   ];
 
-    // 🧠 GET CSRF COOKIE ON LOAD
-    useEffect(() => {
-      fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        mode: "cors",
-        headers: {
-          Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
-        },
-      })
-        .then(() => console.log("CSRF cookie set"))
-        .catch(err => console.error("CSRF cookie failed", err));
+  const handleTagAdd = () => {
+    if (!tag.trim()) return;
+    if (editTags.length >= MAX_TAGS) return;
 
-      // Set state if post is own post
-      setIsMyOwnPost( userId === currentUserId )
-    }, [userId, currentUserId]);
+    setEditTags((prev) => [...prev, tag]);
+    setTag("");
+  }
+
+  const removeTag = (idx) => {
+    setEditTags((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // 🧠 GET CSRF COOKIE ON LOAD
+  useEffect(() => {
+    fetch(`${BASE_URL}/auth/csrf/`, {
+      method: "GET",
+      credentials: "include",
+      mode: "cors",
+      headers: {
+        Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
+      },
+    })
+      .then(() => console.log("CSRF cookie set"))
+      .catch(err => console.error("CSRF cookie failed", err));
+
+    // Set state if post is own post
+    setIsMyOwnPost(userId === currentUserId)
+  }, [userId, currentUserId]);
 
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const result = await updatePost(postId, {content: editText, image: editImage});
+      const result = await updatePost(postId, { content: editText, image: editImage, tags: editTags });
       console.log("Post updated successfully:", result);
-  
+
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
             ? {
-                ...post,
-                content: [editText],
-                postImage: result.post?.image || post.postImage, // updated image
-              }
+              ...post,
+              content: [editText],
+              tags: editTags,
+              postImage: result.post?.image || post.postImage, // updated image
+            }
             : post
         )
       );
-  
+
       setShowEditModal(false);
     } catch (error) {
       console.error("Error updating post:", error);
     }
-  }  
-  
+  }
+
   // DELETE POST
   async function handleDeletePost() {
     try {
       const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
         method: "DELETE",
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete post");
       }
-  
+
       // Update local posts state to remove the deleted post
       setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-  
+
       // Close the delete modal
       setShowDeleteModal(false);
     } catch (error) {
@@ -122,31 +140,31 @@ export default function Post({
   }
 
   // LIKE POST
-async function handleLikePost() {
-  try {
-    const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  async function handleLikePost() {
+    try {
+      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Failed to like post: ${errText}`);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Failed to like post: ${errText}`);
+      }
+
+      const result = await response.json();
+      setLiked(prev => !prev);
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId ? { ...post, likes: result.likes } : post
+        )
+      );
+    } catch (error) {
+      console.error("Error liking post:", error);
     }
-
-    const result = await response.json();
-    setLiked(prev => !prev);
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.id === postId ? { ...post, likes: result.likes } : post
-      )
-    );
-  } catch (error) {
-    console.error("Error liking post:", error);
   }
-}
 
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
@@ -188,16 +206,16 @@ async function handleLikePost() {
     if (userId === currentUserId) return
 
     const reportData = {
-      post_id : postId
+      post_id: postId
     }
 
     try {
       setIsLoading(true)
       const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/report`, {
-        method : 'POST',
-        body : JSON.stringify(reportData),
-        headers : {
-          "Content-type" : 'application/json'
+        method: 'POST',
+        body: JSON.stringify(reportData),
+        headers: {
+          "Content-type": 'application/json'
         }
       })
       const result = await response.json()
@@ -205,9 +223,9 @@ async function handleLikePost() {
       // Set either success or error message
       setReportResponse(result.message)
 
-    } catch (err){
+    } catch (err) {
       console.error(err)
-      setReportResponse(err)      
+      setReportResponse(err)
     } finally {
       setIsLoading(false)
     }
@@ -226,15 +244,15 @@ async function handleLikePost() {
   const handlePinPost = async () => {
     if (is_staff) {
       try {
-        await updatePost(postId, {pinned: !pinned})
+        await updatePost(postId, { pinned: !pinned })
 
         setPosts((prevPosts) => {
           const updatedPosts = prevPosts.map((post) =>
             post.id === postId
               ? {
-                  ...post,
-                  pinned: !post.pinned
-                }
+                ...post,
+                pinned: !post.pinned
+              }
               : post
           );
 
@@ -253,7 +271,7 @@ async function handleLikePost() {
     <div className={pinned ? styles.postPinned : styles.post}>
 
       <div className={styles.postHeader}>
-        <img 
+        <img
           src={userImage || '/assets/ProfileImage.jpg'}
           alt="User profile"
           className={styles.profilePic}
@@ -271,77 +289,94 @@ async function handleLikePost() {
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
         </div>
-       
+
         {/* Edit Post Modal */}
         {showOptions && (
           <div className={styles.optionsMenu} ref={optionsRef}>
-            { isMyOwnPost ? (
+            {isMyOwnPost ? (
               <>
                 <button onClick={() => setShowEditModal(true)}>Edit</button>
                 <button onClick={() => setShowDeleteModal(true)}>Delete</button>
               </>
             ) : (
-              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true) }>Report</button>
+              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true)}>Report</button>
             )}
           </div>
         )}
         {/* Show Edit Modal */}
         {showEditModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContentEdit}>
-            <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
-            <h1>Edit Post</h1>
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContentEdit}>
+              <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
+              <h1>Edit Post</h1>
 
-            <p>Text</p>
-            <textarea
-              placeholder="Enter text..."
-              className={styles.textInput}
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-            />
+              <p>Text</p>
+              <textarea
+                placeholder="Enter text..."
+                className={styles.textInput}
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+              />
 
-            <div
-              className={styles.imageInput}
-              onClick={() => document.getElementById(`editImg-${postId}`).click()}
-            >
-              {editImage ? (
-                <img
-                  src={URL.createObjectURL(editImage)}
-                  alt="Preview"
-                  className={styles.previewImage}
-                />
-              ) : isValidImage(postImage) ? (
-                <img
-                  src={postImage}
-                  alt="Current Post Image"
-                  className={styles.previewImage}
-                />
-              ) : (
-                <span>Choose Photo</span>
-              )}
-            </div>
+              {/* Tag Creation */}
+              <div className={styles.createTags}>
+                <div className={styles.tagList}>
+                  {editTags.map((tag, index) => (
+                    <Tag key={index} name={tag} onRemove={() => removeTag(index)} />
+                  ))}
+                </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              id={`editImg-${postId}`}
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith("image/")) {
-                  setEditImage(file);
-                }
-              }}
-            />
+                <input value={tag} onChange={(e) => setTag(e.target.value)} />
+                <button onClick={handleTagAdd}>ADD</button>
+                <div>
+                  {editTags.length >= MAX_TAGS && (
+                    <span className={styles.tagWarning}>Reached max limit of tags</span>
+                  )}
+                </div>
+              </div>
 
-            <div className={styles.modalButton}>
-              <button className={styles.updateButton} onClick={handleUpdatePost}>
-                Update
-              </button>
+              <div
+                className={styles.imageInput}
+                onClick={() => document.getElementById(`editImg-${postId}`).click()}
+              >
+                {editImage ? (
+                  <img
+                    src={URL.createObjectURL(editImage)}
+                    alt="Preview"
+                    className={styles.previewImage}
+                  />
+                ) : isValidImage(postImage) ? (
+                  <img
+                    src={postImage}
+                    alt="Current Post Image"
+                    className={styles.previewImage}
+                  />
+                ) : (
+                  <span>Choose Photo</span>
+                )}
+              </div>
+
+              <input
+                type="file"
+                accept="image/*"
+                id={`editImg-${postId}`}
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file && file.type.startsWith("image/")) {
+                    setEditImage(file);
+                  }
+                }}
+              />
+
+              <div className={styles.modalButton}>
+                <button className={styles.updateButton} onClick={handleUpdatePost}>
+                  Update
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
         {/* Show Delete Modal */}
         {showDeleteModal && (
           <div className={styles.modalOverlay}>
@@ -353,14 +388,14 @@ async function handleLikePost() {
           </div>
         )}
         {/* Show Report Modal */}
-        { showReportModal && (
+        {showReportModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContentDelete}>
-              <button className={styles.closeButton} onClick={() => {setReportResponse(''); setShowReportModal(false)}}>×</button>
-              { isLoading && (
+              <button className={styles.closeButton} onClick={() => { setReportResponse(''); setShowReportModal(false) }}>×</button>
+              {isLoading && (
                 <h1>Loading...</h1>
               )}
-              { reportResponse ? (
+              {reportResponse ? (
                 <>
                   <h1>{reportResponse}</h1>
                 </>
@@ -369,10 +404,10 @@ async function handleLikePost() {
                   <h1>Are you sure?</h1>
                   <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
                 </>
-              ) }
+              )}
             </div>
           </div>
-        ) }
+        )}
       </div>
 
       <div className={styles.postContent}>
@@ -431,7 +466,7 @@ async function handleLikePost() {
             userIds.length > 0 && (
               <div key={reactionType} className={styles.reactionGroup}>
                 <span className={styles.reactionEmoji}>
-                {REACTIONS.find(r => r.type === reactionType)?.emoji}
+                  {REACTIONS.find(r => r.type === reactionType)?.emoji}
                 </span>
                 <span className={styles.reactionCount}>{userIds.length}</span>
               </div>
@@ -439,27 +474,39 @@ async function handleLikePost() {
           ))}
         </div>
       )}
-      
+
       <div className={styles.postFooter}>
-        <div className={styles.reactions}>
-          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ""}`} onClick={handleLikePost}/>
-          <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
-          <Icon name="message" className={styles.postIcon} onClick={handleCommentClick}/>
-          <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
-          <button className={styles.reactButton} onClick={handleReactionClick}>
-            😊 React
-          </button>
-        </div>
-        {is_staff ?
-              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}>
-                <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ""}`}/>
-              </button>
+        {/* Post Tags */}
+        {tags?.length > 0 && (
+          <div className={styles.postFooterTop}>
+            {tags.map((tag, index) => (
+              <Tag key={index} removable={false} name={tag} />
+            ))}
+          </div>
+        )}
+
+        {/* Post likes, comments, reactions, and pin buttons */}
+        <div className={styles.postFooterBottom}>
+          <div className={styles.reactions}>
+            <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ""}`} onClick={handleLikePost} />
+            <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
+            <Icon name="message" className={styles.postIcon} onClick={handleCommentClick} />
+            <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
+            <button className={styles.reactButton} onClick={handleReactionClick}>
+              😊 React
+            </button>
+          </div>
+          {is_staff ?
+            <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}>
+              <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ""}`} />
+            </button>
             :
-              pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
-        }
+            pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
+          }
+        </div>
       </div>
       {showReactionPicker && (
-        <ReactionPicker 
+        <ReactionPicker
           onReactionSelect={handleReactionSelect}
           currentReactions={reactions}
           currentUserId={currentUserId}

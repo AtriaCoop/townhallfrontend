@@ -132,6 +132,7 @@ export default function HomePage({ hasNewDm }) {
               comments: p.comments || [],
               reactions: p.reactions || {}, 
               pinned: p.pinned || false,
+              tags: p.tags || [],
             }))
           
           console.log("Formatted posts count:", formattedPosts.length); // Debug log
@@ -260,6 +261,7 @@ export default function HomePage({ hasNewDm }) {
                           currentUserId={profileData?.id}
                           userImage={post.userImage}
                           pinned={post.pinned}
+                          tags={post.tags}
                           is_staff={profileData?.is_staff}
                           postId={post.id}
                           setPosts={setPosts}
