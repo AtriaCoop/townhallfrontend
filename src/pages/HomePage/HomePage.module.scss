@@ -122,4 +122,31 @@
     color: #24873d;
     cursor: default;
   }
+
+  // NEW MODIFICATIONS
+  .privacyFooter {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  :global(body.dark) .privacyFooter {
+    border-top-color: #444;
+  }
+  
+  .privacyLink {
+    background: none;
+    border: none;
+    color: #24873d;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0.5rem;
+  
+    &:hover {
+      color: #1e6f35;
+    }
+  }
 }

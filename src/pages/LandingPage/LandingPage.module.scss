@@ -170,6 +170,26 @@
   animation: popIn 0.3s ease-in-out;
 }
 
+// NEW MODIFICATIONS
+.privacyText {
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 1rem;
+  color: #666;
+  line-height: 1.4;
+
+  span {
+    color: #015e22;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #013d15;
+    }
+  }
+}
+
 @keyframes popIn {
   from {
     transform: scale(0.6);
@@ -179,4 +199,5 @@
     transform: scale(1);
     opacity: 1;
   }
+  
 }
