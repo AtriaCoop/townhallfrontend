@@ -3,6 +3,7 @@ import styles from './LandingPage.module.scss';
 import { registerUser, getCookie, authenticatedFetch } from '@/utils/authHelpers';
 import { useRouter } from 'next/router';
 import Loader from '@/components/Loader/Loader';
+import PrivacyModal from '@/components/PrivacyModal/PrivacyModal'; // NEW MODIFICATIONS
 
 export default function LandingPage() {
   const router = useRouter();
@@ -13,6 +14,8 @@ export default function LandingPage() {
   const [logIn, setLogIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // NEW MODIFICATIONS
+
 
   // Logo animation
   const [visibleLogos, setVisibleLogos] = useState([]);
@@ -159,6 +162,17 @@ export default function LandingPage() {
                 <>Already Have An Account? <span onClick={() => { setLogIn(true); setError(''); setMessage(''); }}>LOG IN</span></>
               )}
             </p>
+
+            {/* New modifications */}
+            <p className={styles.privacyText}>
+              By signing up or logging in, you agree to our{' '}
+              <span onClick={() => setShowPrivacyModal(true)}>Privacy Notice</span>
+            </p>
+
+            {/* Privacy Modal */}
+            {showPrivacyModal && (
+              <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+            )}
           </div>
         </>
       )}

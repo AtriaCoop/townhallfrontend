@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import Icon from '@/icons/Icon';
+import PrivacyModal from '@/components/PrivacyModal/PrivacyModal'; // NEW MODIFICATIONS
 
 export default function HomePage({ hasNewDm }) {
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -16,6 +17,8 @@ export default function HomePage({ hasNewDm }) {
     const MAX_PAGINATION_BUTTONS = 5;
       
     const [showModal, setShowModal] = useState(false);
+    // Add state in the component
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false); // NEW MODIFICATIONS
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -307,6 +310,23 @@ export default function HomePage({ hasNewDm }) {
                    NEW POST
                 </div>
                 )}
+
+                {/* New modifications */}
+                {/* Privacy Notice Link */}
+                <div className={styles.privacyFooter}>
+                  <button 
+                    className={styles.privacyLink} 
+                    onClick={() => setShowPrivacyModal(true)}
+                  >
+                    Privacy Notice
+                  </button>
+                </div>
+
+                {/* Privacy Modal */}
+                {showPrivacyModal && (
+                  <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+                )}
+
                 
             </div>
 

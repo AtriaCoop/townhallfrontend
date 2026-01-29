@@ -108,7 +108,21 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
           </button>
         )}
 
+      {/* --- name + pronouns --- */}
+      <div className={styles.nameRow}>
         <div className={styles.name}>{profileData.full_name}</div>
+        {profileData.pronouns && (
+          <div className={styles.pronouns}>{profileData.pronouns}</div>
+        )}
+      </div>
+
+      {/* --- pronunciation line (optional) --- */}
+      {profileData.name_pronunciation && (
+        <div className={styles.pronunciation}>
+          <strong>Name pronunciation:</strong> {profileData.name_pronunciation}
+        </div>
+      )}
+
         <div className={styles.dateJoined}>
           Joined{" "}
           {formatDistanceToNow(new Date(profileData.date_joined), {
