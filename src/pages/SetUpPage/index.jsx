@@ -12,6 +12,7 @@ export default function SetUpPage() {
   const [formData, setFormData] = useState({
     full_name: "",
     pronouns: "",
+    name_pronunciation: "", //NEW MODIFICATIONS
     title: "",
     primary_organization: "",
     other_organizations: "",
@@ -168,6 +169,14 @@ export default function SetUpPage() {
             label="What are your pronouns?"
             placeholder="Share your pronouns (Optional)"
             value={formData.pronouns}
+            onChange={handleInputChange}
+          />
+          {/* --- name pronunciation --- */}
+          <FormInputText
+            name="name_pronunciation"
+            label="Name Pronunciation"
+            placeholder="Enter name pronunciation..."
+            value={formData.name_pronunciation}
             onChange={handleInputChange}
           />
 
