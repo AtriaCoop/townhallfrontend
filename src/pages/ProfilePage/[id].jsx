@@ -7,7 +7,7 @@ import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
 
-export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
+export default function ProfilePage({ darkMode, setDarkMode }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -72,8 +72,6 @@ export default function ProfilePage({ hasNewDm, darkMode, setDarkMode }) {
 
   return (
     <div className={styles.container}>
-      <Navigation hasNewDm={hasNewDm} />
-
       <div className={styles.profileContainer}>
         {toast && (
           <div

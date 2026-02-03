@@ -7,7 +7,7 @@ import Icon from "@/icons/Icon";
 import { validateUrl } from "@/utils/validateUrl";
 import FormInputText from "@/components/FormInputText/FormInputText";
 
-export default function EditProfilePage({ hasNewDm }) {
+export default function EditProfilePage() {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const router = useRouter();
 
@@ -219,8 +219,6 @@ export default function EditProfilePage({ hasNewDm }) {
 
   return (
     <div className={styles.container}>
-      <Navigation hasNewDm={hasNewDm} />
-
       <div className={styles.editProfileContainer}>
         <div className={styles.title}>
           <div
