@@ -73,6 +73,27 @@
   text-align: center;
 }
 
+ // new modifications
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.pronouns {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
+.pronunciation {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+  margin-top: -0.25rem;
+}
+
 .dateJoined {
   font-size: 0.85rem;
   color: var(--text-color-secondary);

@@ -16,6 +16,7 @@ export default function EditProfilePage() {
   const [formData, setFormData] = useState({
     full_name: "",
     pronouns: "",
+    name_pronunciation: "", //NEW MODIFICATIONS
     title: "",
     primary_organization: "",
     other_organizations: "",
@@ -287,6 +288,15 @@ export default function EditProfilePage() {
           onChange={handleInputChange}
         />
 
+        {/* --- name pronunciation --- */}
+        <FormInputText
+          name="name_pronunciation"
+          label="Name Pronunciation"
+          placeholder="Enter name pronunciation..."
+          value={formData.name_pronunciation}
+          onChange={handleInputChange}
+        />
+        
         <FormInputText
           name="title"
           label="Title"
