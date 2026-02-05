@@ -1,10 +1,10 @@
 import styles from './ReportModal.module.scss';
 import { useState } from 'react';
-import { createReport } from '@/api/'
+import { createReport } from '@/api/user'
+import { formatDistance } from 'date-fns';
 
 export default function ReportModal({
     onClose,
-    handleSubmit
  }) {
     const [text, setText] = useState('');
     const MAX_POST_LEN = 250;
@@ -20,8 +20,16 @@ export default function ReportModal({
       }
 
       try {
-        const data = await create
+        const data = await createReport({content: text})
+
+      } catch (err) {
+        console.log(err);
       }
+
+      setText('');
+      setError('');
+      onClose();
+
     }
 
     return (
