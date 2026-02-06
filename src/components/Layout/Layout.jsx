@@ -8,10 +8,10 @@ function Layout({ children, hasNewDm }) {
   const showNav = !noNavPages.includes(router.pathname);
 
   return (
-    <div>
+    <>
       {showNav && <Navigation hasNewDm={hasNewDm} />}
       {children}
-    </div>
+    </>
   );
 }
 
