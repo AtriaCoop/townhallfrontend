@@ -1,248 +1,313 @@
-@import "@/styles/mixins.scss";
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-.container {
-  @include tablet {
-    margin-left: 89px;
-  }
-
-  @include laptop {
-    margin-left: 289px;
-  }
-}
-
-.editProfileContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-}
-
-.title {
-  position: relative;
+.editProfilePage {
+  max-width: 720px;
+  margin: 0 auto;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: bold;
-    margin: 0 auto;
-  }
 }
 
+// Toast Notifications
 .toast {
   position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 1100;
-  padding: 12px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  top: $spacing-4;
+  right: $spacing-4;
+  z-index: $z-toast;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-md;
+  font-weight: $font-weight-semibold;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 300ms $ease-out;
+  @include body-2;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .toastSuccess {
-  background: #e7f7ec;
-  color: #1b5e20;
-  border: 1px solid #b5e1c1;
+  background-color: $success-50;
+  color: $success-700;
+  border: 1px solid $success-500;
 }
 
 .toastError {
-  background: #fdecea;
-  color: #b71c1c;
-  border: 1px solid #f5c6cb;
+  background-color: $error-50;
+  color: $error-700;
+  border: 1px solid $error-500;
 }
 
-.profilePic {
-  width: 149px;
-  height: 149px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ddd;
+// Page Header
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  background-color: var(--card-bg);
+  color: var(--icon-default);
+  cursor: pointer;
+  flex-shrink: 0;
+  @include transition-colors;
+
+  &:hover {
+    border-color: var(--border-strong);
+    color: var(--icon-hover);
+    background-color: var(--bg-hover);
+  }
+}
+
+.pageTitle {
+  margin: 0;
+  @include heading-3;
+}
+
+// Profile Card
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-5;
+  padding: $spacing-5;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-6;
+}
+
+.profileImageSection {
+  flex-shrink: 0;
+}
+
+.profileImageLabel {
+  position: relative;
+  display: block;
   cursor: pointer;
 }
 
-.profilePic:hover {
-  box-shadow: 0 0 0 4px #4d90fe33;
-  opacity: 0.8;
-  transition: box-shadow 0.2s, opacity 0.2s;
+.profileImage {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 3px solid var(--border-default);
+  @include transition-all;
+
+  @include md {
+    width: 100px;
+    height: 100px;
+  }
 }
 
-.inputs {
+.editOverlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--primary);
+  color: $white;
+  border-radius: $radius-full;
+  border: 2px solid var(--card-bg);
+  @include transition-all;
+}
+
+.profileImageLabel:hover {
+  .profileImage {
+    border-color: var(--primary);
+  }
+
+  .editOverlay {
+    background-color: $primary-600;
+  }
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  margin: 0 0 $spacing-1 0;
+  @include heading-4;
+  @include truncate;
+}
+
+.profileEmail {
+  margin: 0;
+  color: var(--text-muted);
+  @include body-2;
+  @include truncate;
+}
+
+// Form Sections
+.formSections {
   display: flex;
   flex-direction: column;
-  margin: 1rem;
+  gap: $spacing-6;
+}
 
-  @include tablet {
-    margin: 8px 64px;
-  }
+.formSection {
+  padding: $spacing-5;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+}
 
-  @include laptop {
-    margin: 8px 128px;
-  }
+.sectionTitle {
+  margin: 0 0 $spacing-4 0;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  @include subheading-1;
+}
 
-  @include desktop {
-    margin: 8px 256px;
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+
+  @include md {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
   }
 }
 
-// Removed old in-form alert styles in favor of floating toast
+// Action Buttons
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-top: $spacing-6;
+  padding-top: $spacing-6;
+  border-top: 1px solid var(--border-default);
 
-.profileImageInput,
-.profileHeaderInput {
-  padding: 6rem;
-  text-align: center;
-  border: 1px solid #ddd;
-  color: rgb(255, 196, 0);
-
-  img {
-    width: 100%;
-    border-radius: 100%;
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
-}
-
-.clickableImage {
-  cursor: pointer;
 }
 
 .saveButton {
-  background-color: #24873d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  margin-top: 2rem;
-  cursor: pointer;
-  font-weight: bold;
+  @include button-primary;
+  @include button-md;
+  width: 100%;
 
-  &:hover {
-    background-color: rgb(30, 100, 50);
+  @include md {
+    width: auto;
+    min-width: 160px;
   }
 }
 
-.deleteButton {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-  color: #ddd;
-  cursor: pointer;
+.deleteAccountButton {
+  @include button-base;
+  @include button-md;
+  width: 100%;
+  background-color: transparent;
+  color: $error-500;
+  border: 1px solid $error-100;
+
+  &:hover:not(:disabled) {
+    background-color: $error-50;
+    border-color: $error-500;
+  }
+
+  @include md {
+    width: auto;
+    min-width: 160px;
+  }
 }
 
+// Delete Modal
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  inset: 0;
+  background-color: rgba($black, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
 }
 
 .modalContent {
-  display: flex;
-  flex-direction: column;
-  background: white;
-  padding: 2rem;
-  margin: 1rem;
-  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  padding: $spacing-6;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
   text-align: center;
 }
 
-.modalButton {
+.modalTitle {
+  margin: 0 0 $spacing-3 0;
+  @include heading-4;
+}
+
+.modalDescription {
+  margin: 0 0 $spacing-6 0;
+  color: var(--text-secondary);
+  @include body-1;
+}
+
+.modalActions {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: $spacing-3;
 
-  .delete {
-    background-color: #24873d;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-
-    &:hover {
-      background-color: rgb(30, 100, 50);
-    }
-  }
-
-  .cancel {
-    background-color: #cc0829;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
+  @include sm {
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .modalContent {
-    display: flex;
-    flex-direction: column;
-    background: var(--modal-bg);
-    padding: 2rem;
-    margin: 1rem;
-    border-radius: 10px;
-    text-align: center;
-  }
-
-  .modalButton {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    .delete {
-      background-color: #24873d;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-
-      &:hover {
-        background-color: rgb(30, 100, 50);
-      }
-    }
-
-    &:hover {
-      background-color: #88071c;
-    }
   }
 }
 
-.backBox {
-  position: absolute;
-  left: 0;
-  width: 3rem;
-  height: 3rem;
-  border: 1px solid #c5c5c5;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--icons);
+.cancelButton {
+  @include button-secondary;
+  @include button-md;
+  flex: 1;
 
-  &:hover {
-    color: var(--icons-hover);
+  @include sm {
+    flex: 0 1 auto;
+    min-width: 120px;
+  }
+}
+
+.confirmDeleteButton {
+  @include button-base;
+  @include button-md;
+  flex: 1;
+  background-color: $error-500;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: $error-600;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $error-700;
+  }
+
+  @include sm {
+    flex: 0 1 auto;
+    min-width: 160px;
   }
 }

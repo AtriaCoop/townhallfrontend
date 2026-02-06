@@ -1,110 +1,313 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-.navigationContainer {
-    display: flex;
-    justify-content: space-evenly;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px;
-    padding: 1rem;
+// ============================================
+// SETUP PAGE STYLES
+// Modern onboarding flow design
+// ============================================
 
-    img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #ddd;
-        margin-left: 1rem;
+.pageContainer {
+  min-height: 100vh;
+  background-color: var(--bg-secondary);
+}
+
+// ============================================
+// PROGRESS HEADER
+// ============================================
+.progressHeader {
+  @include flex-between;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-default);
+  padding: $spacing-4 $spacing-6;
+
+  @include md {
+    padding: $spacing-4 $spacing-8;
+  }
+}
+
+.logoLink {
+  @include flex-center;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+}
+
+.progressSteps {
+  @include flex-center;
+  gap: $spacing-2;
+}
+
+.stepIndicator {
+  @include flex-center;
+  gap: $spacing-2;
+}
+
+.stepDot {
+  width: 10px;
+  height: 10px;
+  border-radius: $radius-full;
+  background-color: var(--border-default);
+  @include transition-all;
+
+  &.active {
+    background-color: $secondary-500;
+    transform: scale(1.2);
+  }
+
+  &.completed {
+    background-color: $secondary-500;
+  }
+}
+
+.stepConnector {
+  width: 32px;
+  height: 2px;
+  background-color: var(--border-default);
+
+  &.active {
+    background-color: $secondary-500;
+  }
+
+  @include below-md {
+    width: 20px;
+  }
+}
+
+.stepLabel {
+  @include caption;
+  color: var(--text-tertiary);
+  margin-left: $spacing-2;
+
+  &.active {
+    color: $secondary-600;
+    font-weight: $font-weight-medium;
+  }
+
+  @include below-md {
+    display: none;
+  }
+}
+
+// ============================================
+// MAIN CONTENT AREA
+// ============================================
+.mainContent {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-4;
+
+  @include md {
+    padding: $spacing-12 $spacing-6;
+  }
+}
+
+// ============================================
+// SECTION HEADER
+// ============================================
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $spacing-8;
+}
+
+.sectionTitle {
+  @include heading-3;
+  color: var(--text-primary);
+  margin-bottom: $spacing-2;
+}
+
+.sectionSubtitle {
+  @include body-1;
+  color: var(--text-secondary);
+}
+
+// ============================================
+// FORM CARD
+// ============================================
+.formCard {
+  @include card-elevated;
+  padding: $spacing-6;
+
+  @include md {
+    padding: $spacing-8;
+  }
+}
+
+.formSection {
+  margin-bottom: $spacing-8;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.formSectionTitle {
+  @include heading-6;
+  color: var(--text-primary);
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.formGrid {
+  display: grid;
+  gap: $spacing-4;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.formField {
+  &.fullWidth {
+    @include md {
+      grid-column: span 2;
     }
+  }
 }
 
-.navigation {
-    display: flex;
-    gap: 1rem;
+// ============================================
+// FILE UPLOAD
+// ============================================
+.uploadSection {
+  margin-top: $spacing-4;
 }
 
-.setUpContainer {
-    margin: 2rem 1rem 2rem 1rem;
-    border-radius: 12.5px;
+.uploadLabel {
+  @include body-2;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  margin-bottom: $spacing-2;
+  display: block;
+}
+
+.uploadArea {
+  @include flex-column-center;
+  position: relative;
+  padding: $spacing-8 $spacing-4;
+  border: 2px dashed var(--border-default);
+  border-radius: $radius-lg;
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    border-color: $primary-400;
+    background-color: $primary-50;
+  }
+
+  &.hasPreview {
+    padding: 0;
     border-style: solid;
-    border-width: 1px;
-    border-color: rgb(0, 75, 20);
-    background-color: rgb(0, 75, 20);
-    inset: 0px;
-
-    @include tablet {
-        margin: 2rem 6rem;
-    }
+    border-color: var(--border-default);
+  }
 }
 
-.title {
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.uploadIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-full;
+  background-color: $primary-100;
+  color: $primary-500;
+  margin-bottom: $spacing-3;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
-.inputs {
-    color: white;
-    display: flex;
-    flex-direction: column;
-    margin: 8px;
+.uploadText {
+  @include body-2;
+  color: var(--text-secondary);
+  text-align: center;
 
-    @include tablet {
-        margin: 8px 64px;
-    }
-
-    @include laptop {
-        margin: 8px 128px;
-    }
-
-    @include desktop {
-        margin: 8px 256px;
-    }
-
-    input {
-        padding: 8px;
-        border-radius: 4.5px;
-        border-style: solid;
-        border-width: 1px;
-        border-color: rgb(221, 221, 221);
-        background-color: rgb(255, 255, 255);
-    }
+  strong {
+    color: $primary-500;
+    font-weight: $font-weight-medium;
+  }
 }
 
-.uploadButton {
-    position: relative;
-    padding: 6rem;
-    text-align: center;
-    border: 1px solid white;
-    color: rgb(255, 196, 0);
-    cursor: pointer;
-    overflow: hidden;
+.uploadHint {
+  @include caption;
+  color: var(--text-muted);
+  margin-top: $spacing-1;
 }
-  
+
 .previewImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    z-index: 1;
-}  
-
-.uploadButton {
-    padding: 6rem;
-    text-align: center;
-    border: 1px solid white;
-    color: rgb(255, 196, 0);;
-    cursor: pointer;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: calc($radius-lg - 2px);
 }
 
-.completeButton {
-    color: white;
-    margin-top: 4rem;
-    margin-bottom: 2rem;
-    background-color: rgb(36, 120, 61);
-    border-radius: 9px;
-    border-width: 0px;
-    padding: 8px;
-    cursor: pointer;
+.previewAvatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: $radius-full;
+  margin: $spacing-4;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+// ============================================
+// SOCIAL LINKS
+// ============================================
+.socialLinksGrid {
+  display: grid;
+  gap: $spacing-4;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ============================================
+// FORM ACTIONS
+// ============================================
+.formActions {
+  @include flex-between;
+  margin-top: $spacing-8;
+  padding-top: $spacing-6;
+  border-top: 1px solid var(--border-default);
+  gap: $spacing-4;
+}
+
+.skipButton {
+  @include button-tertiary;
+  @include button-md;
+}
+
+.submitButton {
+  @include button-primary;
+  @include button-lg;
+  flex: 1;
+  max-width: 200px;
+  background-color: $secondary-500;
+
+  &:hover:not(:disabled) {
+    background-color: $secondary-600;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $secondary-700;
+  }
+}
+
+// ============================================
+// TEXTAREA OVERRIDE
+// ============================================
+.textarea {
+  @include input-base;
+  min-height: 100px;
+  padding: $spacing-3;
+  resize: vertical;
 }

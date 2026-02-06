@@ -1,10 +1,10 @@
-import Navigation from "@/components/Navigation/Navigation";
-import styles from "@/pages/DirectMessagesPage/DirectMessagesPage.module.scss";
+import { useState, useEffect } from "react";
+import { getCookie, authenticatedFetch } from "@/utils/authHelpers";
 import ChatCard from "@/components/ChatCard/ChatCard";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";
-import { useState, useEffect } from "react";
-import { getCookie, authenticatedFetch } from "@/utils/authHelpers";
+import Icon from "@/icons/Icon";
+import styles from "./DirectMessagesPage.module.scss";
 
 export default function DirectMessagesPage({
   currentUserId,
@@ -34,25 +34,21 @@ export default function DirectMessagesPage({
         credentials: "include",
       });
       const data = await res.json();
-      console.log("✅ CSRF fetched:", data);
       setCsrfToken(data.csrfToken);
     };
     fetchCsrf();
-  }, []);
+  }, [BASE_URL]);
 
   useEffect(() => {
     const fetchChats = async () => {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       const res = await authenticatedFetch(
         `${BASE_URL}/chats/?user_id=${userData.id}`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
       const data = await res.json();
       const chatsFromServer = data?.data || [];
 
-      // 🧠 Inject name/title/image from other user
       const processedChats = chatsFromServer.map((chat) => {
         const otherUser = chat.participants.find((p) => p.id !== userData.id);
         return {
@@ -65,6 +61,7 @@ export default function DirectMessagesPage({
               : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
             : "/assets/ProfileImage.jpg",
           time: new Date(chat.created_at).toLocaleString(),
+          lastMessage: chat.last_message || "Start a conversation...",
         };
       });
 
@@ -72,7 +69,7 @@ export default function DirectMessagesPage({
     };
 
     fetchChats();
-  }, []);
+  }, [BASE_URL, CLOUD_NAME]);
 
   const handleStartChat = async (user) => {
     const userData = JSON.parse(localStorage.getItem("user") || "{}");
@@ -83,7 +80,6 @@ export default function DirectMessagesPage({
       return;
     }
 
-    // Check if chat already exists with this user
     const existingChat = chats.find((chat) => {
       const participantIds = chat.participants.map((p) => p.id);
       return (
@@ -100,9 +96,7 @@ export default function DirectMessagesPage({
 
     const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: `chat-${currentUserId}-${user.id}`,
         participants: [currentUserId, user.id],
@@ -110,8 +104,6 @@ export default function DirectMessagesPage({
     });
 
     const data = await res.json();
-    console.log("Chat creation response:", data);
-
     const chatId = data?.data?.id;
 
     const chatObj = {
@@ -120,8 +112,9 @@ export default function DirectMessagesPage({
       title: user.title || "VFJC Member",
       time: new Date().toISOString(),
       imageSrc: user.profile_image || "/assets/ProfileImage.jpg",
-      participants: [currentUserId, user.id], // ✅ Include participants for future checks
+      participants: [currentUserId, user.id],
       messages: [],
+      lastMessage: "Start a conversation...",
     };
 
     setChats((prev) => [...prev, chatObj]);
@@ -131,7 +124,6 @@ export default function DirectMessagesPage({
 
   const handleChatClick = (chat) => {
     setActiveChat(chat);
-
     setUnreadMap((prev) => {
       const updatedMap = { ...prev, [chat.id]: 0 };
       const anyUnread = Object.values(updatedMap).some((count) => count > 0);
@@ -156,8 +148,6 @@ export default function DirectMessagesPage({
         if (activeChat?.id === chatId) {
           setActiveChat(null);
         }
-      } else {
-        console.error("Failed to delete chat");
       }
     } catch (err) {
       console.error("Error deleting chat:", err);
@@ -165,76 +155,108 @@ export default function DirectMessagesPage({
   };
 
   return (
-    <div className={styles.container}>
-      {/* HOME CONTENT CONTAINER */}
-      <div className={styles.homeContainer}>
-        <div className={styles.titleContainer}>
-          <h1 className={styles.title}>
-            Direct Messages
-            <button
-              className={styles.titleButton}
-              onClick={() => setShowModal(true)}
-            >
-              New Chat
-            </button>
-          </h1>
-          <p>
-            You can use this messaging feature to have individual conversations
-            with fellow VFJC members.
-          </p>
+    <div className={styles.messagesPage}>
+      {/* Conversations List Panel */}
+      <div className={`${styles.conversationsPanel} ${activeChat ? styles.hideOnMobile : ''}`}>
+        <div className={styles.panelHeader}>
+          <h1 className={styles.panelTitle}>Messages</h1>
+          <button
+            className={styles.newChatButton}
+            onClick={() => setShowModal(true)}
+            aria-label="New chat"
+          >
+            <Icon name="plus" size={20} />
+          </button>
         </div>
 
-        {showModal && (
-          <ChatModal
-            currUserId={(() => {
-              const userData = JSON.parse(localStorage.getItem("user"));
-              return userData.id ? userData.id : -1;
-            })()}
-            onClose={() => setShowModal(false)}
-            title="New Chat"
-            onUserSelect={handleStartChat}
+        {/* Search Bar */}
+        <div className={styles.searchWrapper}>
+          <Icon name="search" size={18} className={styles.searchIcon} />
+          <input
+            className={styles.searchInput}
+            type="search"
+            placeholder="Search conversations..."
+            value={searchUser}
+            onChange={(e) => setSearchUser(e.target.value)}
           />
-        )}
+        </div>
 
-        <input
-          className={styles.searchBar}
-          type="search"
-          placeholder="Search By Name"
-          value={searchUser}
-          onChange={(e) => setSearchUser(e.target.value)}
-        />
-
+        {/* Chat List */}
         <div className={styles.chatList}>
           {chats.length > 0 ? (
-            filteredChats.map((chat, idx) => (
-              <div key={idx} onClick={() => handleChatClick(chat)}>
-                <div style={{ position: "relative" }}>
-                  <ChatCard
-                    name={chat.name}
-                    title={chat.title}
-                    time={chat.time}
-                    imageSrc={chat.imageSrc}
-                    hasNotification={unreadMap[chat.id] > 0}
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      handleDeleteChat(chat.id);
-                    }}
-                  />
+            filteredChats.map((chat) => (
+              <div
+                key={chat.id}
+                className={`${styles.chatItem} ${activeChat?.id === chat.id ? styles.active : ''}`}
+                onClick={() => handleChatClick(chat)}
+              >
+                <img
+                  src={chat.imageSrc}
+                  alt={chat.name}
+                  className={styles.chatAvatar}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/assets/ProfileImage.jpg";
+                  }}
+                />
+                <div className={styles.chatInfo}>
+                  <div className={styles.chatHeader}>
+                    <span className={styles.chatName}>{chat.name}</span>
+                    <span className={styles.chatTime}>
+                      {new Date(chat.time).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className={styles.chatPreview}>{chat.lastMessage}</p>
                 </div>
+                {unreadMap[chat.id] > 0 && (
+                  <span className={styles.unreadBadge} />
+                )}
               </div>
             ))
           ) : (
-            <p className={styles.noChatsMessage}>No chats yet...</p>
+            <div className={styles.emptyState}>
+              <Icon name="message" size={48} />
+              <h3>No conversations yet</h3>
+              <p>Start chatting with other VFJC members!</p>
+              <button
+                className={styles.startChatButton}
+                onClick={() => setShowModal(true)}
+              >
+                Start a Conversation
+              </button>
+            </div>
           )}
         </div>
       </div>
 
-      {activeChat && (
-        <ChatWindow
-          chat={activeChat}
-          onClose={() => setActiveChat(null)}
-          setUnreadMap={setUnreadMap}
-          setHasNewDm={setHasNewDm}
+      {/* Chat Window Panel */}
+      <div className={`${styles.chatPanel} ${activeChat ? styles.showOnMobile : ''}`}>
+        {activeChat ? (
+          <ChatWindow
+            chat={activeChat}
+            onClose={() => setActiveChat(null)}
+            setUnreadMap={setUnreadMap}
+            setHasNewDm={setHasNewDm}
+          />
+        ) : (
+          <div className={styles.noChatSelected}>
+            <Icon name="message" size={64} />
+            <h2>Chat with your Volunteer Orgs!</h2>
+            <p>Select a conversation or start a new one to begin messaging.</p>
+          </div>
+        )}
+      </div>
+
+      {/* New Chat Modal */}
+      {showModal && (
+        <ChatModal
+          currUserId={(() => {
+            const userData = JSON.parse(localStorage.getItem("user"));
+            return userData.id ? userData.id : -1;
+          })()}
+          onClose={() => setShowModal(false)}
+          title="New Chat"
+          onUserSelect={handleStartChat}
         />
       )}
     </div>

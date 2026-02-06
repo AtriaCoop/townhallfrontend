@@ -1,22 +1,410 @@
+// ============================================
+// Global Styles - VFJC Townhall
+// ============================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------
+// FONT IMPORTS
+// --------------------------------------------
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Nobile:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
+
+// --------------------------------------------
+// CSS CUSTOM PROPERTIES (Light Mode - Default)
+// --------------------------------------------
 :root {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --modal-bg: white;
-    --icons: #444;
-    --icons-hover: #000;
+  // Background colors
+  --bg-primary: #{$white};
+  --bg-secondary: #{$neutral-100};
+  --bg-tertiary: #{$neutral-50};
+  --bg-elevated: #{$white};
+  --bg-hover: #{$neutral-100};
+  --bg-active: #{$neutral-200};
+
+  // Text colors
+  --text-primary: #{$neutral-950};
+  --text-secondary: #{$neutral-700};
+  --text-tertiary: #{$neutral-500};
+  --text-muted: #{$neutral-400};
+  --text-inverse: #{$white};
+
+  // Border colors
+  --border-default: #{$neutral-200};
+  --border-subtle: #{$neutral-100};
+  --border-strong: #{$neutral-300};
+
+  // Brand colors
+  --primary: #{$primary-500};
+  --primary-hover: #{$primary-600};
+  --primary-active: #{$primary-700};
+  --primary-subtle: #{$primary-50};
+
+  --secondary: #{$secondary-500};
+  --secondary-hover: #{$secondary-600};
+  --secondary-active: #{$secondary-700};
+  --secondary-subtle: #{$secondary-50};
+
+  --accent: #{$accent-500};
+  --accent-hover: #{$accent-600};
+  --accent-active: #{$accent-700};
+  --accent-subtle: #{$accent-50};
+
+  // Semantic colors
+  --success: #{$success-500};
+  --success-subtle: #{$success-50};
+  --warning: #{$warning-500};
+  --warning-subtle: #{$warning-50};
+  --error: #{$error-500};
+  --error-subtle: #{$error-50};
+  --info: #{$info-500};
+  --info-subtle: #{$info-50};
+
+  // Component-specific
+  --card-bg: #{$white};
+  --card-border: #{$neutral-200};
+  --card-shadow: #{$shadow-sm};
+
+  --input-bg: #{$white};
+  --input-border: #{$neutral-200};
+  --input-border-hover: #{$neutral-400};
+  --input-bg-disabled: #{$neutral-100};
+
+  --modal-bg: #{$white};
+  --modal-shadow: #{$shadow-xl};
+
+  --sidebar-bg: #{$white};
+  --sidebar-border: #ddd;
+  --sidebar-item-hover: #f5f5f5;
+  --sidebar-item-active: rgba(0, 168, 152, 0.15);
+  --sidebar-text: rgb(0, 75, 20);
+  --sidebar-text-hover: rgb(0, 75, 20);
+  --sidebar-icon: rgb(0, 75, 20);
+
+  --header-bg: #{$white};
+  --header-border: #ddd;
+
+  // Icons
+  --icon-default: #{$neutral-600};
+  --icon-muted: #{$neutral-400};
+  --icon-hover: #{$neutral-900};
+
+  // Scrollbar
+  --scrollbar-thumb: #{$neutral-300};
+  --scrollbar-thumb-hover: #{$neutral-400};
+
+  // Skeleton loading
+  --skeleton-base: #{$neutral-200};
+  --skeleton-shine: #{$neutral-100};
+
+  // Shadows
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+
+  // Legacy variables (for backward compatibility)
+  --bg-color: var(--bg-primary);
+  --text-color: var(--text-primary);
+  --icons: var(--icon-default);
+  --icons-hover: var(--icon-hover);
 }
 
+// --------------------------------------------
+// DARK MODE
+// --------------------------------------------
 body.dark {
-    --bg-color: #2c2c2c;
-    --text-color: #ffffff;
-    --modal-bg: #2e2e2e;
-    --icons: #bbbbbb;
-    --icons-hover: #eeeeee;
+  // Background colors
+  --bg-primary: #{$dark-bg-primary};
+  --bg-secondary: #{$dark-bg-secondary};
+  --bg-tertiary: #{$dark-bg-tertiary};
+  --bg-elevated: #{$dark-bg-elevated};
+  --bg-hover: #{$dark-bg-tertiary};
+  --bg-active: #{$dark-bg-elevated};
+
+  // Text colors
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-tertiary: #{$dark-text-tertiary};
+  --text-muted: #{$dark-text-muted};
+  --text-inverse: #{$neutral-950};
+
+  // Border colors
+  --border-default: #{$dark-border};
+  --border-subtle: #{rgba($white, 0.05)};
+  --border-strong: #{$dark-border-subtle};
+
+  // Brand colors (slightly adjusted for dark mode)
+  --primary: #{$primary-400};
+  --primary-hover: #{$primary-300};
+  --primary-active: #{$primary-500};
+  --primary-subtle: #{rgba($primary-500, 0.15)};
+
+  --secondary: #{$secondary-400};
+  --secondary-hover: #{$secondary-300};
+  --secondary-subtle: #{rgba($secondary-500, 0.15)};
+
+  --accent: #{$accent-400};
+  --accent-hover: #{$accent-300};
+  --accent-subtle: #{rgba($accent-500, 0.15)};
+
+  // Semantic colors
+  --success-subtle: #{rgba($success-500, 0.15)};
+  --warning-subtle: #{rgba($warning-500, 0.15)};
+  --error-subtle: #{rgba($error-500, 0.15)};
+  --info-subtle: #{rgba($info-500, 0.15)};
+
+  // Component-specific
+  --card-bg: #{$dark-bg-secondary};
+  --card-border: #{$dark-border};
+  --card-shadow: #{$shadow-dark-sm};
+
+  --input-bg: #{$dark-bg-tertiary};
+  --input-border: #{$dark-border};
+  --input-border-hover: #{$dark-border-subtle};
+  --input-bg-disabled: #{$dark-bg-secondary};
+
+  --modal-bg: #{$dark-bg-secondary};
+  --modal-shadow: #{$shadow-dark-xl};
+
+  --sidebar-bg: #{$dark-bg-secondary};
+  --sidebar-border: #{$dark-border};
+  --sidebar-item-hover: #{$dark-bg-tertiary};
+  --sidebar-item-active: #{rgba($primary-400, 0.25)};
+  --sidebar-text: #{$dark-text-primary};
+  --sidebar-text-hover: #{$dark-text-primary};
+  --sidebar-icon: #{$dark-text-primary};
+
+  --header-bg: #{$dark-bg-secondary};
+  --header-border: #{$dark-border};
+
+  // Icons
+  --icon-default: #{$dark-text-secondary};
+  --icon-muted: #{$dark-text-muted};
+  --icon-hover: #{$dark-text-primary};
+
+  // Scrollbar
+  --scrollbar-thumb: #{$dark-border-subtle};
+  --scrollbar-thumb-hover: #{$neutral-500};
+
+  // Skeleton loading
+  --skeleton-base: #{$dark-bg-tertiary};
+  --skeleton-shine: #{$dark-bg-elevated};
+
+  // Shadows
+  --shadow-sm: #{$shadow-dark-sm};
+  --shadow-md: #{$shadow-dark-md};
+  --shadow-lg: #{$shadow-dark-lg};
+
+  // Legacy variables
+  --bg-color: var(--bg-primary);
+  --text-color: var(--text-primary);
+  --icons: var(--icon-default);
+  --icons-hover: var(--icon-hover);
+}
+
+// --------------------------------------------
+// CSS RESET & BASE STYLES
+// --------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: background-color $transition-normal $ease-out,
+              color $transition-normal $ease-out;
+  min-height: 100vh;
+}
+
+// --------------------------------------------
+// TYPOGRAPHY DEFAULTS
+// --------------------------------------------
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-headlines;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-snug;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+h1 { @include heading-1; }
+h2 { @include heading-2; }
+h3 { @include heading-3; }
+h4 { @include heading-4; }
+h5 { @include heading-5; }
+h6 { @include heading-6; }
+
+p {
+  margin: 0;
+  @include body-1;
+}
+
+small {
+  @include caption;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color $transition-fast $ease-out;
+
+  &:hover {
+    color: var(--primary-hover);
+  }
+}
+
+strong, b {
+  font-weight: $font-weight-semibold;
+}
+
+// --------------------------------------------
+// FORM ELEMENTS
+// --------------------------------------------
+button {
+  font-family: $font-family-body;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+}
+
+// --------------------------------------------
+// LISTS
+// --------------------------------------------
+ul, ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// --------------------------------------------
+// IMAGES
+// --------------------------------------------
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// --------------------------------------------
+// FOCUS STYLES
+// --------------------------------------------
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+// --------------------------------------------
+// SELECTION
+// --------------------------------------------
+::selection {
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
+}
+
+// --------------------------------------------
+// SCROLLBAR (Global)
+// --------------------------------------------
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: $radius-full;
+
+  &:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+}
+
+// Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+// --------------------------------------------
+// UTILITY CLASSES
+// --------------------------------------------
+.visually-hidden {
+  @include visually-hidden;
+}
+
+.truncate {
+  @include truncate;
+}
+
+// Text colors
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-success { color: var(--success) !important; }
+.text-error { color: var(--error) !important; }
+.text-warning { color: var(--warning) !important; }
+
+// Background colors
+.bg-primary { background-color: var(--bg-primary) !important; }
+.bg-secondary { background-color: var(--bg-secondary) !important; }
+
+// Spacing utilities
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: $spacing-1 !important; }
+.mt-2 { margin-top: $spacing-2 !important; }
+.mt-4 { margin-top: $spacing-4 !important; }
+.mt-6 { margin-top: $spacing-6 !important; }
+.mt-8 { margin-top: $spacing-8 !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: $spacing-1 !important; }
+.mb-2 { margin-bottom: $spacing-2 !important; }
+.mb-4 { margin-bottom: $spacing-4 !important; }
+.mb-6 { margin-bottom: $spacing-6 !important; }
+.mb-8 { margin-bottom: $spacing-8 !important; }
+
+// Display utilities
+.hidden { display: none !important; }
+.block { display: block !important; }
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+
+// Responsive display
+@include below-md {
+  .hide-mobile { display: none !important; }
+}
+
+@include md {
+  .hide-desktop { display: none !important; }
 }

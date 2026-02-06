@@ -1,0 +1,623 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.eventsPage {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  width: 100%;
+}
+
+// Page Header
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+  padding-bottom: $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.pageTitle {
+  margin: 0;
+  @include heading-3;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+}
+
+// Toggle Switch
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  cursor: pointer;
+  @include body-2;
+  color: var(--text-secondary);
+}
+
+.toggleWrapper {
+  position: relative;
+}
+
+.toggleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+
+  &:checked + .toggleTrack {
+    background-color: var(--primary);
+
+    .toggleThumb {
+      transform: translateX(20px);
+    }
+  }
+
+  &:focus-visible + .toggleTrack {
+    box-shadow: $shadow-focus;
+  }
+}
+
+.toggleTrack {
+  display: flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  padding: 2px;
+  background-color: var(--bg-active);
+  border-radius: $radius-full;
+  @include transition-colors;
+}
+
+.toggleThumb {
+  width: 20px;
+  height: 20px;
+  background-color: $white;
+  border-radius: $radius-full;
+  box-shadow: $shadow-sm;
+  @include transition-transform;
+}
+
+// Sections
+.eventsSection {
+  margin-bottom: $spacing-8;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.sectionTitle {
+  margin: 0;
+  @include heading-5;
+  color: var(--text-secondary);
+}
+
+// Search
+.searchWrapper {
+  position: relative;
+  width: 100%;
+
+  @include md {
+    width: 240px;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: $spacing-3;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--icon-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  @include input-base;
+  @include input-md;
+  padding-left: 44px !important;
+}
+
+// Events Grid
+.eventsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+// Event Card
+.eventCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @include md {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: $spacing-5;
+  }
+}
+
+.eventDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  background-color: var(--primary);
+  border-radius: $radius-md;
+  color: $white;
+  flex-shrink: 0;
+
+  @include md {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+  }
+}
+
+.eventMonth {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+  line-height: 1;
+}
+
+.eventDay {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+}
+
+.eventInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventTitle {
+  margin: 0 0 $spacing-2 0;
+  color: var(--text-primary);
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.eventMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-3;
+  margin-bottom: $spacing-2;
+}
+
+.eventTime,
+.eventLocation {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  color: var(--text-muted);
+  @include caption;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.eventDescription {
+  margin: 0 0 $spacing-2 0;
+  color: var(--text-secondary);
+  @include body-2;
+  @include line-clamp(2);
+}
+
+.eventAdmin {
+  margin: 0;
+  color: var(--text-muted);
+  @include caption;
+
+  span {
+    font-weight: $font-weight-medium;
+  }
+}
+
+// Event Actions
+.eventActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  flex-shrink: 0;
+  min-width: 140px;
+
+  @include md {
+    align-self: center;
+  }
+}
+
+.messageButton {
+  @include button-primary;
+  @include button-sm;
+  width: 100%;
+}
+
+.participateButton {
+  @include button-secondary;
+  @include button-sm;
+  width: 100%;
+}
+
+.unenrollButton {
+  @include button-base;
+  @include button-sm;
+  width: 100%;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+
+  &:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+}
+
+// Loading State
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  padding: $spacing-12;
+  color: var(--text-muted);
+  @include body-1;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--primary);
+  border-radius: $radius-full;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+  color: var(--text-muted);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.4;
+  }
+
+  h3 {
+    color: var(--text-secondary);
+    margin: 0;
+    @include heading-5;
+  }
+
+  p {
+    margin: 0;
+    @include body-2;
+  }
+}
+
+// ============================================
+// Calendar View Styles
+// ============================================
+
+.calendarContainer {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+  background-color: var(--bg-secondary);
+}
+
+.calendarMonthTitle {
+  margin: 0;
+  @include heading-5;
+  color: var(--text-primary);
+}
+
+.calendarNavBtn {
+  @include button-base;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: $radius-full;
+  background-color: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+}
+
+.calendarWeekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.weekDay {
+  padding: $spacing-3;
+  text-align: center;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-muted);
+  background-color: var(--bg-secondary);
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendarDay,
+.calendarDayEmpty {
+  min-height: 80px;
+  padding: $spacing-2;
+  border-right: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+
+  &:nth-child(7n) {
+    border-right: none;
+  }
+
+  @include md {
+    min-height: 100px;
+    padding: $spacing-3;
+  }
+}
+
+.calendarDayEmpty {
+  background-color: var(--bg-secondary);
+}
+
+.calendarDay {
+  background-color: var(--card-bg);
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  &.today {
+    background-color: var(--primary-subtle);
+
+    .dayNumber {
+      background-color: var(--primary);
+      color: $white;
+      border-radius: $radius-full;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.dayNumber {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-secondary);
+  margin-bottom: $spacing-1;
+}
+
+.dayEvents {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eventChip {
+  @include button-base;
+  padding: 2px $spacing-2;
+  font-size: 10px;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  cursor: pointer;
+
+  @include md {
+    font-size: $font-size-xs;
+    padding: $spacing-1 $spacing-2;
+  }
+}
+
+.eventChip1 {
+  background-color: $primary-100;
+  color: $primary-700;
+
+  &:hover {
+    background-color: $primary-200;
+  }
+}
+
+.eventChip2 {
+  background-color: $secondary-100;
+  color: $secondary-700;
+
+  &:hover {
+    background-color: $secondary-200;
+  }
+}
+
+.eventChip3 {
+  background-color: $accent-100;
+  color: $accent-700;
+
+  &:hover {
+    background-color: $accent-200;
+  }
+}
+
+.moreEvents {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-left: $spacing-1;
+}
+
+// ============================================
+// Event Modal Styles
+// ============================================
+
+.eventModal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  padding: $spacing-4;
+}
+
+.eventModalContent {
+  background-color: var(--modal-bg);
+  border-radius: $radius-lg;
+  padding: $spacing-6;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: var(--modal-shadow);
+}
+
+.modalCloseBtn {
+  @include button-base;
+  position: absolute;
+  top: $spacing-4;
+  right: $spacing-4;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-full;
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.modalTitle {
+  margin: 0 0 $spacing-4 0;
+  @include heading-5;
+  color: var(--text-primary);
+}
+
+.modalEventInfo {
+  margin-bottom: $spacing-6;
+
+  h4 {
+    margin: 0 0 $spacing-3 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+  }
+}
+
+.modalMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  margin-bottom: $spacing-4;
+
+  p {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    margin: 0;
+    color: var(--text-secondary);
+    @include body-2;
+
+    svg {
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+  }
+}
+
+.modalDescription {
+  margin: 0;
+  color: var(--text-secondary);
+  @include body-2;
+  line-height: $line-height-relaxed;
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  @include sm {
+    flex-direction: row;
+  }
+}

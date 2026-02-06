@@ -1,40 +1,57 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  width: 100%;
+}
+
 .inputLabel {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+  @include body-2;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+
+  .required {
+    color: $error-500;
+    margin-left: $spacing-1;
+  }
 }
 
 .inputField {
-  padding: 8px;
-  border-radius: 4.5px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: rgb(221, 221, 221);
-  background-color: rgb(255, 255, 255);
-
-  &:focus {
-    outline: none;
-    border-color: #000;
-  }
-
-  &::placeholder {
-    color: #999;
-  }
+  @include input-base;
+  @include input-md;
+  width: 100%;
 }
 
 .inputError {
-  border-color: #dc3545 !important;
-  background-color: #fff5f5;
+  border-color: $error-500;
+  background-color: $error-50;
 
   &:focus {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    border-color: $error-500;
+    box-shadow: $shadow-focus-error;
   }
 }
 
 .errorMessage {
-  display: block;
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  animation: slideDown 0.2s ease;
+  @include caption;
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  color: $error-500;
+  margin-top: $spacing-1;
+  animation: slideDown $transition-fast $ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

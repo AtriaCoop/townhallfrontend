@@ -1,0 +1,79 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  min-width: 200px;
+  max-width: 280px;
+  padding: $spacing-2;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: $spacing-2;
+  z-index: $z-popover;
+  animation: popIn 150ms $ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2;
+  border-radius: $radius-md;
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: $radius-full;
+  object-fit: cover;
+}
+
+.userName {
+  flex: 1;
+  color: var(--text-primary);
+  font-weight: $font-weight-medium;
+  @include body-2;
+  @include truncate;
+}
+
+.moreText {
+  padding: $spacing-2;
+  color: var(--text-muted);
+  @include caption;
+}
+
+.emptyText {
+  margin: 0;
+  padding: $spacing-2;
+  color: var(--text-muted);
+  text-align: center;
+  @include caption;
+}

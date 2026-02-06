@@ -1,118 +1,281 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .dashboard {
-
-  --bg-color: #f9f9f9;
-  --bg-color-secondary: white;
-  --bg-placeholder: #e9ecef;
-  --text-color-secondary: #555;
-  
   display: flex;
-  background-color: var(--bg-color);
-  min-height: 100vh;
-  padding: 0 1rem;
   flex-direction: column;
-
-  @include tablet {
-    margin-left: 89px;
-    padding: 0 2rem;
-  }
-
-  @include laptop {
-    margin-left: 289px;
-  }
-}
-
-:global(body.dark) .dashboard {
-  --bg-color: #222222;
-  --bg-color-secondary: #2e2e2e;
-  --bg-placeholder: #3a3a3a;
-  --text-color-secondary: #d1d1d1;
-}
-
-.content {
-  flex: 1;
+  gap: $spacing-6;
+  max-width: $content-max-width;
+  margin: 0 auto;
   width: 100%;
-  padding-top: 2rem;
-  font-family: 'Arial', sans-serif;
+
+  @include lg {
+    flex-direction: row;
+    gap: $spacing-8;
+  }
 }
 
-.title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
+// Main Feed Section
+.feedSection {
+  flex: 1;
+  min-width: 0; // Prevent flex item overflow
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+// Create Post Card
+.createPostCard {
+  gap: $spacing-3;
+  cursor: pointer;
+  @include card;
+  @include flex-start;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--primary);
+  }
+
+  @include md {
+    gap: $spacing-4;
+  }
+}
+
+.createPostAvatar {
+  @include avatar($avatar-md);
+  flex-shrink: 0;
+}
+
+.createPostPlaceholder {
+  flex: 1;
+  color: var(--text-muted);
+  font-size: $font-size-base;
+
+  @include md {
+    font-size: $font-size-lg;
+  }
+}
+
+.createPostBtn {
+  @include button-primary;
+  @include button-md;
+  flex-shrink: 0;
+  display: none;
+
+  @include md {
+    display: inline-flex;
+  }
+}
+
+// Posts List
+.postsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+// Loader
+.loaderContainer {
+  @include flex-center;
+  min-height: 200px;
+}
+
+// Empty Feed State
+.emptyFeed {
+  @include card;
+  @include flex-column-center;
+  gap: $spacing-4;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+  color: var(--text-muted);
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  h3 {
+    @include heading-5;
+    color: var(--text-secondary);
+    margin: 0;
+  }
 
   p {
-    color: var(--text-color-secondary);
-  }
-
-  @include tablet {
-    font-size: 2rem;
+    @include body-2;
+    margin: 0;
   }
 }
 
-.grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: 1fr;
+// Pagination
+.pagination {
+  @include flex-center;
+  gap: $spacing-4;
+  padding: $spacing-4 0;
+  margin-top: $spacing-4;
+}
 
-  @include tablet {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.paginationBtn {
+  @include button-secondary;
+  @include button-sm;
+  gap: $spacing-2;
 
-  @include laptop {
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: minmax(150px, auto);
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }
 
-.card {
-  background: var(--bg-color-secondary);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.pageInfo {
+  @include body-2;
+  color: var(--text-secondary);
 }
 
-.cardWide {
-  @extend .card;
-
-  @include tablet {
-    grid-column: span 2;
-  }
-
-  @include laptop {
-    grid-column: span 2;
-  }
-}
-
-.calendar,
-.graph {
-  background-color: var(--bg-placeholder);
-  height: 180px;
-  border-radius: 8px;
+// Sidebar
+.sidebar {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: $spacing-4;
+  width: 100%;
+
+  @include lg {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc($header-height + $spacing-6);
+    max-height: calc(100vh - $header-height - $spacing-12);
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  @include xl {
+    width: 360px;
+  }
+}
+
+// Widget Card
+.widget {
+  @include card;
+}
+
+.widgetTitle {
+  @include heading-5;
+  margin: 0 0 $spacing-4 0;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid var(--border-default);
+}
+
+// Events List
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.eventCard {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  background-color: var(--bg-secondary);
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+}
+
+.eventDate {
+  @include flex-column-center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--primary);
+  border-radius: $radius-md;
+  color: $white;
+  flex-shrink: 0;
+}
+
+.eventMonth {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+}
+
+.eventDay {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+}
+
+.eventInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventTitle {
+  @include body-2;
+  @include line-clamp(2);
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.eventTime {
+  @include caption;
+  color: var(--text-muted);
+}
+
+.eventArrow {
+  @include button-ghost;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-full;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.viewAllBtn {
+  @include button-tertiary;
+  @include button-sm;
+  width: 100%;
+  margin-top: $spacing-3;
   justify-content: center;
-  color: var(--text-color-secondary);
-  font-size: 1rem;
+  color: var(--primary);
 
-  @include tablet {
-    height: 200px;
-    font-size: 1.1rem;
+  &:hover {
+    background-color: var(--primary-subtle);
   }
 }
 
-.opportunityList {
-  padding-left: 1.2rem;
-  margin-top: 0.5rem;
+// Activity List
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
 
-  li {
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+.activityItem {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-2 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-subtle);
   }
 }
 
+.activityAvatar {
+  @include avatar($avatar-sm);
+  flex-shrink: 0;
+}
 
-.activitiesWrapper{
-  grid-column: span 3;
+.activityText {
+  @include body-2;
+  margin: 0;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-medium;
+  }
 }

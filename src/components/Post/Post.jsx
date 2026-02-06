@@ -1,13 +1,14 @@
 import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import CommentModal from '@/components/CommentModal/CommentModal'
-import LikeModal from '@/components/LikeModal/LikeModal';
-import { getCookie } from '@/utils/authHelpers';
+import InlineComments from '@/components/InlineComments/InlineComments';
+import LikesTooltip from '@/components/LikesTooltip/LikesTooltip';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import Icon from '@/icons/Icon';
+import { getReactionEmoji } from '@/constants/reactions';
+import { BASE_URL } from '@/constants/api';
 
 export default function Post({ 
   fullName,
@@ -31,56 +32,28 @@ export default function Post({
   reactions = {},
 }) {
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
   const optionsRef = useRef(null);
   const router = useRouter();
 
   const [showOptions, setShowOptions] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false);
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
-  const [commentModal, setCommentModal] = useState(false);
-  const [likeModal, setLikeModal] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showLikesTooltip, setShowLikesTooltip] = useState(false);
   const [liked, setLiked] = useState(isLiked);
-  const [isMyOwnPost, setIsMyOwnPost] = useState(false)
-  const [reportResponse, setReportResponse] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [reportResponse, setReportResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
 
-  // Can make this a separate file and import but I'm lazy so this can be another Jira Ticket (this is for testing)
-  const REACTIONS = [
-    { type: 'love', emoji: '❤️' },
-    { type: 'appreciate', emoji: '🤲' },
-    { type: 'respect', emoji: '👌' },
-    { type: 'support', emoji: '🤝' },
-    { type: 'inspired', emoji: '☀️' },
-    { type: 'helpful', emoji: '✅' },
-  ];
-
-    // 🧠 GET CSRF COOKIE ON LOAD
-    useEffect(() => {
-      fetch(`${BASE_URL}/auth/csrf/`, {
-        method: "GET",
-        credentials: "include",
-        mode: "cors",
-        headers: {
-          Accept: "application/json", // ✅ explicitly ask for JSON, not HTML
-        },
-      })
-        .then(() => console.log("CSRF cookie set"))
-        .catch(err => console.error("CSRF cookie failed", err));
-
-      // Set state if post is own post
-      setIsMyOwnPost( userId === currentUserId )
-    }, [userId, currentUserId]);
+  const isMyOwnPost = userId === currentUserId;
 
   // UPDATE POST
   async function handleUpdatePost() {
     try {
       const result = await updatePost(postId, {content: editText, image: editImage});
-      console.log("Post updated successfully:", result);
   
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
@@ -153,14 +126,12 @@ async function handleLikePost() {
   };
 
   const handleCommentClick = () => {
-    console.log("Comment clicked!")
-    setCommentModal(true);
-  }
+    setShowComments(prev => !prev);
+  };
 
   const handleLikeClick = () => {
-    console.log("Likes clicked!")
-    setLikeModal(true);
-  }
+    setShowLikesTooltip(prev => !prev);
+  };
 
   // Handle outside click to close edit/delete modal
   useEffect(() => {
@@ -207,7 +178,7 @@ async function handleLikePost() {
 
     } catch (err){
       console.error(err)
-      setReportResponse(err)      
+      setReportResponse(err.message || "Something went wrong")
     } finally {
       setIsLoading(false)
     }
@@ -216,11 +187,6 @@ async function handleLikePost() {
   const handleReactionClick = () => {
     setShowReactionPicker(prev => !prev);
   }
-
-  const handleReactionSelect = (reactionType) => {
-    // Reaction is handled in the ReactionPicker component
-    // This callback can be used for any additional UI updates
-  };
 
   // PIN POST
   const handlePinPost = async () => {
@@ -405,33 +371,13 @@ async function handleLikePost() {
         )}
       </div>
 
-      {commentModal && (
-        <CommentModal
-          onClose={() => setCommentModal(false)}
-          comments={[...comments].reverse()}
-          currentUserId={currentUserId}
-          date={date}
-          postId={postId}
-          BASE_URL={BASE_URL}
-          setPosts={setPosts}
-        />
-      )}
-
-      {likeModal && (
-        <LikeModal
-          onClose={() => setLikeModal(false)}
-          liked_by={liked_by}
-          BASE_URL={BASE_URL}
-        />
-      )}
-
       {Object.keys(reactions).length > 0 && (
         <div className={styles.reactionsDisplay}>
           {Object.entries(reactions).map(([reactionType, userIds]) => (
             userIds.length > 0 && (
               <div key={reactionType} className={styles.reactionGroup}>
                 <span className={styles.reactionEmoji}>
-                {REACTIONS.find(r => r.type === reactionType)?.emoji}
+                  {getReactionEmoji(reactionType)}
                 </span>
                 <span className={styles.reactionCount}>{userIds.length}</span>
               </div>
@@ -442,32 +388,63 @@ async function handleLikePost() {
       
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ""}`} onClick={handleLikePost}/>
-          <div className={styles.likesComments} onClick={handleLikeClick}>{likes} Likes</div>
-          <Icon name="message" className={styles.postIcon} onClick={handleCommentClick}/>
-          <div className={styles.likesComments} onClick={handleCommentClick}>{comments?.length} Comment{comments?.length !== 1 ? 's' : ''}</div>
-          <button className={styles.reactButton} onClick={handleReactionClick}>
-            😊 React
-          </button>
+          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ''}`} onClick={handleLikePost} />
+          {/* Likes with tooltip */}
+          <div className={styles.likesWrapper}>
+            <div className={styles.likesComments} onClick={handleLikeClick}>
+              {likes} Like{likes !== 1 ? 's' : ''}
+            </div>
+            {showLikesTooltip && (
+              <LikesTooltip
+                liked_by={liked_by}
+                onClose={() => setShowLikesTooltip(false)}
+              />
+            )}
+          </div>
+          <Icon name="message" className={`${styles.postIcon} ${showComments ? styles.active : ''}`} onClick={handleCommentClick} />
+          <div className={styles.likesComments} onClick={handleCommentClick}>
+            {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
+          </div>
+          {/* Reaction Picker Wrapper */}
+          <div className={styles.reactionWrapper}>
+            <button
+              className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ''}`}
+              onClick={handleReactionClick}
+              title="Add reaction"
+            >
+              <Icon name="smile" size={20} />
+            </button>
+            {showReactionPicker && (
+              <ReactionPicker
+                currentReactions={reactions}
+                currentUserId={currentUserId}
+                postId={postId}
+                BASE_URL={BASE_URL}
+                setPosts={setPosts}
+                onClose={() => setShowReactionPicker(false)}
+              />
+            )}
+          </div>
         </div>
-        {is_staff ?
-              <button className={styles.pin} onClick={handlePinPost} title={pinned ? "Unpin post" : "Pin post"}>
-                <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ""}`}/>
-              </button>
-            :
-              pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
-        }
+        {is_staff ? (
+          <button className={styles.pin} onClick={handlePinPost} title={pinned ? 'Unpin post' : 'Pin post'}>
+            <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ''}`} />
+          </button>
+        ) : (
+          pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
+        )}
       </div>
-      {showReactionPicker && (
-        <ReactionPicker 
-          onReactionSelect={handleReactionSelect}
-          currentReactions={reactions}
-          currentUserId={currentUserId}
-          postId={postId}
-          BASE_URL={BASE_URL}
-          setPosts={setPosts}
-        />
-      )}
+
+      {/* Inline Comments Section */}
+      <InlineComments
+        comments={comments}
+        currentUserId={currentUserId}
+        postId={postId}
+        BASE_URL={BASE_URL}
+        setPosts={setPosts}
+        isExpanded={showComments}
+        onToggle={() => setShowComments(prev => !prev)}
+      />
     </div>
   );
 }

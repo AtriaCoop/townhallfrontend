@@ -1,11 +1,10 @@
-import styles from "@/pages/ProfilePage/ProfilePage.module.scss";
-import Navigation from "@/components/Navigation/Navigation";
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import styles from "./ProfilePage.module.scss";
 
 export default function ProfilePage({ darkMode, setDarkMode }) {
   const router = useRouter();
@@ -14,7 +13,7 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
 
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [toast, setToast] = useState(null); // { type: 'success'|'error', message: string }
+  const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
 
   useEffect(() => {
@@ -37,7 +36,6 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
 
     fetchProfile();
 
-    // Check for deferred toast from previous page
     try {
       const queued = sessionStorage.getItem("toastAfterNav");
       if (queued) {
@@ -48,7 +46,7 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
     } catch (e) {
       // no-op
     }
-  }, [id, router.isReady]);
+  }, [id, router.isReady, BASE_URL]);
 
   useEffect(() => {
     if (!toast) return;
@@ -65,101 +63,148 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
     await authenticatedFetch(`${BASE_URL}/auth/logout/`, {
       method: "POST",
     });
-
     localStorage.removeItem("user");
     router.push("/");
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.profileContainer}>
-        {toast && (
-          <div
-            className={`${styles.toast} ${
-              toast.type === "success" ? styles.toastSuccess : styles.toastError
-            }`}
-            role="status"
-            aria-live="assertive"
-          >
-            {toast.message}
-          </div>
-        )}
-        <div className={styles.cardHeader}>Profile Overview</div>
-
-        <img
-          className={styles.profilePic}
-          src={profileData.profile_image || "/assets/ProfileImage.jpg"}
-          alt="Profile"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/assets/ProfileImage.jpg";
-          }}
-        />
-
-        {isCurrentUser && (
-          <button
-            onClick={() => router.push("/EditProfilePage")}
-            className={styles.editButtonInline}
-          >
-            <Icon name="edit" className={styles.icon} />
-            Edit Profile
-          </button>
-        )}
-
-        <div className={styles.name}>{profileData.full_name}</div>
-        <div className={styles.dateJoined}>
-          Joined{" "}
-          {formatDistanceToNow(new Date(profileData.date_joined), {
-            addSuffix: true,
-          })}
+    <div className={styles.profilePage}>
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`${styles.toast} ${
+            toast.type === "success" ? styles.toastSuccess : styles.toastError
+          }`}
+          role="status"
+          aria-live="assertive"
+        >
+          {toast.message}
         </div>
-        {isCurrentUser && (
-          <div>
+      )}
+
+      {/* Cover Image Section */}
+      <div className={styles.coverSection}>
+        <div className={styles.coverImage}>
+          <div className={styles.coverOverlay} />
+          <div className={styles.coverIllustration}>
+            <svg viewBox="0 0 200 100" className={styles.silhouettes}>
+              <circle cx="50" cy="40" r="15" fill="currentColor" opacity="0.3" />
+              <path d="M35 100 Q50 60 65 100" fill="currentColor" opacity="0.3" />
+              <circle cx="100" cy="35" r="18" fill="currentColor" opacity="0.4" />
+              <path d="M80 100 Q100 55 120 100" fill="currentColor" opacity="0.4" />
+              <circle cx="150" cy="40" r="15" fill="currentColor" opacity="0.3" />
+              <path d="M135 100 Q150 60 165 100" fill="currentColor" opacity="0.3" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Profile Avatar */}
+        <div className={styles.avatarWrapper}>
+          <img
+            src={profileData.profile_image || "/assets/ProfileImage.jpg"}
+            alt={profileData.full_name}
+            className={styles.avatar}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/assets/ProfileImage.jpg";
+            }}
+          />
+        </div>
+
+        {/* Name and Edit Button */}
+        <div className={styles.profileHeader}>
+          <h1 className={styles.name}>{profileData.full_name}</h1>
+          {isCurrentUser && (
             <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`${styles.darkModeButton} ${
-                darkMode ? styles.isDark : ""
-              }`}
+              onClick={() => router.push("/EditProfilePage")}
+              className={styles.editButton}
             >
-              {darkMode ? "☀️ Light Mode" : "🌘 Dark Mode"}
+              Edit Profile
             </button>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        <div className={styles.sectionTitle}>👤 Details</div>
-        <div className={styles.profileInfo}>
-          <div>
-            <strong>Title:</strong> {profileData.title}
-          </div>
-          <div>
-            <strong>Primary Organization:</strong>{" "}
-            {profileData.primary_organization}
-          </div>
-          <div>
-            <strong>Other Organizations:</strong>{" "}
-            {profileData.other_organizations}
-          </div>
-          <div>
-            <strong>Other Networks:</strong> {profileData.other_networks}
+      {/* Content Cards */}
+      <div className={styles.contentGrid}>
+        {/* Basic Information Card */}
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Basic Information</h2>
+          <div className={styles.infoList}>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Name:</span>
+              <span className={styles.infoValue}>{profileData.full_name}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Email:</span>
+              <span className={styles.infoValue}>{profileData.email}</span>
+            </div>
+            {profileData.title && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Title:</span>
+                <span className={styles.infoValue}>{profileData.title}</span>
+              </div>
+            )}
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Joined:</span>
+              <span className={styles.infoValue}>
+                {formatDistanceToNow(new Date(profileData.date_joined), {
+                  addSuffix: true,
+                })}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className={styles.sectionTitle}>📝 About</div>
-        <div className={styles.aboutBox}>
-          <div>
-            <strong>About Me:</strong> {profileData.about_me}
-          </div>
-          <div>
-            <strong>Skills & Interests:</strong> {profileData.skills_interests}
-          </div>
+        {/* Details Card */}
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Details</h2>
+
+          {/* About Section */}
+          {profileData.about_me && (
+            <div className={styles.detailSection}>
+              <h3 className={styles.detailLabel}>About</h3>
+              <p className={styles.detailContent}>{profileData.about_me}</p>
+            </div>
+          )}
+
+          {/* Organizations Section */}
+          {profileData.primary_organization && (
+            <div className={styles.detailSection}>
+              <h3 className={styles.detailLabel}>Organizations</h3>
+              <p className={styles.detailContent}>
+                {profileData.primary_organization}
+                {profileData.other_organizations && (
+                  <>, {profileData.other_organizations}</>
+                )}
+              </p>
+            </div>
+          )}
+
+          {/* Skills & Interests */}
+          {profileData.skills_interests && (
+            <div className={styles.detailSection}>
+              <h3 className={styles.detailLabel}>Skills & Interests</h3>
+              <p className={styles.detailContent}>{profileData.skills_interests}</p>
+            </div>
+          )}
+
+          {/* Networks */}
+          {profileData.other_networks && (
+            <div className={styles.detailSection}>
+              <h3 className={styles.detailLabel}>Other Networks</h3>
+              <p className={styles.detailContent}>{profileData.other_networks}</p>
+            </div>
+          )}
         </div>
 
+        {/* Social Links Card */}
         {(profileData.linkedin_url ||
           profileData.x_url ||
           profileData.facebook_url ||
           profileData.instagram_url) && (
-          <>
-            <div className={styles.sectionTitle}>🔗 Social Links</div>
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>Social Links</h2>
             <SocialLinks
               socialLinks={{
                 linkedin_url: profileData.linkedin_url,
@@ -168,19 +213,33 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
                 instagram_url: profileData.instagram_url,
               }}
             />
-          </>
+          </div>
         )}
 
+        {/* Settings Card (only for current user) */}
         {isCurrentUser && (
-          <>
-            <button
-              onClick={userLogout}
-              className={styles.signoutFloatingButton}
-            >
-              <Icon name="leave" className={styles.icon} />
-              Sign Out
-            </button>
-          </>
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>Settings</h2>
+            <div className={styles.settingsList}>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={styles.settingButton}
+              >
+                <span className={styles.settingIcon}>
+                  {darkMode ? "☀️" : "🌙"}
+                </span>
+                <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+              </button>
+
+              <button
+                onClick={userLogout}
+                className={`${styles.settingButton} ${styles.logoutButton}`}
+              >
+                <Icon name="leave" size={20} />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
