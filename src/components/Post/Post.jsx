@@ -45,16 +45,29 @@ export default function Post({
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [tag, setTag] = useState("");
   const [editTags, setEditTags] = useState(tags);
+  const [tagErrorText, setTagErrorText] = useState("");
   const MAX_TAGS = 5;
 
   const isMyOwnPost = userId === currentUserId;
 
   const handleTagAdd = () => {
     if (!tag.trim()) return;
-    if (editTags.length >= MAX_TAGS) return;
+    if (editTags.length >= MAX_TAGS) {
+      setTagErrorText("Can't add more than 5 tags.");
+      return;
+    };
+
+    const exists = editTags.some(
+      (t) => t.toLowerCase() === tag.toLowerCase()
+    );
+    if (exists) {
+      setTagErrorText("Can't add duplicate tag.");
+      return;
+    };
 
     setEditTags((prev) => [...prev, tag]);
     setTag("");
+    setTagErrorText("");
   }
 
   const removeTag = (idx) => {
@@ -232,8 +245,8 @@ export default function Post({
                 <input value={tag} onChange={(e) => setTag(e.target.value)} />
                 <button onClick={handleTagAdd}>ADD</button>
                 <div>
-                  {editTags.length >= MAX_TAGS && (
-                    <span className={styles.tagWarning}>Reached max limit of tags</span>
+                  {tagErrorText.length > 0 && (
+                    <span className={styles.tagWarning}>{tagErrorText}</span>
                   )}
                 </div>
               </div>
