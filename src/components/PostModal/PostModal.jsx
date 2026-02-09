@@ -125,7 +125,6 @@ export default function Modal({
   };
 
   return (
-<<<<<<< HEAD
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
@@ -133,57 +132,6 @@ export default function Modal({
           <button className={styles.closeButton} onClick={onClose} aria-label="Close">
             <Icon name="close" size={20} />
           </button>
-=======
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalCard}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
-        <h2 className={styles.modalTitle}>{title}</h2>
-
-        <textarea
-          className={text.length > MAX_POST_LEN ? styles.textAreaError : styles.textArea}
-          placeholder="What's on your mind?"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-
-        {images.length > 0 && (
-          <div className={styles.imageGrid}>
-            {images.map((img, idx) => (
-              <div key={idx} className={styles.imagePreviewContainer}>
-                <img
-                  src={URL.createObjectURL(img)}
-                  alt={`preview-${idx}`}
-                  className={styles.previewImage}
-                />
-                <button
-                  className={styles.removeImageButton}
-                  onClick={() => {
-                    setImages(prev => prev.filter((_, i) => i !== idx));
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Tag Creation */}
-        <div className={styles.createTags}>
-          <div className={styles.tagList}>
-            {tags.map((tag, index) => (
-              <Tag key={index} name={tag} onRemove={() => removeTag(index)} />
-            ))}
-          </div>
-
-          <input value={tag} onChange={(e) => setTag(e.target.value)} />
-          <button onClick={handleTagAdd}>ADD</button>
-          <div>
-            {tagErrorText.length > 0 && (
-              <span className={styles.tagWarning}>{tagErrorText}</span>
-            )}
-          </div>
->>>>>>> 82a609b (fix: stopped duplicate tags, and tag add overflow in update)
         </div>
 
         <div className={styles.modalBody}>
