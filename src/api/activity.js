@@ -1,4 +1,5 @@
 import { authenticatedFetch, getCookie } from "@/utils/authHelpers"
+import { BASE_URL } from '@/constants/api'
 import { useEffect, useState } from "react"
 
 //  Custom hook to fetch activities
@@ -14,7 +15,7 @@ export const useGetActivities = (userId) => {
 
             setLoading(true)
             setError('')
-            const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/activities`, {
+            const response = await authenticatedFetch(`${BASE_URL}/activities`, {
                 method : "GET",
                 headers: {
                     "X-CSRFToken": csrfToken

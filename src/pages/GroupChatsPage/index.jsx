@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
 import { getCookie, authenticatedFetch } from "@/utils/authHelpers";
+import { BASE_URL } from "@/constants/api";
 
 export default function GroupChatsPage() {
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
@@ -45,7 +46,7 @@ export default function GroupChatsPage() {
 
     const fetchGroupMessages = async () => {
       const res = await authenticatedFetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/groups/${activeGroup}/messages/`
+        `${BASE_URL}/groups/${activeGroup}/messages/`
       );
       const data = await res.json();
 
@@ -163,7 +164,7 @@ export default function GroupChatsPage() {
     if (selectedImage) formData.append("image", selectedImage);
 
     const res = await authenticatedFetch(
-      `${process.env.NEXT_PUBLIC_API_BASE}/groups/messages/`,
+      `${BASE_URL}/groups/messages/`,
       {
         method: "POST",
         body: formData,

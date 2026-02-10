@@ -1,13 +1,14 @@
 import { authenticatedFetch } from '@/utils/authHelpers';
+import { BASE_URL } from '@/constants/api';
 
 export async function updatePost(postId, { content, image, pinned }) {
 	const formData = new FormData();
-  
+
 	if (content !== undefined) formData.append("content", content);
 	if (image !== undefined && image !== null) formData.append("image", image);
 	if (pinned !== undefined) formData.append("pinned", pinned);
-  
-	const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/${postId}/`, {
+
+	const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
 	  method: "PATCH",
 	  body: formData,
 	});
@@ -26,7 +27,7 @@ export async function createPost({content, images = [], pinned}) {
 	images.forEach((img) => formData.append("image", img));
     if(pinned) {formData.append("pinned", pinned)};
 
-	const response = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/post/`, {
+	const response = await authenticatedFetch(`${BASE_URL}/post/`, {
 		method: "POST",
 		body: formData,
 	});

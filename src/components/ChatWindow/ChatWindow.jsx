@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import { BASE_URL } from '@/constants/api';
 import MessageModal from '@/components/MessageModal/MessageModal'
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
 
@@ -65,7 +66,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     useEffect(() => {
         const fetchMessages = async () => {
           try {
-            const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/${chat.id}/messages/`);
+            const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
             const data = await res.json();
       
             const formatted = data.messages.map((m) => ({
@@ -111,7 +112,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
       formData.append("content", inputText);
       if (selectedImage) formData.append("image_content", selectedImage);
     
-      const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/send/`, {
+      const res = await authenticatedFetch(`${BASE_URL}/chats/send/`, {
         method: "POST",
         body: formData,
       });
