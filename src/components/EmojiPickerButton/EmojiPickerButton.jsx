@@ -3,7 +3,7 @@ import Icon from '@/icons/Icon';
 import EmojiPicker from "emoji-picker-react";
 import styles from "./EmojiPickerButton.module.scss";
 
-export default function EmojiPickerButton({ onSelect }) {
+export default function EmojiPickerButton({ onSelect, placement = "top" }) {
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef(null);
 
@@ -28,7 +28,7 @@ export default function EmojiPickerButton({ onSelect }) {
       </button>
 
       {showPicker && (
-        <div ref={pickerRef} className={styles.emojiPicker}>
+        <div ref={pickerRef} className={placement === "bottom" ? styles.emojiPickerBottom : styles.emojiPicker}>
           <EmojiPicker onEmojiClick={(e) => {
             onSelect(e.emoji);
             setShowPicker(false);

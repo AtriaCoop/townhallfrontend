@@ -234,36 +234,3 @@
     display: block;
   }
 }
-
-// Bottom section - Clean Atria watermark only
-.bottomSection {
-  padding: $spacing-4;
-  border-top: 1px solid var(--sidebar-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @include md {
-    padding: $spacing-3;
-  }
-}
-
-// Atria Watermark
-.atriaWatermark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @include md {
-    display: none;
-  }
-
-  @include lg {
-    display: flex;
-  }
-}
-
-.atriaLogo {
-  height: 28px;
-  width: auto;
-}

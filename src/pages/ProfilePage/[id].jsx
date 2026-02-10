@@ -1,12 +1,11 @@
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
-import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
 import styles from "./ProfilePage.module.scss";
 
-export default function ProfilePage({ darkMode, setDarkMode }) {
+export default function ProfilePage() {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -58,14 +57,6 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
   }, [toast]);
 
   if (!profileData) return null;
-
-  async function userLogout() {
-    await authenticatedFetch(`${BASE_URL}/auth/logout/`, {
-      method: "POST",
-    });
-    localStorage.removeItem("user");
-    router.push("/");
-  }
 
   return (
     <div className={styles.profilePage}>
@@ -216,31 +207,6 @@ export default function ProfilePage({ darkMode, setDarkMode }) {
           </div>
         )}
 
-        {/* Settings Card (only for current user) */}
-        {isCurrentUser && (
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Settings</h2>
-            <div className={styles.settingsList}>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={styles.settingButton}
-              >
-                <span className={styles.settingIcon}>
-                  {darkMode ? "☀️" : "🌙"}
-                </span>
-                <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-              </button>
-
-              <button
-                onClick={userLogout}
-                className={`${styles.settingButton} ${styles.logoutButton}`}
-              >
-                <Icon name="leave" size={20} />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

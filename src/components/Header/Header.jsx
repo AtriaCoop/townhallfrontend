@@ -66,6 +66,15 @@ export default function Header({ hasNewDm = false }) {
 
       {/* Right section - icons and profile */}
       <div className={styles.rightSection}>
+        {/* Atria Logo */}
+        <img
+          src="/assets/atriaLogo.png"
+          alt="Powered by Atria"
+          className={styles.atriaLogo}
+        />
+
+        <div className={styles.divider} />
+
         {/* Notification Bell */}
         <button className={styles.iconButton} aria-label="Notifications">
           <Icon name="bell" size={22} />

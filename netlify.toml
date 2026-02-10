@@ -9,3 +9,39 @@
   to = "https://townhallbackend.onrender.com/users/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/user/*"
+  to = "https://townhallbackend.onrender.com/user/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/post/*"
+  to = "https://townhallbackend.onrender.com/post/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/chats/*"
+  to = "https://townhallbackend.onrender.com/chats/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/groups/*"
+  to = "https://townhallbackend.onrender.com/groups/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/activities/*"
+  to = "https://townhallbackend.onrender.com/activities/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tags/*"
+  to = "https://townhallbackend.onrender.com/tags/:splat"
+  status = 200
+  force = true

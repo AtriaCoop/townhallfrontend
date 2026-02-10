@@ -30,6 +30,9 @@ import {
 	MessageCircle,
 	Share2,
 	Clock,
+	Sun,
+	Moon,
+	Monitor,
 } from 'lucide-react';
 
 // If you update an alias, you must also update it in each component that uses the icon!
@@ -66,4 +69,7 @@ export const Icons = {
 	comment: MessageCircle,
 	share: Share2,
 	clock: Clock,
+	sun: Sun,
+	moon: Moon,
+	monitor: Monitor,
 }

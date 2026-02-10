@@ -50,7 +50,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>
-        {/* Logo Section */}
+        {/* Logo Section - VFJC Logo */}
         <div className={styles.logoSection}>
           <img
             src="/assets/VFJC.png"
@@ -90,17 +90,6 @@ export default function Sidebar() {
             </button>
           ))}
         </nav>
-
-        {/* Bottom Section - Atria Watermark */}
-        <div className={styles.bottomSection}>
-          <div className={styles.atriaWatermark}>
-            <img
-              src="/assets/atriaLogo.png"
-              alt="Powered by Atria"
-              className={styles.atriaLogo}
-            />
-          </div>
-        </div>
       </aside>
     </>
   );

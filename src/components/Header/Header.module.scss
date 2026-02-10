@@ -42,6 +42,23 @@
   }
 }
 
+// Atria logo
+.atriaLogo {
+  height: 24px;
+  width: auto;
+
+  @include md {
+    height: 28px;
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-default);
+  flex-shrink: 0;
+}
+
 // Icon buttons (bell, messages)
 .iconButton {
   @include button-ghost;

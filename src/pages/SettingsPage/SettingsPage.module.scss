@@ -1,0 +1,174 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.settingsPage {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+.pageTitle {
+  @include heading-2;
+  margin: 0;
+}
+
+// Cards
+.card {
+  @include card;
+}
+
+.cardTitle {
+  @include subheading-1;
+  color: var(--text-primary);
+  margin: 0 0 $spacing-2 0;
+}
+
+.cardDescription {
+  @include body-2;
+  color: var(--text-muted);
+  margin: 0 0 $spacing-5 0;
+}
+
+// Theme Options
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+}
+
+.themeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  background: transparent;
+  border: 2px solid var(--border-default);
+  border-radius: $radius-lg;
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--primary);
+  }
+}
+
+.themeActive {
+  border-color: var(--primary);
+  background-color: var(--primary-subtle, rgba($primary-500, 0.05));
+}
+
+.themePreview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.themePreviewLight {
+  width: 100%;
+  height: 100%;
+  background-color: $neutral-50;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  padding: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  .previewBar {
+    width: 100%;
+    height: 6px;
+    background-color: $primary-500;
+    border-radius: $radius-sm;
+  }
+
+  .previewLine {
+    width: 80%;
+    height: 4px;
+    background-color: $neutral-300;
+    border-radius: $radius-sm;
+  }
+
+  .previewLineShort {
+    width: 50%;
+    height: 4px;
+    background-color: $neutral-200;
+    border-radius: $radius-sm;
+  }
+}
+
+.themePreviewDark {
+  width: 100%;
+  height: 100%;
+  background-color: $dark-bg-primary;
+  border: 1px solid $dark-border;
+  border-radius: $radius-md;
+  padding: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  .previewBar {
+    width: 100%;
+    height: 6px;
+    background-color: $primary-500;
+    border-radius: $radius-sm;
+  }
+
+  .previewLine {
+    width: 80%;
+    height: 4px;
+    background-color: $dark-bg-tertiary;
+    border-radius: $radius-sm;
+  }
+
+  .previewLineShort {
+    width: 50%;
+    height: 4px;
+    background-color: $dark-bg-secondary;
+    border-radius: $radius-sm;
+  }
+}
+
+.themeInfo {
+  @include flex-center;
+  gap: $spacing-2;
+  color: var(--text-primary);
+  font-family: $font-family-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+// Settings List
+.settingsList {
+  @include flex-column;
+  gap: $spacing-2;
+}
+
+.logoutButton {
+  @include button-tertiary;
+  @include button-md;
+  justify-content: flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  color: $error-500;
+
+  &:hover:not(:disabled) {
+    background-color: $error-50;
+    color: $error-600;
+  }
+
+  svg {
+    color: $error-500;
+  }
+}
+
+:global(body.dark) {
+  .logoutButton:hover:not(:disabled) {
+    background-color: rgba($error-500, 0.15);
+  }
+}

@@ -212,39 +212,3 @@
   line-height: $line-height-relaxed;
 }
 
-// Settings List
-.settingsList {
-  @include flex-column;
-  gap: $spacing-2;
-}
-
-.settingButton {
-  @include button-tertiary;
-  @include button-md;
-  justify-content: flex-start;
-  gap: $spacing-3;
-  width: 100%;
-
-  .settingIcon {
-    font-size: $font-size-xl;
-  }
-}
-
-.logoutButton {
-  color: $error-500;
-
-  &:hover:not(:disabled) {
-    background-color: $error-50;
-    color: $error-600;
-  }
-
-  svg {
-    color: $error-500;
-  }
-}
-
-:global(body.dark) {
-  .logoutButton:hover:not(:disabled) {
-    background-color: rgba($error-500, 0.15);
-  }
-}
