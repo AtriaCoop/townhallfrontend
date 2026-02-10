@@ -1,4 +1,4 @@
-import { authenticatedFetch, getCookie } from "@/utils/authHelpers"
+import { authenticatedFetch } from "@/utils/authHelpers"
 import { BASE_URL } from '@/constants/api'
 import { useEffect, useState } from "react"
 
@@ -8,18 +8,13 @@ export const useGetActivities = (userId) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    
+
     const getActivities = async () => {
         try {
-            const csrfToken = getCookie("csrftoken")
-
             setLoading(true)
             setError('')
             const response = await authenticatedFetch(`${BASE_URL}/activities`, {
                 method : "GET",
-                headers: {
-                    "X-CSRFToken": csrfToken
-                },
             })
             const res = await response.json()
             if (!response.ok){

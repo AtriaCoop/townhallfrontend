@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCookie, authenticatedFetch } from "@/utils/authHelpers";
+import { authenticatedFetch } from "@/utils/authHelpers";
 import ChatCard from "@/components/ChatCard/ChatCard";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";

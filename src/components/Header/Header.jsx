@@ -47,7 +47,14 @@ export default function Header({ hasNewDm = false }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await authenticatedFetch(`${BASE_URL}/auth/logout/`, {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     localStorage.removeItem("user");
     router.push('/LandingPage');
   };
