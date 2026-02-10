@@ -78,12 +78,7 @@ export default function DashboardPage() {
     async function fetchPosts() {
       try {
         setLoading(true);
-        const baseUrl = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
-        const url = new URL(`${baseUrl}/post/`);
-        url.searchParams.append("limit", POSTS_PER_PAGE.toString());
-        url.searchParams.append("page", currentPage.toString());
-
-        const res = await authenticatedFetch(url.toString());
+        const res = await authenticatedFetch(`${BASE_URL}/post/?limit=${POSTS_PER_PAGE}&page=${currentPage}`);
         if (!res.ok) {
           console.error("Failed to fetch posts:", res.status);
           setPosts([]);

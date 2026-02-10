@@ -41,6 +41,12 @@
   force = true
 
 [[redirects]]
+  from = "/comment/*"
+  to = "https://townhallbackend.onrender.com/comment/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/tags/*"
   to = "https://townhallbackend.onrender.com/tags/:splat"
   status = 200
