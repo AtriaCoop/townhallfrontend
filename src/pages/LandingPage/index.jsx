@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import styles from "./LandingPage.module.scss";
 import { registerUser, authenticatedFetch } from "@/utils/authHelpers";
 import Loader from "@/components/Loader/Loader";
+import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
 const AUTH_MODES = {
   LOGIN: "login",
@@ -22,6 +23,7 @@ export default function LandingPage() {
   // Logo animation state
   const [visibleLogos, setVisibleLogos] = useState([]);
   const [showAuthUI, setShowAuthUI] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const isLoginMode = authMode === AUTH_MODES.LOGIN;
 
@@ -284,8 +286,19 @@ export default function LandingPage() {
               {isLoginMode ? "Sign up" : "Sign in"}
             </span>
           </p>
+          <p className={styles.privacyText}>
+            By {isLoginMode ? 'signing in' : 'creating an account'}, you agree to our{' '}
+            <span onClick={() => setShowPrivacyModal(true)} className={styles.privacyLink}>
+              Privacy Notice
+            </span>
+          </p>
         </div>
       </div>
+
+        {/* Privacy Modal */}
+        {showPrivacyModal && (
+        <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+      )}
 
       <img
         src="/assets/atriaLogo.png"

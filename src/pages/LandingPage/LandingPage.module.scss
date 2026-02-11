@@ -256,6 +256,7 @@
   height: $input-height-md;
   background-color: $neutral-50;
   border-color: $neutral-200;
+  color: $neutral-900;
 
   &:hover:not(:disabled):not(:focus) {
     border-color: $neutral-300;
@@ -265,6 +266,7 @@
     background-color: $white;
     border-color: $primary-500;
     box-shadow: $shadow-focus;
+    color: $neutral-900;
   }
 }
 
@@ -371,4 +373,28 @@
   z-index: 1;
   width: 100%;
   min-height: 100vh;
+}
+
+// Privacy Notice Text
+.privacyText {
+  @include body-2;
+  text-align: center;
+  margin-top: $spacing-4;
+  padding-top: $spacing-4;
+  border-top: 1px solid $neutral-200;
+  color: $neutral-500;
+  font-size: $font-size-xs;
+  line-height: $line-height-relaxed;
+}
+
+.privacyLink {
+  font-weight: $font-weight-semibold;
+  color: $secondary-600;
+  cursor: pointer;
+  text-decoration: underline;
+  @include transition-colors;
+
+  &:hover {
+    color: $secondary-700;
+  }
 }
