@@ -249,7 +249,7 @@ export default function EditProfilePage() {
                   className={styles.profileHeader}
                   onError={(e) => {
                     e.target.onerror = null;
-                    <CoverIllustration className={styles.profileHeader}/>
+                    <CoverIllustration />
                   }}
                 />
               ) : (

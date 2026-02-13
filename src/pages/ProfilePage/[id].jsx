@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [toast, setToast] = useState(null);
+  const [headerImageError, setHeaderImageError] = useState(false);
   const toastTimerRef = useRef(null);
 
   useEffect(() => {
@@ -23,6 +24,8 @@ export default function ProfilePage() {
     if (user?.id?.toString() === id?.toString()) {
       setIsCurrentUser(true);
     }
+
+    setHeaderImageError(false);
 
     async function fetchProfile() {
       try {
@@ -75,16 +78,14 @@ export default function ProfilePage() {
       )}
 
       {/* Cover Image Section */}
-      <div className={styles.coverSection}>\
-          {profileData.profile_header ? (
-            <img 
-            src={profileData.profile_header} 
-            alt="Profile Header" 
-            className={styles.profileHeaderImage} 
-            onError={(e) => {
-              e.target.onerror = null;
-              <CoverIllustration />
-            }} />
+      <div className={styles.coverSection}>
+          {profileData.profile_header && !headerImageError ? (
+            <img
+              src={profileData.profile_header}
+              alt="Profile Header"
+              className={styles.profileHeaderImage}
+              onError={() => setHeaderImageError(true)}
+            />
           ) : (
             <CoverIllustration />
           )}
