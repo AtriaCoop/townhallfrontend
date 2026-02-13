@@ -2,7 +2,6 @@ import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import InlineComments from '@/components/InlineComments/InlineComments';
-import LikesTooltip from '@/components/LikesTooltip/LikesTooltip';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
@@ -14,19 +13,13 @@ export default function Post({
   fullName,
   organization,
   date,
-  created_at,
   content,
   postImage,
   links,
-  likes,
-  liked_by,
-  isLiked,
   comments,
   userId,
   currentUserId,
   userImage,
-  pinned,
-  is_staff,
   postId,
   setPosts,
   reactions = {},
@@ -42,8 +35,6 @@ export default function Post({
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
   const [showComments, setShowComments] = useState(false);
-  const [showLikesTooltip, setShowLikesTooltip] = useState(false);
-  const [liked, setLiked] = useState(isLiked);
   const [reportResponse, setReportResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
@@ -94,43 +85,12 @@ export default function Post({
     }
   }
 
-  // LIKE POST
-async function handleLikePost() {
-  try {
-    const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Failed to like post: ${errText}`);
-    }
-
-    const result = await response.json();
-    setLiked(prev => !prev);
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.id === postId ? { ...post, likes: result.likes } : post
-      )
-    );
-  } catch (error) {
-    console.error("Error liking post:", error);
-  }
-}
-
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
   };
 
   const handleCommentClick = () => {
     setShowComments(prev => !prev);
-  };
-
-  const handleLikeClick = () => {
-    setShowLikesTooltip(prev => !prev);
   };
 
   // Handle outside click to close edit/delete modal
@@ -188,35 +148,8 @@ async function handleLikePost() {
     setShowReactionPicker(prev => !prev);
   }
 
-  // PIN POST
-  const handlePinPost = async () => {
-    if (is_staff) {
-      try {
-        await updatePost(postId, {pinned: !pinned})
-
-        setPosts((prevPosts) => {
-          const updatedPosts = prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  pinned: !post.pinned
-                }
-              : post
-          );
-
-          return updatedPosts.sort((a, b) => {
-            if (a.pinned !== b.pinned) return b.pinned - a.pinned;
-            return new Date(b.created_at) - new Date(a.created_at);
-          });
-        });
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  }
-
   return (
-    <div className={pinned ? styles.postPinned : styles.post}>
+    <div className={styles.post}>
 
       <div className={styles.postHeader}>
         <img 
@@ -373,13 +306,16 @@ async function handleLikePost() {
 
       {Object.keys(reactions).length > 0 && (
         <div className={styles.reactionsDisplay}>
-          {Object.entries(reactions).map(([reactionType, userIds]) => (
-            userIds.length > 0 && (
+          {Object.entries(reactions).map(([reactionType, users]) => (
+            users.length > 0 && (
               <div key={reactionType} className={styles.reactionGroup}>
                 <span className={styles.reactionEmoji}>
                   {getReactionEmoji(reactionType)}
                 </span>
-                <span className={styles.reactionCount}>{userIds.length}</span>
+                <span className={styles.reactionCount}>{users.length}</span>
+                <div className={styles.reactionTooltip}>
+                  {users.map(u => u.full_name || "Unknown").join(", ")}
+                </div>
               </div>
             )
           ))}
@@ -388,19 +324,6 @@ async function handleLikePost() {
       
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ''}`} onClick={handleLikePost} />
-          {/* Likes with tooltip */}
-          <div className={styles.likesWrapper}>
-            <div className={styles.likesComments} onClick={handleLikeClick}>
-              {likes} Like{likes !== 1 ? 's' : ''}
-            </div>
-            {showLikesTooltip && (
-              <LikesTooltip
-                liked_by={liked_by}
-                onClose={() => setShowLikesTooltip(false)}
-              />
-            )}
-          </div>
           <Icon name="message" className={`${styles.postIcon} ${showComments ? styles.active : ''}`} onClick={handleCommentClick} />
           <div className={styles.likesComments} onClick={handleCommentClick}>
             {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
@@ -410,6 +333,7 @@ async function handleLikePost() {
             <button
               className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ''}`}
               onClick={handleReactionClick}
+              onMouseDown={(e) => e.stopPropagation()}
               title="Add reaction"
             >
               <Icon name="smile" size={20} />
@@ -426,13 +350,6 @@ async function handleLikePost() {
             )}
           </div>
         </div>
-        {is_staff ? (
-          <button className={styles.pin} onClick={handlePinPost} title={pinned ? 'Unpin post' : 'Pin post'}>
-            <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ''}`} />
-          </button>
-        ) : (
-          pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
-        )}
       </div>
 
       {/* Inline Comments Section */}

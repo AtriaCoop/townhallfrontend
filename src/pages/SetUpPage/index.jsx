@@ -64,6 +64,7 @@ export default function SetUpPage() {
     const file = e.target.files[0];
     if (file) {
       setProfilePreview(URL.createObjectURL(file));
+      setFieldErrors((prev) => ({ ...prev, profile_image: "" }));
     }
   };
 
@@ -92,6 +93,11 @@ export default function SetUpPage() {
     }
     if (!formData.primary_organization.trim()) {
       errors.primary_organization = "Primary organization is required";
+    }
+
+    // Profile picture required
+    if (!profilePicRef.current?.files[0]) {
+      errors.profile_image = "Profile picture is required";
     }
 
     // URL validation
@@ -298,11 +304,11 @@ export default function SetUpPage() {
             <h2 className={styles.formSectionTitle}>Profile Images</h2>
             <div className={styles.formGrid}>
               <div className={styles.uploadSection}>
-                <label className={styles.uploadLabel}>Profile Picture</label>
+                <label className={styles.uploadLabel}>Profile Picture <span className={styles.required}>*</span></label>
                 <div
                   className={`${styles.uploadArea} ${
                     profilePreview ? styles.hasPreview : ""
-                  }`}
+                  } ${fieldErrors.profile_image ? styles.uploadError : ""}`}
                   onClick={handleProfileUploadClick}
                   role="button"
                   tabIndex={0}
@@ -335,6 +341,9 @@ export default function SetUpPage() {
                   onChange={handleProfilePicChange}
                   className={styles.hiddenInput}
                 />
+                {fieldErrors.profile_image && (
+                  <p className={styles.fieldError}>{fieldErrors.profile_image}</p>
+                )}
               </div>
 
               <div className={styles.uploadSection}>
