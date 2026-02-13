@@ -33,6 +33,7 @@ export default function EditProfilePage() {
   const [saveStatus, setSaveStatus] = useState(null);
   const [saveMessage, setSaveMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [headerImageError, setHeaderImageError] = useState(false);
 
   const dismissTimerRef = useRef(null);
 
@@ -49,6 +50,7 @@ export default function EditProfilePage() {
         const data = await response.json();
         setProfileData(data.user);
         setFormData((prev) => ({ ...prev, ...data.user }));
+        setHeaderImageError(false);
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
@@ -149,6 +151,7 @@ export default function EditProfilePage() {
   }
 
   function handleFieldChange(patch) {
+    if (patch.profile_header !== undefined) setHeaderImageError(false);
     setFormData({ ...formData, ...patch });
     if (saveStatus) {
       setSaveStatus(null);
@@ -238,19 +241,16 @@ export default function EditProfilePage() {
           <h3 className={styles.sectionTitle}>Profile Header</h3>
           <label htmlFor="profileHeaderUpload" className={styles.profileHeaderLabel}>
             <div className={styles.profileHeaderImage}>
-              {formData.profile_header ? (
+              {formData.profile_header && !headerImageError ? (
                 <img
                   src={
                     formData.profile_header instanceof File
-                    ? URL.createObjectURL(formData.profile_header)
-                    : profileData?.profile_header
+                      ? URL.createObjectURL(formData.profile_header)
+                      : profileData?.profile_header
                   }
                   alt="Profile Header"
                   className={styles.profileHeader}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    <CoverIllustration />
-                  }}
+                  onError={() => setHeaderImageError(true)}
                 />
               ) : (
                 <CoverIllustration className={styles.profileHeader} />
