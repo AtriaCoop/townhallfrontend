@@ -49,6 +49,22 @@
   margin-bottom: $spacing-16;
 }
 
+.profileHeaderImage {
+  position: relative;
+  height: 160px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  width: 100%;
+  
+  @include md {
+    height: 200px;
+  }
+
+  @include lg {
+    height: 240px;
+  } 
+}
+
 .coverImage {
   position: relative;
   height: 160px;
