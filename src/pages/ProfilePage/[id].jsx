@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import CoverIllustration from "@/components/CoverIllustration/CoverIllustration";
 import styles from "./ProfilePage.module.scss";
 
 export default function ProfilePage() {
@@ -74,20 +75,19 @@ export default function ProfilePage() {
       )}
 
       {/* Cover Image Section */}
-      <div className={styles.coverSection}>
-        <div className={styles.coverImage}>
-          <div className={styles.coverOverlay} />
-          <div className={styles.coverIllustration}>
-            <svg viewBox="0 0 200 100" className={styles.silhouettes}>
-              <circle cx="50" cy="40" r="15" fill="currentColor" opacity="0.3" />
-              <path d="M35 100 Q50 60 65 100" fill="currentColor" opacity="0.3" />
-              <circle cx="100" cy="35" r="18" fill="currentColor" opacity="0.4" />
-              <path d="M80 100 Q100 55 120 100" fill="currentColor" opacity="0.4" />
-              <circle cx="150" cy="40" r="15" fill="currentColor" opacity="0.3" />
-              <path d="M135 100 Q150 60 165 100" fill="currentColor" opacity="0.3" />
-            </svg>
-          </div>
-        </div>
+      <div className={styles.coverSection}>\
+          {profileData.profile_header ? (
+            <img 
+            src={profileData.profile_header} 
+            alt="Profile Header" 
+            className={styles.profileHeaderImage} 
+            onError={(e) => {
+              e.target.onerror = null;
+              <CoverIllustration />
+            }} />
+          ) : (
+            <CoverIllustration />
+          )}
 
         {/* Profile Avatar */}
         <div className={styles.avatarWrapper}>

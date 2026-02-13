@@ -6,6 +6,7 @@ import { BASE_URL } from "@/constants/api";
 import Icon from "@/icons/Icon";
 import { validateUrl } from "@/utils/validateUrl";
 import FormInputText from "@/components/FormInputText/FormInputText";
+import CoverIllustration from "@/components/CoverIllustration/CoverIllustration";
 import styles from "./EditProfilePage.module.scss";
 
 export default function EditProfilePage() {
@@ -228,9 +229,46 @@ export default function EditProfilePage() {
           <p className={styles.profileEmail}>{profileData?.email}</p>
         </div>
       </div>
+      
 
       {/* Form Sections */}
       <div className={styles.formSections}>
+        {/* Profile Header */}
+        <div className={styles.formSection}>
+          <h3 className={styles.sectionTitle}>Profile Header</h3>
+          <label htmlFor="profileHeaderUpload" className={styles.profileHeaderLabel}>
+            <div className={styles.profileHeaderImage}>
+              {formData.profile_header ? (
+                <img
+                  src={
+                    formData.profile_header instanceof File
+                    ? URL.createObjectURL(formData.profile_header)
+                    : profileData?.profile_header
+                  }
+                  alt="Profile Header"
+                  className={styles.profileHeader}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    <CoverIllustration className={styles.profileHeader}/>
+                  }}
+                />
+              ) : (
+                <CoverIllustration className={styles.profileHeader} />
+              )}
+              <div className={styles.profileHeaderOverlay}>
+                <span className={styles.profileHeaderOverlayText}>Edit Header</span>
+              </div>
+            </div>
+          </label>
+          <input
+            id="profileHeaderUpload"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => handleFieldChange({ profile_header: e.target.files[0] })}
+          />
+        </div>
+        
         {/* Basic Information */}
         <div className={styles.formSection}>
           <h3 className={styles.sectionTitle}>Basic Information</h3>

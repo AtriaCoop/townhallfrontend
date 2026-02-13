@@ -1,0 +1,37 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.coverOverlay {
+  @include cover;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.coverIllustration {
+  @include cover;
+  @include flex-center;
+  padding-top: $spacing-4;
+}
+
+.silhouettes {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  color: $white;
+  opacity: 0.6;
+}
+
+.coverImage {
+  position: relative;
+  height: 160px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary) 0%, $primary-600 100%);
+
+  @include md {
+    height: 200px;
+  }
+
+  @include lg {
+    height: 240px;
+  }
+}

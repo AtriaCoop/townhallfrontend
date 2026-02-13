@@ -140,6 +140,38 @@
   }
 }
 
+.profileHeaderLabel {
+  cursor: pointer;
+  display: block;
+}
+
+.profileHeaderImage {
+  position: relative;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.profileHeaderOverlay {
+  position: absolute;
+  inset: 0;
+  @include flex-center;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  @include transition-all;
+  border-radius: $radius-lg;
+}
+
+.profileHeaderOverlayText {
+  color: $white;
+  font-weight: $font-weight-semibold;
+  @include subheading-2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profileHeaderLabel:hover .profileHeaderOverlay {
+  opacity: 1;
+}
+
 .profileInfo {
   flex: 1;
   min-width: 0;
