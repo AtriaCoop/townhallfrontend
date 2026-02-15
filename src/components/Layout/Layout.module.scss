@@ -1,0 +1,39 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-secondary);
+}
+
+.mainArea {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+  width: 100%;
+
+  // Account for sidebar on tablet+
+  @include md {
+    margin-left: $sidebar-width-collapsed;
+  }
+
+  @include lg {
+    margin-left: $sidebar-width-expanded;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: $spacing-4;
+  overflow-y: auto;
+
+  @include md {
+    padding: $spacing-6;
+  }
+
+  @include lg {
+    padding: $spacing-8;
+  }
+}

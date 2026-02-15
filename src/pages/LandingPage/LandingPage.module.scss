@@ -1,158 +1,147 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-  .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1.5rem;
-      background-color: white;
-      min-height: 100vh;
+// ============================================
+// LANDING PAGE STYLES
+// Professional, modern authentication page
+// ============================================
 
-      background-image: url('/assets/landingBackground.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $spacing-4;
+  background-color: $neutral-900;
+  background-image: url('/assets/landingBackground.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 
-      @include laptop {
-          flex-direction: row-reverse;
-          justify-content: center;
-          gap: 4rem;
-          position: relative;
-      }
-    }
+  // Dark overlay for readability and professional feel
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      rgba($black, 0.65) 0%,
+      rgba($black, 0.45) 50%,
+      rgba($black, 0.6) 100%
+    );
+    z-index: 0;
+  }
 
-  .logoContainer {
-    display: flex;
-    flex-direction: column;
+  @include lg {
+    padding: $spacing-8;
+  }
+}
+
+// ============================================
+// MAIN CONTENT WRAPPER
+// Two-panel layout on desktop
+// ============================================
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-8;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+
+  @include lg {
+    flex-direction: row;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  
-    .vfjcLogo {
-      max-width: 200px;
-      height: auto;
-
-      @include laptop {
-        max-width: 400px;
-      }
-    }
-  
-    .atriaLogo {
-      max-width: 120px;
-      height: auto;
-      margin-top: 3rem;
-
-      @include laptop {
-        position: absolute;
-        top: 2rem;
-        left: 2rem;
-        margin-bottom: 0;
-        margin-top: 0rem;
-      }
-    }
+    justify-content: center;
+    gap: $spacing-16;
+    max-width: 960px;
   }
-  
-  .card {
-    background-color: white;
-    border: 1px solid #f1c40f;
-    border-radius: 12px;
-    padding: 1.5rem;
-    width: 100%;
+}
 
-    @include tablet {
-        width: 50%;
-    }
+// ============================================
+// BRANDING PANEL (left side on desktop)
+// ============================================
+.brandingPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 
-    @include laptop {
-        width: 25%;
-    }
+  @include lg {
+    align-items: flex-start;
+    text-align: left;
+    flex: 1;
+    max-width: 400px;
+  }
+}
 
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 0.75rem;
-    }
-  
-    p {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 1rem;
-    }
-  
-    label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 0.25rem;
-      margin-top: 1rem;
-    }
-  
-    input {
-      width: 100%;
-      display: block;
-      box-sizing: border-box;
-      padding: 0.75rem;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-    }
-  
-    .signupButton {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 1rem;
-      background-color: #015e22;
-      color: white;
-      border: none;
-      border-radius: 999px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  
-    .loginText {
-      text-align: center;
-      font-size: 0.8rem;
-      margin-top: 1rem;
-      color: #444;
-  
-      span {
-        color: #015e22;
-        font-weight: 600;
-        cursor: pointer;
-      }
-    }
+.vfjcLogo {
+  max-width: 200px;
+  height: auto;
+  filter: drop-shadow(0 4px 12px rgba($black, 0.3));
+  margin-bottom: $spacing-6;
 
-    .forgotPassword {
-      text-align: center;
-      margin-top: 0.75rem;
-      margin-bottom: 1rem;
-      font-size: 0.8rem;
-    
-      a {
-        color: #015e22;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    }
+  @include lg {
+    max-width: 300px;
+  }
+}
 
-    .error {
-      color: #e74c3c; // red
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-      text-align: center;
+.brandingText {
+  color: $white;
+  margin-bottom: $spacing-2;
+
+  h2 {
+    font-family: $font-family-headlines;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-snug;
+    letter-spacing: $letter-spacing-tight;
+    margin-bottom: $spacing-3;
+
+    @include lg {
+      font-size: $font-size-5xl;
     }
   }
 
+  p {
+    font-size: $font-size-base;
+    color: rgba($white, 0.75);
+    line-height: $line-height-relaxed;
+    max-width: 340px;
+
+    @include lg {
+      font-size: $font-size-lg;
+    }
+  }
+}
+
+.atriaLogo {
+  max-width: 80px;
+  height: auto;
+  opacity: 0.85;
+  position: fixed;
+  bottom: $spacing-6;
+  left: $spacing-6;
+  z-index: 2;
+  display: none;
+
+  @include lg {
+    display: block;
+  }
+}
+
+// ============================================
+// LOGO SEQUENCE ANIMATION
+// ============================================
 .logoSequence {
+  @include flex-center;
   position: fixed;
   inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  z-index: $z-modal;
+  background-color: $neutral-900;
 }
 
 .logoCluster {
@@ -167,7 +156,7 @@
   position: absolute;
   width: 100px;
   height: auto;
-  animation: popIn 0.3s ease-in-out;
+  animation: popIn $transition-slow $ease-spring forwards;
 }
 
 @keyframes popIn {
@@ -179,4 +168,213 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+// ============================================
+// AUTH CARD
+// ============================================
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba($white, 0.97);
+  backdrop-filter: blur(20px);
+  border-radius: $radius-xl;
+  box-shadow:
+    0 20px 60px rgba($black, 0.3),
+    0 0 0 1px rgba($white, 0.1);
+  padding: $spacing-8;
+  animation: cardEnter 0.5s $ease-out both;
+  animation-delay: 0.1s;
+
+  @include md {
+    padding: $spacing-10 $spacing-10 $spacing-8;
+  }
+
+  @include lg {
+    flex-shrink: 0;
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cardHeader {
+  text-align: center;
+  margin-bottom: $spacing-8;
+}
+
+.cardTitle {
+  font-family: $font-family-headlines;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $neutral-900;
+  margin-bottom: $spacing-2;
+  letter-spacing: $letter-spacing-tight;
+
+  @include md {
+    font-size: $font-size-4xl;
+  }
+}
+
+.cardDescription {
+  @include body-2;
+  color: $neutral-500;
+  line-height: $line-height-relaxed;
+}
+
+// ============================================
+// FORM STYLES
+// ============================================
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $neutral-700;
+}
+
+.input {
+  @include input-base;
+  height: $input-height-md;
+  color: $neutral-900;
+  background-color: $neutral-50;
+  border-color: $neutral-200;
+
+  &::placeholder {
+    color: $neutral-400;
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: $neutral-300;
+  }
+
+  &:focus {
+    color: $neutral-900;
+    background-color: $white;
+    border-color: $primary-500;
+    box-shadow: $shadow-focus;
+  }
+}
+
+// ============================================
+// SUBMIT BUTTON
+// ============================================
+.submitButton {
+  @include button-base;
+  width: 100%;
+  height: $button-height-lg;
+  margin-top: $spacing-2;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $white;
+  background-color: $secondary-500;
+  border-radius: $radius-md;
+  letter-spacing: $letter-spacing-wide;
+
+  &:hover:not(:disabled) {
+    background-color: $secondary-600;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($secondary-500, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    background-color: $secondary-700;
+    transform: translateY(0);
+    box-shadow: none;
+  }
+}
+
+// ============================================
+// LINKS & MESSAGES
+// ============================================
+.forgotPassword {
+  text-align: center;
+  margin-top: $spacing-2;
+
+  a {
+    @include body-2;
+    font-weight: $font-weight-medium;
+    color: $neutral-500;
+    text-decoration: none;
+    @include transition-colors;
+
+    &:hover {
+      color: $primary-500;
+    }
+  }
+}
+
+.message {
+  @include body-2;
+  text-align: center;
+  margin-top: $spacing-4;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  background-color: $success-50;
+  color: $success-700;
+  border: 1px solid rgba($success-500, 0.2);
+}
+
+.error {
+  @include body-2;
+  text-align: center;
+  margin-top: $spacing-4;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  background-color: $error-50;
+  color: $error-600;
+  border: 1px solid rgba($error-500, 0.2);
+}
+
+// ============================================
+// SWITCH AUTH MODE
+// ============================================
+.switchMode {
+  @include body-2;
+  text-align: center;
+  margin-top: $spacing-6;
+  padding-top: $spacing-6;
+  border-top: 1px solid $neutral-200;
+  color: $neutral-500;
+}
+
+.switchModeLink {
+  font-weight: $font-weight-semibold;
+  color: $secondary-600;
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    color: $secondary-700;
+    text-decoration: underline;
+  }
+}
+
+// ============================================
+// LOADING OVERLAY
+// ============================================
+.loadingOverlay {
+  @include flex-center;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
 }

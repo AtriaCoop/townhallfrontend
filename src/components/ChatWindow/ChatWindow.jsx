@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import { BASE_URL } from '@/constants/api';
 import MessageModal from '@/components/MessageModal/MessageModal'
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
 
@@ -45,7 +46,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     };
 
     const socketRef = useRef(null);
-    const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
     const postImageRef = useRef(null);
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -65,7 +66,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     useEffect(() => {
         const fetchMessages = async () => {
           try {
-            const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/${chat.id}/messages/`);
+            const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
             const data = await res.json();
       
             const formatted = data.messages.map((m) => ({
@@ -111,7 +112,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
       formData.append("content", inputText);
       if (selectedImage) formData.append("image_content", selectedImage);
     
-      const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/send/`, {
+      const res = await authenticatedFetch(`${BASE_URL}/chats/send/`, {
         method: "POST",
         body: formData,
       });
@@ -147,21 +148,33 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
     };
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages]);    
 
     return (
         <div className={styles.chatWindow}>
             <div className={styles.header}>
-                <img src={chat.imageSrc} alt={chat.name} className={styles.avatar} />
+                <button className={styles.closeButton} onClick={onClose} aria-label="Back to conversations">
+                    <Icon name="arrowleft" size={20} />
+                </button>
+                <img
+                    src={chat.imageSrc}
+                    alt={chat.name}
+                    className={styles.avatar}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/assets/ProfileImage.jpg";
+                    }}
+                />
                 <div>
                     <h2>{chat.name}</h2>
                     <p>{chat.title}</p>
                 </div>
-                <button className={styles.closeButton} onClick={onClose}>X</button>
             </div>
 
-            <div className={styles.messages}>
+            <div className={styles.messages} ref={messagesContainerRef}>
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
@@ -187,10 +200,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
                     </button>
                   </div>
                 </div>
-                ))}
-                
-                {/* Scroll to bottom */}
-                <div ref={messagesEndRef} />
+              ))}
             </div>
 
             {showMessageModal && (

@@ -22,7 +22,7 @@ export function validateEmail(email) {
 
 
 export async function fetchCsrfToken() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/csrf/`, {
+    const res = await fetch(`${BASE_URL}/auth/csrf/`, {
       credentials: 'include',
     });
     const data = await res.json();

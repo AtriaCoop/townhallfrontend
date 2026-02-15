@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import { BASE_URL } from '@/constants/api';
 import styles from './UpdateMessageModal.module.scss'
 
 export default function UpdateMessageModal({ msg, onCancel }) {
@@ -16,7 +17,7 @@ export default function UpdateMessageModal({ msg, onCancel }) {
         formData.append("content", inputText);
         if (selectedImage) formData.append("image_content", selectedImage);
             
-              const res = await authenticatedFetch(`${process.env.NEXT_PUBLIC_API_BASE}/chats/messages/${id}/`, {
+              const res = await authenticatedFetch(`${BASE_URL}/chats/messages/${id}/`, {
                 method: "PATCH",
                 body: formData,
               });

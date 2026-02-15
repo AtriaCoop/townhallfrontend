@@ -1,29 +1,52 @@
+import { useRouter } from 'next/router';
+import Icon from '@/icons/Icon';
 import styles from './LikeModal.module.scss';
 
-export default function LikeModal({ onClose, liked_by = [], BASE_URL }) {
+export default function LikeModal({ onClose, liked_by = [] }) {
+  const router = useRouter();
+
+  const handleUserClick = (userId) => {
+    onClose();
+    router.push(`/ProfilePage/${userId}`);
+  };
+
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
-        <h1>Who Liked The Post</h1>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Likes</h2>
+          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+            <Icon name="close" size={20} />
+          </button>
+        </div>
 
         <div className={styles.userList}>
           {liked_by.length === 0 ? (
-            <p>No liked_by yet.</p>
+            <div className={styles.emptyState}>
+              <Icon name="heart" size={32} />
+              <p>No likes yet</p>
+            </div>
           ) : (
-            liked_by.map(user => (
-              <div key={user.id} className={styles.userItem}>
+            liked_by.map((user) => (
+              <div
+                key={user.id}
+                className={styles.userItem}
+                onClick={() => handleUserClick(user.id)}
+              >
                 <img
                   src={user.profile_image || '/assets/ProfileImage.jpg'}
-                  alt="User"
+                  alt={user.full_name}
+                  className={styles.userAvatar}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = '/assets/ProfileImage.jpg';
                   }}
                 />
-                <div>
-                  <strong>{user.full_name}</strong>
-                  <p>{user.primary_organization}</p>
+                <div className={styles.userInfo}>
+                  <span className={styles.userName}>{user.full_name}</span>
+                  {user.primary_organization && (
+                    <span className={styles.userOrg}>{user.primary_organization}</span>
+                  )}
                 </div>
               </div>
             ))

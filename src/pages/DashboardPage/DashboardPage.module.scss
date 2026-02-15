@@ -1,118 +1,511 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .dashboard {
-
-  --bg-color: #f9f9f9;
-  --bg-color-secondary: white;
-  --bg-placeholder: #e9ecef;
-  --text-color-secondary: #555;
-  
   display: flex;
-  background-color: var(--bg-color);
-  min-height: 100vh;
-  padding: 0 1rem;
   flex-direction: column;
-
-  @include tablet {
-    margin-left: 89px;
-    padding: 0 2rem;
-  }
-
-  @include laptop {
-    margin-left: 289px;
-  }
-}
-
-:global(body.dark) .dashboard {
-  --bg-color: #222222;
-  --bg-color-secondary: #2e2e2e;
-  --bg-placeholder: #3a3a3a;
-  --text-color-secondary: #d1d1d1;
-}
-
-.content {
-  flex: 1;
+  gap: $spacing-6;
+  max-width: $content-max-width;
+  margin: 0 auto;
   width: 100%;
-  padding-top: 2rem;
-  font-family: 'Arial', sans-serif;
-}
 
-.title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
-
-  p {
-    color: var(--text-color-secondary);
-  }
-
-  @include tablet {
-    font-size: 2rem;
+  @include lg {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: $spacing-8;
   }
 }
 
-.grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: 1fr;
+// Main Feed Section
+.feedSection {
+  flex: 1;
+  min-width: 0; // Prevent flex item overflow
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
 
-  @include tablet {
-    grid-template-columns: repeat(2, 1fr);
-  }
+// Inline Create Post Card
+.createPostCard {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
 
-  @include laptop {
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: minmax(150px, auto);
+.createPostTop {
+  @include flex-start;
+  gap: $spacing-3;
+  align-items: flex-start;
+
+  @include md {
+    gap: $spacing-4;
   }
 }
 
-.card {
-  background: var(--bg-color-secondary);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.createPostAvatar {
+  @include avatar($avatar-md);
+  flex-shrink: 0;
+  margin-top: $spacing-1;
 }
 
-.cardWide {
-  @extend .card;
+.createPostInput {
+  flex: 1;
+  min-height: 40px;
+  padding: $spacing-2 $spacing-3;
+  background-color: var(--input-bg, var(--bg-secondary));
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  color: var(--text-primary);
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  resize: vertical;
+  @include transition-colors;
 
-  @include tablet {
-    grid-column: span 2;
+  &::placeholder {
+    color: var(--text-muted);
   }
 
-  @include laptop {
-    grid-column: span 2;
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
   }
 }
 
-.calendar,
-.graph {
-  background-color: var(--bg-placeholder);
-  height: 180px;
-  border-radius: 8px;
+.createPostInputError {
+  border-color: $error-500;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($error-500, 0.1);
+  }
+}
+
+// Image Previews
+.imagePreviewRow {
+  display: flex;
+  gap: $spacing-3;
+  overflow-x: auto;
+  padding: 0 $spacing-1 $spacing-2;
+  @include custom-scrollbar;
+}
+
+.imagePreviewContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.previewImage {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-md;
+  object-fit: cover;
+  border: 1px solid var(--border-default);
+}
+
+.removeImageButton {
+  position: absolute;
+  top: -6px;
+  right: -6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color-secondary);
-  font-size: 1rem;
+  width: 22px;
+  height: 22px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-full;
+  color: var(--icon-default);
+  cursor: pointer;
+  box-shadow: $shadow-sm;
+  @include transition-colors;
 
-  @include tablet {
-    height: 200px;
-    font-size: 1.1rem;
+  &:hover {
+    background-color: $error-50;
+    border-color: $error-500;
+    color: $error-500;
   }
 }
 
-.opportunityList {
-  padding-left: 1.2rem;
-  margin-top: 0.5rem;
+.postErrorMessage {
+  color: $error-500;
+  @include body-2;
+  margin: 0;
+  padding: 0 $spacing-1;
+}
 
-  li {
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+// Create Post Action Bar
+.createPostActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  padding-top: $spacing-2;
+  border-top: 1px solid var(--border-default);
+
+  @include sm {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 
+.createPostToolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+}
 
-.activitiesWrapper{
-  grid-column: span 3;
+.toolbarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  color: var(--icon-default);
+  border-radius: $radius-md;
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
+  }
+}
+
+.toolbarButtonActive {
+  color: $error-500;
+  background-color: $error-50;
+
+  &:hover {
+    color: $error-600;
+    background-color: $error-100;
+  }
+}
+
+.createPostSubmit {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  justify-content: flex-end;
+}
+
+.charCount {
+  color: var(--text-muted);
+  @include caption;
+}
+
+.charCountError {
+  color: $error-500;
+  @include caption;
+}
+
+.cancelBtn {
+  @include button-tertiary;
+  @include button-sm;
+}
+
+.postBtn {
+  @include button-primary;
+  @include button-sm;
+  min-width: 80px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Posts List
+.postsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+// Loader
+.loaderContainer {
+  @include flex-center;
+  min-height: 200px;
+}
+
+// Empty Feed State
+.emptyFeed {
+  @include card;
+  @include flex-column-center;
+  gap: $spacing-4;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+  color: var(--text-muted);
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  h3 {
+    @include heading-5;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  p {
+    @include body-2;
+    margin: 0;
+  }
+}
+
+// Pagination
+.pagination {
+  @include flex-center;
+  gap: $spacing-4;
+  padding: $spacing-4 0;
+  margin-top: $spacing-4;
+}
+
+.paginationBtn {
+  @include button-secondary;
+  @include button-sm;
+  gap: $spacing-2;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pageInfo {
+  @include body-2;
+  color: var(--text-secondary);
+}
+
+// Sidebar
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  width: 100%;
+
+  @include lg {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc($header-height + $spacing-6);
+    max-height: calc(100vh - $header-height - $spacing-12);
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  @include xl {
+    width: 360px;
+  }
+}
+
+// Widget Card
+.widget {
+  @include card;
+}
+
+.widgetTitle {
+  @include heading-5;
+  margin: 0 0 $spacing-4 0;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid var(--border-default);
+}
+
+// Events List
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.eventCard {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+}
+
+.eventDate {
+  @include flex-column-center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--primary);
+  border-radius: $radius-md;
+  color: $white;
+  flex-shrink: 0;
+}
+
+.eventMonth {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+}
+
+.eventDay {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+}
+
+.eventInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventTitle {
+  @include body-2;
+  @include line-clamp(2);
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.eventTime {
+  @include caption;
+  color: var(--text-muted);
+}
+
+.eventArrow {
+  @include button-ghost;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-full;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.viewAllBtn {
+  @include button-tertiary;
+  @include button-sm;
+  width: 100%;
+  margin-top: $spacing-3;
+  justify-content: center;
+  color: var(--primary);
+
+  &:hover {
+    background-color: var(--primary-subtle);
+  }
+}
+
+// Activity List
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.activityItem {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-2 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+}
+
+.activityAvatar {
+  @include avatar($avatar-sm);
+  flex-shrink: 0;
+}
+
+.activityText {
+  @include body-2;
+  margin: 0;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-medium;
+  }
+}
+
+// Community Members
+.memberCount {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin: 0 0 $spacing-3 0;
+  @include body-2;
+  color: var(--text-secondary);
+
+  svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+}
+
+.memberAvatars {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+}
+
+.memberAvatar {
+  @include avatar($avatar-sm);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: $shadow-sm;
+  }
+}
+
+.memberMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $avatar-sm;
+  height: $avatar-sm;
+  border-radius: $radius-full;
+  background-color: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+// Empty widget state
+.emptyWidget {
+  @include body-2;
+  color: var(--text-muted);
+  margin: 0;
+  padding: $spacing-2 0;
+}
+
+// Activity Summary
+.activitySummary {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.activityStat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  @include body-2;
+  color: var(--text-secondary);
+
+  svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-semibold;
+  }
 }
