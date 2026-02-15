@@ -403,6 +403,7 @@
   color: var(--text-muted);
   @include transition-all;
   margin-bottom: $spacing-4;
+  margin-top: $spacing-4;
 
   &:hover {
     border-color: var(--primary);

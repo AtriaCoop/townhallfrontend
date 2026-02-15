@@ -1,0 +1,59 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.createTags {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tagList {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.tagInputFields {
+  display: inline-block;
+}
+
+.tagInput {
+  flex: 1;
+  margin-right: 5px;
+  padding: $spacing-1 $spacing-3;
+  background-color: var(--input-bg, var(--bg-secondary));
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  color: var(--text-primary);
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  resize: vertical;
+  @include transition-colors;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+  }
+}
+
+.tagWarning {
+  color: $error-500;
+  text-align: center;
+  @include body-2;
+}
+
+.tagAddButton {
+  @include button-primary;
+  @include button-sm;
+
+  min-width: 80px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
