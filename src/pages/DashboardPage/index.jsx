@@ -124,6 +124,7 @@ export default function DashboardPage() {
             links: [],
             comments: p.comments || [],
             reactions: p.reactions || {},
+            tags: p.tags || [],
           }));
 
         setPosts(formattedPosts);
@@ -327,6 +328,7 @@ export default function DashboardPage() {
                 userId={post.userId}
                 currentUserId={profileData?.id}
                 userImage={post.userImage}
+                tags={post.tags}
                 postId={post.id}
                 setPosts={setPosts}
               />
