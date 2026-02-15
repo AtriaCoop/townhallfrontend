@@ -51,3 +51,9 @@
   to = "https://townhallbackend.onrender.com/tags/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/event/*"
+  to = "https://townhallbackend.onrender.com/event/:splat"
+  status = 200
+  force = true

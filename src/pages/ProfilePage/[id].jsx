@@ -84,7 +84,11 @@ export default function ProfilePage() {
               src={profileData.profile_header}
               alt="Profile Header"
               className={styles.profileHeaderImage}
-              onError={() => setHeaderImageError(true)}
+              onError={() => {
+                e.target.onerror = null;
+                e.target.style.display = "none";
+                setHeaderImageError(true);
+              }}
             />
           ) : (
             <CoverIllustration />

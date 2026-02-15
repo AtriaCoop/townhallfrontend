@@ -22,6 +22,7 @@ export default function EmojiPickerButton({ onSelect, placement = "top" }) {
       <button
         type="button"
         className={styles.iconButton}
+        onMouseDown={(e) => e.stopPropagation()}
         onClick={() => setShowPicker((prev) => !prev)}
       >
         <Icon name="smile" />

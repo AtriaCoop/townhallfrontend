@@ -1,8 +1,11 @@
 import styles from './Post.module.scss';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
+import CommentModal from '@/components/CommentModal/CommentModal'
+import LikeModal from '@/components/LikeModal/LikeModal';
+import Tag from '@/components/Tag/Tag';
+import { getCookie } from '@/utils/authHelpers';
 import InlineComments from '@/components/InlineComments/InlineComments';
-import LikesTooltip from '@/components/LikesTooltip/LikesTooltip';
 import ReactionPicker from '../ReactionPicker/ReactionPicker';
 import { updatePost } from '@/api/post';
 import { authenticatedFetch } from '@/utils/authHelpers';
@@ -10,23 +13,18 @@ import Icon from '@/icons/Icon';
 import { getReactionEmoji } from '@/constants/reactions';
 import { BASE_URL } from '@/constants/api';
 
-export default function Post({ 
+export default function Post({
   fullName,
   organization,
   date,
-  created_at,
   content,
   postImage,
   links,
-  likes,
-  liked_by,
-  isLiked,
   comments,
   userId,
   currentUserId,
   userImage,
-  pinned,
-  is_staff,
+  tags,
   postId,
   setPosts,
   reactions = {},
@@ -42,51 +40,79 @@ export default function Post({
   const [editText, setEditText] = useState(content.join('\n'));
   const [editImage, setEditImage] = useState(null);
   const [showComments, setShowComments] = useState(false);
-  const [showLikesTooltip, setShowLikesTooltip] = useState(false);
-  const [liked, setLiked] = useState(isLiked);
   const [reportResponse, setReportResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [tag, setTag] = useState("");
+  const [editTags, setEditTags] = useState(tags);
+  const [tagErrorText, setTagErrorText] = useState("");
+  const MAX_TAGS = 5;
 
   const isMyOwnPost = userId === currentUserId;
+
+  const handleTagAdd = () => {
+    if (!tag.trim()) return;
+    if (editTags.length >= MAX_TAGS) {
+      setTagErrorText("Can't add more than 5 tags.");
+      return;
+    };
+
+    const exists = editTags.some(
+      (t) => t.toLowerCase() === tag.toLowerCase()
+    );
+    if (exists) {
+      setTagErrorText("Can't add duplicate tag.");
+      return;
+    };
+
+    setEditTags((prev) => [...prev, tag]);
+    setTag("");
+    setTagErrorText("");
+  }
+
+  const removeTag = (idx) => {
+    setEditTags((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const result = await updatePost(postId, {content: editText, image: editImage});
-  
+      const result = await updatePost(postId, { content: editText, image: editImage, tags: editTags });
+      console.log("Post updated successfully:", result);
+
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
             ? {
-                ...post,
-                content: [editText],
-                postImage: result.post?.image || post.postImage, // updated image
-              }
+              ...post,
+              content: [editText],
+              tags: editTags,
+              postImage: result.post?.image || post.postImage, // updated image
+            }
             : post
         )
       );
-  
+
       setShowEditModal(false);
     } catch (error) {
       console.error("Error updating post:", error);
     }
-  }  
-  
+  }
+
   // DELETE POST
   async function handleDeletePost() {
     try {
       const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
         method: "DELETE",
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete post");
       }
-  
+
       // Update local posts state to remove the deleted post
       setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-  
+
       // Close the delete modal
       setShowDeleteModal(false);
     } catch (error) {
@@ -94,43 +120,12 @@ export default function Post({
     }
   }
 
-  // LIKE POST
-async function handleLikePost() {
-  try {
-    const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/like/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Failed to like post: ${errText}`);
-    }
-
-    const result = await response.json();
-    setLiked(prev => !prev);
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.id === postId ? { ...post, likes: result.likes } : post
-      )
-    );
-  } catch (error) {
-    console.error("Error liking post:", error);
-  }
-}
-
   const handleOptionsClick = () => {
     setShowOptions(prev => !prev);
   };
 
   const handleCommentClick = () => {
     setShowComments(prev => !prev);
-  };
-
-  const handleLikeClick = () => {
-    setShowLikesTooltip(prev => !prev);
   };
 
   // Handle outside click to close edit/delete modal
@@ -159,16 +154,16 @@ async function handleLikePost() {
     if (userId === currentUserId) return
 
     const reportData = {
-      post_id : postId
+      post_id: postId
     }
 
     try {
       setIsLoading(true)
       const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/report`, {
-        method : 'POST',
-        body : JSON.stringify(reportData),
-        headers : {
-          "Content-type" : 'application/json'
+        method: 'POST',
+        body: JSON.stringify(reportData),
+        headers: {
+          "Content-type": 'application/json'
         }
       })
       const result = await response.json()
@@ -176,7 +171,7 @@ async function handleLikePost() {
       // Set either success or error message
       setReportResponse(result.message)
 
-    } catch (err){
+    } catch (err) {
       console.error(err)
       setReportResponse(err.message || "Something went wrong")
     } finally {
@@ -188,38 +183,11 @@ async function handleLikePost() {
     setShowReactionPicker(prev => !prev);
   }
 
-  // PIN POST
-  const handlePinPost = async () => {
-    if (is_staff) {
-      try {
-        await updatePost(postId, {pinned: !pinned})
-
-        setPosts((prevPosts) => {
-          const updatedPosts = prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  pinned: !post.pinned
-                }
-              : post
-          );
-
-          return updatedPosts.sort((a, b) => {
-            if (a.pinned !== b.pinned) return b.pinned - a.pinned;
-            return new Date(b.created_at) - new Date(a.created_at);
-          });
-        });
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  }
-
   return (
-    <div className={pinned ? styles.postPinned : styles.post}>
+    <div className={styles.post}>
 
       <div className={styles.postHeader}>
-        <img 
+        <img
           src={userImage || '/assets/ProfileImage.jpg'}
           alt="User profile"
           className={styles.profilePic}
@@ -237,77 +205,94 @@ async function handleLikePost() {
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
         </div>
-       
+
         {/* Edit Post Modal */}
         {showOptions && (
           <div className={styles.optionsMenu} ref={optionsRef}>
-            { isMyOwnPost ? (
+            {isMyOwnPost ? (
               <>
                 <button onClick={() => setShowEditModal(true)}>Edit</button>
                 <button onClick={() => setShowDeleteModal(true)}>Delete</button>
               </>
             ) : (
-              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true) }>Report</button>
+              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true)}>Report</button>
             )}
           </div>
         )}
         {/* Show Edit Modal */}
         {showEditModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContentEdit}>
-            <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
-            <h1>Edit Post</h1>
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContentEdit}>
+              <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
+              <h1>Edit Post</h1>
 
-            <p>Text</p>
-            <textarea
-              placeholder="Enter text..."
-              className={styles.textInput}
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-            />
+              <p>Text</p>
+              <textarea
+                placeholder="Enter text..."
+                className={styles.textInput}
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+              />
 
-            <div
-              className={styles.imageInput}
-              onClick={() => document.getElementById(`editImg-${postId}`).click()}
-            >
-              {editImage ? (
-                <img
-                  src={URL.createObjectURL(editImage)}
-                  alt="Preview"
-                  className={styles.previewImage}
-                />
-              ) : isValidImage(postImage) ? (
-                <img
-                  src={postImage}
-                  alt="Current Post Image"
-                  className={styles.previewImage}
-                />
-              ) : (
-                <span>Choose Photo</span>
-              )}
-            </div>
+              {/* Tag Creation */}
+              <div className={styles.createTags}>
+                <div className={styles.tagList}>
+                  {editTags.map((tag, index) => (
+                    <Tag key={index} name={tag} onRemove={() => removeTag(index)} />
+                  ))}
+                </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              id={`editImg-${postId}`}
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith("image/")) {
-                  setEditImage(file);
-                }
-              }}
-            />
+                <input value={tag} onChange={(e) => setTag(e.target.value)} />
+                <button onClick={handleTagAdd}>ADD</button>
+                <div>
+                  {tagErrorText.length > 0 && (
+                    <span className={styles.tagWarning}>{tagErrorText}</span>
+                  )}
+                </div>
+              </div>
 
-            <div className={styles.modalButton}>
-              <button className={styles.updateButton} onClick={handleUpdatePost}>
-                Update
-              </button>
+              <div
+                className={styles.imageInput}
+                onClick={() => document.getElementById(`editImg-${postId}`).click()}
+              >
+                {editImage ? (
+                  <img
+                    src={URL.createObjectURL(editImage)}
+                    alt="Preview"
+                    className={styles.previewImage}
+                  />
+                ) : isValidImage(postImage) ? (
+                  <img
+                    src={postImage}
+                    alt="Current Post Image"
+                    className={styles.previewImage}
+                  />
+                ) : (
+                  <span>Choose Photo</span>
+                )}
+              </div>
+
+              <input
+                type="file"
+                accept="image/*"
+                id={`editImg-${postId}`}
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file && file.type.startsWith("image/")) {
+                    setEditImage(file);
+                  }
+                }}
+              />
+
+              <div className={styles.modalButton}>
+                <button className={styles.updateButton} onClick={handleUpdatePost}>
+                  Update
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
         {/* Show Delete Modal */}
         {showDeleteModal && (
           <div className={styles.modalOverlay}>
@@ -319,14 +304,14 @@ async function handleLikePost() {
           </div>
         )}
         {/* Show Report Modal */}
-        { showReportModal && (
+        {showReportModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContentDelete}>
-              <button className={styles.closeButton} onClick={() => {setReportResponse(''); setShowReportModal(false)}}>×</button>
-              { isLoading && (
+              <button className={styles.closeButton} onClick={() => { setReportResponse(''); setShowReportModal(false) }}>×</button>
+              {isLoading && (
                 <h1>Loading...</h1>
               )}
-              { reportResponse ? (
+              {reportResponse ? (
                 <>
                   <h1>{reportResponse}</h1>
                 </>
@@ -335,10 +320,10 @@ async function handleLikePost() {
                   <h1>Are you sure?</h1>
                   <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
                 </>
-              ) }
+              )}
             </div>
           </div>
-        ) }
+        )}
       </div>
 
       <div className={styles.postContent}>
@@ -373,34 +358,33 @@ async function handleLikePost() {
 
       {Object.keys(reactions).length > 0 && (
         <div className={styles.reactionsDisplay}>
-          {Object.entries(reactions).map(([reactionType, userIds]) => (
-            userIds.length > 0 && (
+          {Object.entries(reactions).map(([reactionType, users]) => (
+            users.length > 0 && (
               <div key={reactionType} className={styles.reactionGroup}>
                 <span className={styles.reactionEmoji}>
                   {getReactionEmoji(reactionType)}
                 </span>
-                <span className={styles.reactionCount}>{userIds.length}</span>
+                <span className={styles.reactionCount}>{users.length}</span>
+                <div className={styles.reactionTooltip}>
+                  {users.map(u => u.full_name || "Unknown").join(", ")}
+                </div>
               </div>
             )
           ))}
         </div>
       )}
-      
+
       <div className={styles.postFooter}>
-        <div className={styles.reactions}>
-          <Icon name="heart" className={`${styles.postIcon} ${liked ? styles.liked : ''}`} onClick={handleLikePost} />
-          {/* Likes with tooltip */}
-          <div className={styles.likesWrapper}>
-            <div className={styles.likesComments} onClick={handleLikeClick}>
-              {likes} Like{likes !== 1 ? 's' : ''}
-            </div>
-            {showLikesTooltip && (
-              <LikesTooltip
-                liked_by={liked_by}
-                onClose={() => setShowLikesTooltip(false)}
-              />
-            )}
+        {/* Post Tags */}
+        {tags?.length > 0 && (
+          <div className={styles.postFooterTop}>
+            {tags.map((tag, index) => (
+              <Tag key={index} removable={false} name={tag} />
+            ))}
           </div>
+        )}
+
+        <div className={styles.reactions}>
           <Icon name="message" className={`${styles.postIcon} ${showComments ? styles.active : ''}`} onClick={handleCommentClick} />
           <div className={styles.likesComments} onClick={handleCommentClick}>
             {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
@@ -410,6 +394,7 @@ async function handleLikePost() {
             <button
               className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ''}`}
               onClick={handleReactionClick}
+              onMouseDown={(e) => e.stopPropagation()}
               title="Add reaction"
             >
               <Icon name="smile" size={20} />
@@ -426,13 +411,6 @@ async function handleLikePost() {
             )}
           </div>
         </div>
-        {is_staff ? (
-          <button className={styles.pin} onClick={handlePinPost} title={pinned ? 'Unpin post' : 'Pin post'}>
-            <Icon name="pin" className={`${styles.postIcon} ${pinned ? styles.pinned : ''}`} />
-          </button>
-        ) : (
-          pinned && <Icon name="pin" className={`${styles.postIcon} ${styles.pinned}`} />
-        )}
       </div>
 
       {/* Inline Comments Section */}

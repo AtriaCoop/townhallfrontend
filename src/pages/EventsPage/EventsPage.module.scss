@@ -25,11 +25,20 @@
 
 .headerContent {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
 }
 
 .pageTitle {
   margin: 0;
   @include heading-3;
+}
+
+.createEventButton {
+  @include button-primary;
+  @include button-sm;
+  white-space: nowrap;
 }
 
 .headerControls {
@@ -157,6 +166,7 @@
   background-color: var(--card-bg);
   border: 1px solid var(--border-default);
   border-radius: $radius-lg;
+  cursor: pointer;
   @include transition-all;
 
   &:hover {
@@ -244,15 +254,7 @@
   @include line-clamp(2);
 }
 
-.eventAdmin {
-  margin: 0;
-  color: var(--text-muted);
-  @include caption;
-
-  span {
-    font-weight: $font-weight-medium;
-  }
-}
+// .eventAdmin removed — replaced by .eventAdminRow
 
 // Event Actions
 .eventActions {
@@ -265,12 +267,6 @@
   @include md {
     align-self: center;
   }
-}
-
-.messageButton {
-  @include button-primary;
-  @include button-sm;
-  width: 100%;
 }
 
 .participateButton {
@@ -619,5 +615,350 @@
 
   @include sm {
     flex-direction: row;
+  }
+}
+
+// Create Event Form
+.createEventForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.createFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--text-secondary);
+  }
+}
+
+.createFormInput {
+  @include input-base;
+  @include input-md;
+}
+
+.createFormTextarea {
+  @include input-base;
+  padding: $spacing-3;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.createFormError {
+  margin: 0;
+  color: $error-600;
+  font-size: $font-size-sm;
+}
+
+// ============================================
+// Event Card Enhancements
+// ============================================
+
+.eventTitleRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-2;
+}
+
+.eventTitleRow .eventTitle {
+  margin-bottom: 0;
+}
+
+// Date Badges
+.dateBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $spacing-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dateBadge_today {
+  background-color: $success-100;
+  color: $success-700;
+}
+
+.dateBadge_tomorrow {
+  background-color: $info-100;
+  color: $info-700;
+}
+
+.dateBadge_thisWeek {
+  background-color: $primary-100;
+  color: $primary-700;
+}
+
+.dateBadge_past {
+  background-color: $neutral-100;
+  color: $neutral-500;
+}
+
+// Participant count in meta
+.eventParticipants {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  color: var(--text-muted);
+  @include caption;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// Admin row on card
+.eventAdminRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-top: $spacing-1;
+}
+
+.adminAvatar {
+  @include avatar($avatar-xs);
+}
+
+.adminAvatarPlaceholder {
+  width: $avatar-xs;
+  height: $avatar-xs;
+  min-width: $avatar-xs;
+  border-radius: $radius-full;
+  background-color: var(--bg-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.adminName {
+  color: var(--text-muted);
+  @include caption;
+}
+
+// Admin action buttons (edit/delete icons)
+.adminActions {
+  display: flex;
+  gap: $spacing-1;
+  margin-bottom: $spacing-1;
+}
+
+.iconButton {
+  @include button-base;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-md;
+  background-color: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+}
+
+// ============================================
+// Detail Modal Enhancements
+// ============================================
+
+// Organizer section
+.organizerSection {
+  margin-bottom: $spacing-4;
+  padding-top: $spacing-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.organizerLabel {
+  margin: 0 0 $spacing-2 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+}
+
+.organizerCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+}
+
+.organizerAvatar {
+  @include avatar($avatar-md);
+}
+
+.organizerAvatarPlaceholder {
+  width: $avatar-md;
+  height: $avatar-md;
+  min-width: $avatar-md;
+  border-radius: $radius-full;
+  background-color: var(--bg-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.organizerInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.organizerName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.organizerOrg {
+  font-size: $font-size-xs;
+  color: var(--text-muted);
+}
+
+.viewProfileLink {
+  font-size: $font-size-sm;
+  color: var(--primary);
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+// Participants section
+.participantsSection {
+  margin-bottom: $spacing-4;
+  padding-top: $spacing-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.participantsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.participantChip {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  background-color: var(--bg-secondary);
+  border-radius: $radius-full;
+  cursor: pointer;
+  @include transition-colors;
+  @include caption;
+  color: var(--text-secondary);
+
+  &:hover {
+    background-color: var(--bg-active);
+    color: var(--text-primary);
+  }
+}
+
+.participantAvatar {
+  @include avatar($avatar-xs);
+}
+
+.participantAvatarPlaceholder {
+  width: $avatar-xs;
+  height: $avatar-xs;
+  min-width: $avatar-xs;
+  border-radius: $radius-full;
+  background-color: var(--bg-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.moreParticipants {
+  display: flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-2;
+  font-size: $font-size-xs;
+  color: var(--text-muted);
+}
+
+// Edit & Delete buttons in detail modal
+.editButton {
+  @include button-base;
+  @include button-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+
+  &:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+}
+
+.deleteButton {
+  @include button-base;
+  @include button-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  background-color: transparent;
+  color: $error-600;
+  border: 1px solid $error-100;
+
+  &:hover:not(:disabled) {
+    background-color: $error-50;
+    border-color: $error-600;
+  }
+}
+
+// Delete confirmation modal
+.deleteConfirmText {
+  margin: 0 0 $spacing-4 0;
+  color: var(--text-secondary);
+  @include body-2;
+  line-height: $line-height-relaxed;
+}
+
+.deleteConfirmActions {
+  display: flex;
+  gap: $spacing-2;
+
+  @include sm {
+    justify-content: flex-end;
+  }
+}
+
+.deleteConfirmButton {
+  @include button-base;
+  @include button-sm;
+  background-color: $error-600;
+  color: $white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background-color: $error-700;
   }
 }

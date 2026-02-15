@@ -49,8 +49,23 @@ export default function EditProfilePage() {
         const response = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`);
         const data = await response.json();
         setProfileData(data.user);
+<<<<<<< HEAD
         setFormData((prev) => ({ ...prev, ...data.user }));
         setHeaderImageError(false);
+=======
+        setFormData((prev) => {
+          const updated = { ...prev };
+          for (const key of Object.keys(prev)) {
+            if (key in data.user) {
+              updated[key] =
+                key === "profile_image" || key === "profile_header"
+                  ? data.user[key]
+                  : data.user[key] ?? "";
+            }
+          }
+          return updated;
+        });
+>>>>>>> origin
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
@@ -224,7 +239,9 @@ export default function EditProfilePage() {
             type="file"
             accept="image/*"
             style={{ display: "none" }}
-            onChange={(e) => handleFieldChange({ profile_image: e.target.files[0] })}
+            onChange={(e) => {
+              if (e.target.files[0]) handleFieldChange({ profile_image: e.target.files[0] });
+            }}
           />
         </div>
         <div className={styles.profileInfo}>
@@ -233,6 +250,38 @@ export default function EditProfilePage() {
         </div>
       </div>
       
+
+      {/* Banner Image */}
+      <div className={styles.bannerSection}>
+        <label htmlFor="bannerImageUpload" className={styles.bannerImageLabel}>
+          <img
+            src={
+              formData.profile_header instanceof File
+                ? URL.createObjectURL(formData.profile_header)
+                : profileData?.profile_header || "/assets/defaultBanner.svg"
+            }
+            alt="Banner"
+            className={styles.bannerImage}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/assets/defaultBanner.svg";
+            }}
+          />
+          <div className={styles.bannerEditOverlay}>
+            <Icon name="pencil" size={16} />
+            <span>Change Banner</span>
+          </div>
+        </label>
+        <input
+          id="bannerImageUpload"
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            if (e.target.files[0]) handleFieldChange({ profile_header: e.target.files[0] });
+          }}
+        />
+      </div>
 
       {/* Form Sections */}
       <div className={styles.formSections}>

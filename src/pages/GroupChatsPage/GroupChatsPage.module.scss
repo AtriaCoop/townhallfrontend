@@ -222,6 +222,18 @@
   }
 }
 
+.chatItemActive {
+  background-color: var(--primary);
+  color: $white;
+  border-color: var(--primary);
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+  }
+}
+
 .chatImage {
   width: 100%;
 }

@@ -19,13 +19,19 @@
 }
 
 .iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   background: none;
   border: none;
-  font-size: 1.25rem;
+  border-radius: 8px;
   cursor: pointer;
-  color: var(--icons);
+  color: var(--icon-default, var(--icons));
 
   &:hover {
-    color: var(--icons-hover);
+    background-color: var(--bg-hover);
+    color: var(--icon-hover, var(--icons-hover));
   }
 }
