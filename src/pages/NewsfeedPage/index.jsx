@@ -10,12 +10,12 @@ import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
-import styles from "./DashboardPage.module.scss";
+import styles from "./NewsfeedPage.module.scss";
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
 
-export default function DashboardPage() {
+export default function NewsfeedPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -208,7 +208,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.newsfeed}>
       {/* Main Feed Section */}
       <div className={styles.feedSection}>
         {/* Inline Create Post Card */}
