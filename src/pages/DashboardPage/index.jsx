@@ -10,6 +10,7 @@ import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
+import SortBy from "@/components/SortBy/SortBy";
 import styles from "./DashboardPage.module.scss";
 
 const POSTS_PER_PAGE = 10;
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const [profileData, setProfileData] = useState(null);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [members, setMembers] = useState([]);
+  const [sortStatus, setSortStatus] = useState("newest");
 
   // Inline create post state
   const [postText, setPostText] = useState("");
@@ -207,6 +209,16 @@ export default function DashboardPage() {
     setIsComposing(false);
   };
 
+  const handleSort = (sortValue) => {
+    setSortStatus(sortValue);
+
+    switch (sortStatus) {
+      case "newest":
+        setPosts(posts.sort((a, b) => {a.created_at > b.created_at}));
+        break;
+    }
+  }
+
   return (
     <div className={styles.dashboard}>
       {/* Main Feed Section */}
@@ -302,6 +314,8 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        <SortBy onSelect={handleSort}></SortBy>
 
         {/* Posts Feed */}
         {loading ? (

@@ -1,0 +1,24 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.container {
+  padding: $spacing-lg;
+  padding-bottom: 0;
+}
+
+.sortby_dropdown {
+  @include card;
+  padding: 2px $spacing-2;
+  cursor: pointer;
+  @include body-2;
+  color: var(--text-primary);
+
+  padding-right: $spacing-6;
+
+  option {
+    padding: $spacing-2;
+    background-color: var(--card-bg, $white);
+    color: var(--text-primary);
+    border-radius: $card-border-radius;
+  }
+}
