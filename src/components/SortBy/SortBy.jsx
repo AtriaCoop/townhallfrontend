@@ -10,7 +10,7 @@ export default function SortBy({onSelect}) {
         <option value="most_reactions">Most Reactions</option>
         <option value="least_reactions">Least Reactions</option>
         <option value="most_comments">Most Comments</option>
-        <option value="least_comments">Least Commentns</option>
+        <option value="least_comments">Least Comments</option>
       </select>
     </div>
   );
