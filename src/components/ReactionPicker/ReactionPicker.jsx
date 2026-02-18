@@ -61,7 +61,7 @@ export default function ReactionPicker({
   return (
     <div className={styles.reactionPicker} ref={pickerRef}>
       {REACTIONS.map((reaction) => {
-        const hasReacted = currentReactions[reaction.type]?.includes(currentUserId);
+        const hasReacted = currentReactions[reaction.type]?.some(u => u.id === currentUserId);
 
         return (
           <button

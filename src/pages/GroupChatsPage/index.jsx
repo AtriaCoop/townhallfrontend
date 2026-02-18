@@ -216,7 +216,7 @@ export default function GroupChatsPage() {
             joinedGroups.map((group, idx) => (
               <button
                 key={idx}
-                className={styles.chatItem}
+                className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ''}`}
                 onClick={() => setActiveGroup(group)}
               >
                 {group}

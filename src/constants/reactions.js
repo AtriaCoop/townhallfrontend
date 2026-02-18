@@ -9,6 +9,12 @@ export const REACTIONS = [
   { type: 'support', emoji: '🤝', label: 'Support' },
   { type: 'inspired', emoji: '☀️', label: 'Inspired' },
   { type: 'helpful', emoji: '✅', label: 'Helpful' },
+  { type: 'celebrate', emoji: '🎉', label: 'Celebrate' },
+  { type: 'laugh', emoji: '😂', label: 'Laugh' },
+  { type: 'fire', emoji: '🔥', label: 'Fire' },
+  { type: 'clap', emoji: '👏', label: 'Clap' },
+  { type: 'grateful', emoji: '🙏', label: 'Grateful' },
+  { type: 'mindblown', emoji: '🤯', label: 'Mind Blown' },
 ];
 
 /**

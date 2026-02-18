@@ -3,7 +3,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 import styles from "./Layout.module.scss";
 
-const noNavPages = ["/", "/LandingPage", "/SetUpPage"];
+const noNavPages = ["/", "/LandingPage", "/SetUpPage", "/ForgotPasswordPage", "/ResetPasswordPage"];
 
 function Layout({ children, hasNewDm }) {
   const router = useRouter();

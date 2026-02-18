@@ -11,6 +11,7 @@
 
   @include lg {
     flex-direction: row;
+    align-items: flex-start;
     gap: $spacing-8;
   }
 }
@@ -326,6 +327,7 @@
   padding: $spacing-3;
   border-radius: $radius-md;
   background-color: var(--bg-secondary);
+  cursor: pointer;
   @include transition-all;
 
   &:hover {
@@ -450,5 +452,83 @@
 
   &:hover {
     color: var(--primary-hover);
+  }
+}
+// Community Members
+.memberCount {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin: 0 0 $spacing-3 0;
+  @include body-2;
+  color: var(--text-secondary);
+
+  svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+}
+
+.memberAvatars {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+}
+
+.memberAvatar {
+  @include avatar($avatar-sm);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: $shadow-sm;
+  }
+}
+
+.memberMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $avatar-sm;
+  height: $avatar-sm;
+  border-radius: $radius-full;
+  background-color: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+// Empty widget state
+.emptyWidget {
+  @include body-2;
+  color: var(--text-muted);
+  margin: 0;
+  padding: $spacing-2 0;
+}
+
+// Activity Summary
+.activitySummary {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.activityStat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  @include body-2;
+  color: var(--text-secondary);
+
+  svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-semibold;
   }
 }

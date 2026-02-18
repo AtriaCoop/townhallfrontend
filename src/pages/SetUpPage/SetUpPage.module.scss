@@ -258,6 +258,20 @@
   display: none;
 }
 
+.required {
+  color: $error-500;
+}
+
+.uploadError {
+  border-color: $error-500;
+}
+
+.fieldError {
+  color: $error-600;
+  font-size: $font-size-sm;
+  margin-top: $spacing-2;
+}
+
 // ============================================
 // SOCIAL LINKS
 // ============================================

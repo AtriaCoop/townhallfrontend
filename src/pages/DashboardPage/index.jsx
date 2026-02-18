@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import { formatDistance } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { getStoredUser } from "@/utils/getStoredUser";
 import { BASE_URL } from "@/constants/api";
 import { createPost } from "@/api/post";
+import { fetchAllEvents } from "@/api/event";
 import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
@@ -16,21 +18,8 @@ import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
 
-// Mock data for upcoming events - replace with API call
-const UPCOMING_EVENTS = [
-  { id: 1, title: "Corem ipsum dolor sit amet, consectetur adipiscing elit.", date: "JAN 24", time: "7:00 PM" },
-  { id: 2, title: "Corem ipsum dolor sit amet, consectetur adipiscing elit.", date: "JAN 24", time: "7:00 PM" },
-  { id: 3, title: "Corem ipsum dolor sit amet, consectetur adipiscing elit.", date: "JAN 24", time: "7:00 PM" },
-];
-
-// Mock data for activity - replace with API call
-const RECENT_ACTIVITY = [
-  { id: 1, user: "@jjjjjjjjjj", action: "and 3 others liked your post", avatar: "/assets/ProfileImage.jpg" },
-  { id: 2, user: "@jjjjjjjjjj", action: "and 3 others liked your post", avatar: "/assets/ProfileImage.jpg" },
-  { id: 3, user: "@jjjjjjjjjj", action: "and 3 others liked your post", avatar: "/assets/ProfileImage.jpg" },
-];
-
 export default function DashboardPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,11 +27,12 @@ export default function DashboardPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [profileData, setProfileData] = useState(null);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [members, setMembers] = useState([]);
 
   // Inline create post state
   const [postText, setPostText] = useState("");
   const [postImages, setPostImages] = useState([]);
-  const [postPinned, setPostPinned] = useState(false);
   const [postError, setPostError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
@@ -75,7 +65,33 @@ export default function DashboardPage() {
       }
     }
 
+    async function loadEvents() {
+      try {
+        const events = await fetchAllEvents();
+        const today = new Date().toISOString().split("T")[0];
+        const upcoming = events
+          .filter((e) => e.date >= today)
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 5);
+        setUpcomingEvents(upcoming);
+      } catch (err) {
+        console.error("Error loading events:", err);
+      }
+    }
+
+    async function loadMembers() {
+      try {
+        const res = await authenticatedFetch(`${BASE_URL}/user`);
+        const data = await res.json();
+        setMembers(data.data || []);
+      } catch (err) {
+        console.error("Error loading members:", err);
+      }
+    }
+
     fetchProfile();
+    loadEvents();
+    loadMembers();
   }, []);
 
   useEffect(() => {
@@ -97,11 +113,6 @@ export default function DashboardPage() {
           return;
         }
 
-        function userInLiked(list, curr_uid) {
-          if (!list || !Array.isArray(list)) return false;
-          return list.some(user => user && user.id === curr_uid);
-        }
-
         const formattedPosts = data.posts
           .filter(p => p && p.id)
           .map(p => ({
@@ -115,12 +126,9 @@ export default function DashboardPage() {
             content: [p.content],
             postImage: p.image || null,
             links: [],
-            likes: p.likes || 0,
-            liked_by: p.liked_by || [],
-            isLiked: profileData ? userInLiked(p.liked_by, profileData.id) : false,
             comments: p.comments || [],
             reactions: p.reactions || {},
-            pinned: p.pinned || false,
+            tags: p.tags || [],
           }));
 
         setPosts(formattedPosts);
@@ -161,7 +169,7 @@ export default function DashboardPage() {
 
     setIsPosting(true);
     try {
-      const data = await createPost({ content: postText, images: postImages, pinned: postPinned });
+      const data = await createPost({ content: postText, images: postImages });
 
       const newPost = {
         id: data.post.id,
@@ -173,26 +181,15 @@ export default function DashboardPage() {
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
-        pinned: data.post.pinned || false,
         links: [],
-        likes: data.post.likes || 0,
-        liked_by: data.post.liked_by || [],
-        isLiked: false,
         comments: data.post.comments || [],
         reactions: data.post.reactions || {},
       };
 
-      setPosts((prevPosts) => {
-        const updatedPosts = [newPost, ...prevPosts];
-        return updatedPosts.sort((a, b) => {
-          if (a.pinned !== b.pinned) return b.pinned - a.pinned;
-          return new Date(b.created_at) - new Date(a.created_at);
-        });
-      });
+      setPosts((prevPosts) => [newPost, ...prevPosts]);
 
       setPostText("");
       setPostImages([]);
-      setPostPinned(false);
       setPostError("");
       setIsComposing(false);
     } catch (err) {
@@ -210,7 +207,6 @@ export default function DashboardPage() {
   const handleCancelPost = () => {
     setPostText("");
     setPostImages([]);
-    setPostPinned(false);
     setPostError("");
     setIsComposing(false);
   };
@@ -277,15 +273,6 @@ export default function DashboardPage() {
               >
                 <Icon name="image" size={20} />
               </button>
-              {profileData?.is_staff && (
-                <button
-                  className={`${styles.toolbarButton} ${postPinned ? styles.toolbarButtonActive : ""}`}
-                  onClick={() => setPostPinned(!postPinned)}
-                  aria-label={postPinned ? "Unpin post" : "Pin post"}
-                >
-                  <Icon name="pin" size={20} />
-                </button>
-              )}
               <input
                 ref={postImageRef}
                 type="file"
@@ -340,16 +327,12 @@ export default function DashboardPage() {
                 content={post.content}
                 postImage={post.postImage}
                 links={post.links}
-                likes={post.likes}
-                liked_by={post.liked_by}
-                isLiked={post.isLiked}
                 comments={post.comments}
                 reactions={post.reactions}
                 userId={post.userId}
                 currentUserId={profileData?.id}
                 userImage={post.userImage}
-                pinned={post.pinned}
-                is_staff={profileData?.is_staff}
+                tags={post.tags}
                 postId={post.id}
                 setPosts={setPosts}
               />
@@ -402,43 +385,74 @@ export default function DashboardPage() {
         {/* Upcoming Events Widget */}
         <div className={styles.widget}>
           <h2 className={styles.widgetTitle}>Upcoming Events</h2>
-          <div className={styles.eventsList}>
-            {UPCOMING_EVENTS.map(event => (
-              <div key={event.id} className={styles.eventCard}>
-                <div className={styles.eventDate}>
-                  <span className={styles.eventMonth}>{event.date.split(' ')[0]}</span>
-                  <span className={styles.eventDay}>{event.date.split(' ')[1]}</span>
-                </div>
-                <div className={styles.eventInfo}>
-                  <p className={styles.eventTitle}>{event.title}</p>
-                  <span className={styles.eventTime}>{event.time}</span>
-                </div>
-                <button className={styles.eventArrow}>
-                  <Icon name="chevronRight" size={20} />
-                </button>
-              </div>
-            ))}
-          </div>
-          <button className={styles.viewAllBtn}>View All Events</button>
+          {upcomingEvents.length > 0 ? (
+            <div className={styles.eventsList}>
+              {upcomingEvents.map(event => {
+                const date = new Date(event.date + "T00:00:00");
+                const month = date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+                const day = date.getDate();
+                return (
+                  <div
+                    key={event.id}
+                    className={styles.eventCard}
+                    onClick={() => router.push("/EventsPage")}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className={styles.eventDate}>
+                      <span className={styles.eventMonth}>{month}</span>
+                      <span className={styles.eventDay}>{day}</span>
+                    </div>
+                    <div className={styles.eventInfo}>
+                      <p className={styles.eventTitle}>{event.title}</p>
+                      <span className={styles.eventTime}>{event.time}</span>
+                    </div>
+                    <div className={styles.eventArrow}>
+                      <Icon name="chevronRight" size={20} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className={styles.emptyWidget}>No upcoming events</p>
+          )}
+          <button className={styles.viewAllBtn} onClick={() => router.push("/EventsPage")}>
+            View All Events
+          </button>
         </div>
 
-        {/* Activity Overview Widget */}
+        {/* Community Members Widget */}
         <div className={styles.widget}>
-          <h2 className={styles.widgetTitle}>Activity Overview</h2>
-          <div className={styles.activityList}>
-            {RECENT_ACTIVITY.map(activity => (
-              <div key={activity.id} className={styles.activityItem}>
+          <h2 className={styles.widgetTitle}>Community</h2>
+          <p className={styles.memberCount}>
+            <Icon name="members" size={16} />
+            <strong>{members.length}</strong> members
+          </p>
+          {members.length > 0 && (
+            <div className={styles.memberAvatars}>
+              {members.slice(0, 6).map((member) => (
                 <img
-                  src={activity.avatar}
-                  alt=""
-                  className={styles.activityAvatar}
+                  key={member.id}
+                  src={member.profile_image || "/assets/ProfileImage.jpg"}
+                  alt={member.full_name}
+                  className={styles.memberAvatar}
+                  title={member.full_name}
+                  onClick={() => router.push(`/ProfilePage/${member.id}`)}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/assets/ProfileImage.jpg";
+                  }}
                 />
-                <p className={styles.activityText}>
-                  <strong>{activity.user}</strong> {activity.action}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+              {members.length > 6 && (
+                <span className={styles.memberMore}>+{members.length - 6}</span>
+              )}
+            </div>
+          )}
+          <button className={styles.viewAllBtn} onClick={() => router.push("/MembersPage")}>
+            View All Members
+          </button>
         </div>
       </aside>
     </div>

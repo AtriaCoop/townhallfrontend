@@ -270,7 +270,7 @@ export default function LandingPage() {
 
             {isLoginMode && (
               <p className={styles.forgotPassword}>
-                <a href="#">Forgot your password?</a>
+                <a href="/ForgotPasswordPage">Forgot your password?</a>
               </p>
             )}
           </form>

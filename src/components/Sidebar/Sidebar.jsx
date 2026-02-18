@@ -5,7 +5,7 @@ import Icon from '@/icons/Icon';
 import styles from './Sidebar.module.scss';
 
 const navItems = [
-  { name: 'Dashboard', icon: 'dashboard', path: '/DashboardPage' },
+  { name: 'Newsfeed', icon: 'dashboard', path: '/DashboardPage' },
   { name: 'Events', icon: 'calendar', path: '/EventsPage' },
   { name: 'Messages', icon: 'message', path: '/DirectMessagesPage' },
   { name: 'Members', icon: 'members', path: '/MembersPage' },
