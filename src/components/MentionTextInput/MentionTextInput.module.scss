@@ -1,5 +1,6 @@
 
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .mentionInputContainer {
   width: 100%;

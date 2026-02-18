@@ -1,14 +1,14 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .container {
+  @include tablet {
+    margin-left: calc(#{$sidebar-width-collapsed} + 240px);
+  }
 
-    @include tablet {
-        margin-left: 340px;
-    }
-
-    @include laptop {
-        margin-left: 540px;
-    }
+  @include laptop {
+    margin-left: calc(#{$sidebar-width-expanded} + 240px);
+  }
 }
 
 .chatWrapper {
@@ -63,20 +63,21 @@
   bottom: 0;
   right: 0;
   left: 0;
-  padding: 1rem;
+  padding: $spacing-4;
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-default);
   z-index: 9;
-  gap: 1rem;
+  gap: $spacing-3;
   flex-wrap: wrap;
 
   @include tablet {
-    margin-left: 340px;
+    margin-left: calc(#{$sidebar-width-collapsed} + 240px);
   }
 
   @include laptop {
-    margin-left: 540px;
+    margin-left: calc(#{$sidebar-width-expanded} + 240px);
   }
 }
 
@@ -160,49 +161,38 @@
 }
 
 .groupChatsSidebar {
-  --sidebar-bg: #e6e6e6;
   display: none;
-  
-    @include tablet {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      left: 90px;
-      height: 100vh;
-      background-color: var(--sidebar-bg);
-      border-right: 1px solid #ddd;
-      padding: 1.5rem 1rem;
-      z-index: 10;
-      width: 220px;
-    }
-  
-    @include laptop {
-      left: 290px;
-    }
-  
-    h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: $sidebar-width-collapsed;
+    height: 100vh;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-default);
+    padding: $spacing-5 $spacing-4;
+    z-index: 10;
+    width: 240px;
+    overflow-y: auto;
+    @include custom-scrollbar;
   }
 
-  :global(body.dark) .groupChatsSidebar {
-    --sidebar-bg: #363636;
+  @include laptop {
+    left: $sidebar-width-expanded;
   }
+
+  h2 {
+    @include heading-5;
+    margin-bottom: $spacing-4;
+  }
+}
   
 .joinButton {
-  background-color: #24873d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  cursor: pointer;
-  font-weight: bold;
-
-  &:hover {
-    background-color: rgb(30, 100, 50);
-  }     
+  @include button-primary;
+  @include button-md;
+  width: 100%;
+  margin-bottom: $spacing-4;
 }
   
 .chatList {
@@ -212,23 +202,35 @@
 }
   
 .chatItem {
-  background-color: var(--modal-bg);
-  color: var(--text-color);
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0.5rem;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  padding: $spacing-3;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: $font-size-sm;
   cursor: pointer;
-
-  width: 220px;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  @include transition-colors;
 
   &:hover {
-    background-color: #e9e9e9;
-    color: black;
+    background-color: var(--bg-hover);
+    border-color: var(--primary);
+  }
+}
+
+.chatItemActive {
+  background-color: var(--primary);
+  color: $white;
+  border-color: var(--primary);
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
   }
 }
 
