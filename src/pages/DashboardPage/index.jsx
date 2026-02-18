@@ -11,6 +11,9 @@ import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
 import styles from "./DashboardPage.module.scss";
+// Add import at the top
+import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
+
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
@@ -23,6 +26,7 @@ export default function DashboardPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [profileData, setProfileData] = useState(null);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [members, setMembers] = useState([]);
 
@@ -360,7 +364,21 @@ export default function DashboardPage() {
             </button>
           </div>
         )}
+         {/* Privacy Notice Footer */}
+       <div className={styles.privacyFooter}>
+          <button 
+            className={styles.privacyLink} 
+            onClick={() => setShowPrivacyModal(true)}
+          >
+            Privacy Notice
+          </button>
+        </div>
       </div>
+
+      {/* Privacy Modal */}
+      {showPrivacyModal && (
+        <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+      )}
 
       {/* Sidebar Section */}
       <aside className={styles.sidebar}>
