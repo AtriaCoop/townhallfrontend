@@ -4,10 +4,12 @@ import Header from "../Header/Header";
 import styles from "./Layout.module.scss";
 
 const noNavPages = ["/", "/LandingPage", "/SetUpPage", "/ForgotPasswordPage", "/ResetPasswordPage"];
+const fullBleedPages = ["/DirectMessagesPage", "/GroupChatsPage"];
 
 function Layout({ children, hasNewDm }) {
   const router = useRouter();
   const showNav = !noNavPages.includes(router.pathname);
+  const isFullBleed = fullBleedPages.includes(router.pathname);
 
   if (!showNav) {
     return <>{children}</>;
@@ -18,7 +20,7 @@ function Layout({ children, hasNewDm }) {
       <Sidebar />
       <div className={styles.mainArea}>
         <Header hasNewDm={hasNewDm} />
-        <main className={styles.content}>
+        <main className={`${styles.content} ${isFullBleed ? styles.fullBleed : ''}`}>
           {children}
         </main>
       </div>

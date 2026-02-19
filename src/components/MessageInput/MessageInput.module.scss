@@ -1,0 +1,113 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.inputArea {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border-default);
+  padding: $spacing-3 $spacing-4;
+  gap: $spacing-2;
+  flex-wrap: nowrap;
+  background: var(--bg-primary);
+}
+
+.inputArea input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: $spacing-2 $spacing-3;
+  font-size: $font-size-sm;
+  border: 1px solid var(--border-default);
+  border-radius: $radius-full;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  @include transition-colors;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary, $primary-500);
+    box-shadow: $shadow-focus;
+  }
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  color: var(--icons);
+  flex-shrink: 0;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icons-hover);
+  }
+}
+
+.sendButton {
+  background: var(--primary, $primary-500);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: $radius-full;
+  border: none;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  color: $white;
+  flex-shrink: 0;
+  @include transition-colors;
+
+  &:hover {
+    background: var(--primary-hover, $primary-600);
+  }
+}
+
+.imagePreviewWrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-md;
+  overflow: visible;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid var(--border-default);
+    border-radius: $radius-md;
+  }
+}
+
+.removePreviewButton {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: $error-500;
+  color: $white;
+  border: none;
+  border-radius: $radius-full;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  padding: 0;
+
+  &:hover {
+    background: $error-600;
+  }
+}

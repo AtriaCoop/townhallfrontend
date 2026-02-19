@@ -1,0 +1,103 @@
+@import '@/styles/mixins.scss';
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modalTitle {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.closeButton {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.textArea {
+  min-height: 120px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.textAreaError {
+  min-height: 120px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid red;
+  border-radius: 8px;
+  resize: vertical;
+
+  &:focus {
+    outline: {color: red};
+  }
+}
+
+.postButton {
+  background-color: #24873d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #1e6f35;
+  }
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.characterCount {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: #737373; 
+}
+
+.characterCountError {
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  color: red;
+}

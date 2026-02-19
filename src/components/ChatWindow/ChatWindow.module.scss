@@ -5,7 +5,7 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    min-height: 0; // Important for nested flex containers
+    min-height: 0;
     background: var(--bg-primary);
     border: none;
     overflow: hidden;
@@ -14,7 +14,7 @@
   :global(body.dark) .chatWindow {
     --header-bg: #444444;
   }
-  
+
   .header {
     display: flex;
     align-items: center;
@@ -58,188 +58,103 @@
       color: var(--icons-hover);
     }
 
-    // Show close button on mobile as a back button
     @media (max-width: 767px) {
       display: flex;
     }
   }
-  
+
   .messages {
     flex: 1;
     padding: 16px 20px;
     overflow-y: auto;
     background: var(--bg-secondary);
-    min-height: 0; // Important for flex overflow
-    overscroll-behavior: contain; // Prevent scroll chaining to parent
+    min-height: 0;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
-  
-  .messageIncoming {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    padding: 10px 14px;
-    margin-bottom: 8px;
-    border-radius: 18px 18px 18px 4px;
+
+  .messageIncoming,
+  .messageOutgoing {
+    width: fit-content;
     max-width: 70%;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+    margin-bottom: 2px;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 
     p {
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.5;
+      font-size: 1rem;
     }
 
     img {
-      width: 100%;
+      max-width: 280px;
       max-height: 300px;
       object-fit: contain;
       margin-top: 0.5rem;
       border-radius: 8px;
     }
+  }
+
+  .messageIncoming {
+    align-self: flex-start;
+    background: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   .messageOutgoing {
+    align-self: flex-end;
     background: var(--primary);
     color: white;
-    padding: 10px 14px;
-    margin-bottom: 8px;
-    border-radius: 18px 18px 4px 18px;
-    max-width: 70%;
-    margin-left: auto;
-
-    p {
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      margin-top: 0.5rem;
-      border-radius: 8px;
-    }
   }
-  
-  .inputArea {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid var(--border-default);
-    padding: 12px 20px;
-    gap: 10px;
-    flex-wrap: nowrap;
-    background: var(--bg-primary);
-  }
-
-  .inputArea input[type="text"] {
-    flex: 1;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    border: 1px solid var(--border-default);
-    border-radius: 20px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-  }
-
-  .inputArea button {
-    padding: 8px;
-  }
-
-  .iconButton {
-    background: none;
-    border: none;
-    font-size: 1.25rem;
-    cursor: pointer;
-    color: var(--icons);
-  
-    &:hover {
-      color: var(--icons-hover);
-    }
-  }
-
-  .sendButton {
-    background: var(--primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    border: none;
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: white;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background: var(--primary-hover);
-    }
-  }
-  
-.imagePreviewWrapper {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  overflow: visible;
-  flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-  }
-}
-
-.removePreviewButton {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-
-  &:hover {
-    background: #d9363e;
-  }
-}
 
 .messageContent {
   display: flex;
   align-items: center;
-  justify-content: space-between; // pushes text to left, button to right
+  gap: 4px;
 }
 
 .optionsButton {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  padding: 0 0.25rem;
+  font-size: 1.1rem;
+  padding: 2px 4px;
   color: inherit;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.messageIncoming:hover .optionsButton,
+.messageOutgoing:hover .optionsButton {
   opacity: 0.6;
-  margin-left: 8px;
 }
 
 .optionsButton:hover {
+  opacity: 1 !important;
+}
+
+.messageTimestamp {
+  font-size: 0.7rem;
+  color: var(--text-muted, #999);
+  margin-top: 2px;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.messageIncoming:hover .messageTimestamp,
+.messageOutgoing:hover .messageTimestamp {
   opacity: 1;
+}
+
+.messageOutgoing .messageTimestamp {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.7);
 }

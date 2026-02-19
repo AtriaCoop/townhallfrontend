@@ -13,7 +13,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [searchEvent, setSearchEvent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [showMyEvents, setShowMyEvents] = useState(true);
+  const [activeTab, setActiveTab] = useState("all");
   const [showCalendarView, setShowCalendarView] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -118,8 +118,9 @@ export default function EventsPage() {
     )
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const myEvents = filteredEvents.filter((event) => event.isEnrolled);
-  const allEvents = filteredEvents;
+  const displayedEvents = activeTab === "my"
+    ? filteredEvents.filter((event) => event.isEnrolled)
+    : filteredEvents;
 
   // Calendar helpers
   const getDaysInMonth = (date) => {
@@ -132,7 +133,9 @@ export default function EventsPage() {
 
   const getEventsForDate = (date) => {
     const dateString = date.toISOString().split("T")[0];
-    return events.filter((event) => event.date === dateString);
+    return events.filter(
+      (event) => event.date === dateString && (event.isEnrolled || event.admin?.id === currentUserId)
+    );
   };
 
   const navigateMonth = (direction) => {
@@ -330,6 +333,9 @@ export default function EventsPage() {
                 {badge.label}
               </span>
             )}
+            {event.isEnrolled && (
+              <span className={styles.enrolledBadge}>Enrolled</span>
+            )}
           </div>
           <div className={styles.eventMeta}>
             <span className={styles.eventTime}>
@@ -474,20 +480,24 @@ export default function EventsPage() {
           )}
         </div>
         <div className={styles.headerControls}>
-          <label className={styles.toggleLabel}>
-            <span>My upcoming events</span>
-            <div className={styles.toggleWrapper}>
-              <input
-                type="checkbox"
-                checked={showMyEvents}
-                onChange={(e) => setShowMyEvents(e.target.checked)}
-                className={styles.toggleInput}
-              />
-              <div className={styles.toggleTrack}>
-                <div className={styles.toggleThumb} />
-              </div>
-            </div>
-          </label>
+          <div className={styles.tabBar} role="tablist" aria-label="Event filter">
+            <button
+              role="tab"
+              aria-selected={activeTab === "all"}
+              className={`${styles.tabButton} ${activeTab === "all" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("all")}
+            >
+              All Events
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === "my"}
+              className={`${styles.tabButton} ${activeTab === "my" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("my")}
+            >
+              My Events
+            </button>
+          </div>
           <label className={styles.toggleLabel}>
             <span>Calendar View</span>
             <div className={styles.toggleWrapper}>
@@ -512,16 +522,6 @@ export default function EventsPage() {
         </div>
       ) : (
         <>
-          {/* My Upcoming Events */}
-          {showMyEvents && myEvents.length > 0 && (
-            <section className={styles.eventsSection}>
-              <h2 className={styles.sectionTitle}>My upcoming Events</h2>
-              <div className={styles.eventsGrid}>
-                {myEvents.map((event) => renderEventCard(event))}
-              </div>
-            </section>
-          )}
-
           {/* Calendar View */}
           {showCalendarView && (
             <section className={styles.eventsSection}>
@@ -529,10 +529,12 @@ export default function EventsPage() {
             </section>
           )}
 
-          {/* All Upcoming Events */}
+          {/* Events List */}
           <section className={styles.eventsSection}>
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>All upcoming</h2>
+              <h2 className={styles.sectionTitle}>
+                {activeTab === "my" ? "My Events" : "All Events"}
+              </h2>
               <div className={styles.searchWrapper}>
                 <Icon name="search" size={18} className={styles.searchIcon} />
                 <input
@@ -545,8 +547,8 @@ export default function EventsPage() {
               </div>
             </div>
             <div className={styles.eventsGrid}>
-              {allEvents.length > 0 ? (
-                allEvents.map((event) => renderEventCard(event))
+              {displayedEvents.length > 0 ? (
+                displayedEvents.map((event) => renderEventCard(event))
               ) : (
                 <div className={styles.emptyState}>
                   <Icon name="calendar" size={48} />
@@ -554,6 +556,8 @@ export default function EventsPage() {
                   <p>
                     {searchEvent
                       ? "Try adjusting your search terms."
+                      : activeTab === "my"
+                      ? "You haven't enrolled in any events yet."
                       : "Check back later for upcoming events."}
                   </p>
                 </div>

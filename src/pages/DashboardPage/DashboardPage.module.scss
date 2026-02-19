@@ -431,6 +431,29 @@
   }
 }
 
+// Privacy Footer
+.privacyFooter {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-6 $spacing-4;
+  margin-top: $spacing-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.privacyLink {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: $font-size-sm;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: $spacing-2;
+  @include transition-colors;
+
+  &:hover {
+    color: var(--primary-hover);
+  }
+}
 // Community Members
 .memberCount {
   display: flex;
