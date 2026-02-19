@@ -1,8 +1,10 @@
 import styles from './JoinGroupModal.module.scss';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import Icon from '@/icons/Icon';
+import { formatGroupName } from '@/utils/formatGroupName';
 
 export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
-  const [text, setText] = useState('');
+  const [searchText, setSearchText] = useState('');
 
   const groups = [
     { name: "atria-questions-and-support" },
@@ -13,38 +15,50 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
     { name: "wg-food-as-a-human-right" },
     { name: "wg-food-justice-as-a-public-health-priority" },
     { name: "wg-sustainable-resourcing-for-community-food-systems" },
-  ];  
+  ];
 
   const filteredGroups = groups.filter(group =>
-    group.name.toLowerCase().includes(text.toLowerCase())
+    formatGroupName(group.name).toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
-        <h1>{title}</h1>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2>{title}</h2>
+          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+            <Icon name="close" size={20} />
+          </button>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Search For A Group"
-          className={styles.textInput}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        <div className={styles.searchWrapper}>
+          <Icon name="search" size={16} className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search groups..."
+            className={styles.searchInput}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
 
-        <div className={styles.userList}>
-          {filteredGroups.map((group, idx) => (
-            <div
-              key={idx}
-              className={styles.userItem}
-              onClick={() => onJoinGroup(group.name)}
-            >
-              <div className={styles.userInfo}>
-                <h3>{group.name}</h3>
+        <div className={styles.groupList}>
+          {filteredGroups.length > 0 ? (
+            filteredGroups.map((group, idx) => (
+              <div
+                key={idx}
+                className={styles.groupItem}
+                onClick={() => onJoinGroup(group.name)}
+              >
+                <div className={styles.groupIcon}>
+                  <Icon name="groupChats" size={18} />
+                </div>
+                <span className={styles.groupName}>{formatGroupName(group.name)}</span>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className={styles.noResults}>No groups found matching your search.</p>
+          )}
         </div>
       </div>
     </div>
