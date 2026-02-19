@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { formatDistance } from 'date-fns';
 import Icon from '@/icons/Icon';
-import Tag from '@/components/Tag/Tag';
 import { createPost } from '@/api/post';
 import EmojiPickerButton from '@/components/EmojiPickerButton/EmojiPickerButton';
 import styles from './PostModal.module.scss';
+import TagCreationField from '@/components/TagCreationField/TagCreationField';
 
 export default function Modal({
   title,
@@ -25,7 +25,6 @@ export default function Modal({
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
   const MAX_POST_LEN = 250;
-  const MAX_TAGS = 5;
 
   const postImageRef = useRef(null);
 
@@ -38,30 +37,6 @@ export default function Modal({
     } else {
       alert("Please upload valid image files.");
     }
-  };
-
-  const handleTagAdd = () => {
-    if (!tag.trim()) return;
-    if (tags.length >= MAX_TAGS) {
-      setTagErrorText("Can't add more than 5 tags.");
-      return;
-    };
-
-    const exists = tags.some(
-      (t) => t.toLowerCase() === tag.toLowerCase()
-    );
-    if (exists) {
-      setTagErrorText("Can't add duplicate tag.");
-      return;
-    };
-
-    setTags((prev) => [...prev, tag]);
-    setTag("");
-    setTagErrorText("");
-  }
-
-  const removeTag = (idx) => {
-    setTags((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleSubmit = async () => {
@@ -167,22 +142,14 @@ export default function Modal({
 
           {error && <p className={styles.errorMessage}>{error}</p>}
 
-          {/* Tag Creation */}
-          <div className={styles.createTags}>
-            <div className={styles.tagList}>
-              {tags.map((tag, index) => (
-                <Tag key={index} name={tag} onRemove={() => removeTag(index)} />
-              ))}
-            </div>
-
-            <input value={tag} onChange={(e) => setTag(e.target.value)} />
-            <button onClick={handleTagAdd}>ADD</button>
-            <div>
-              {tags.length >= MAX_TAGS && (
-                <span className={styles.tagWarning}>Reached max limit of tags</span>
-              )}
-            </div>
-          </div>
+          <TagCreationField
+            tag={tag}
+            setTag={setTag}
+            tags={tags}
+            setTags={setTags}
+            tagErrorText={tagErrorText}
+            setTagErrorText={setTagErrorText}
+          />
         </div>
 
         <div className={styles.modalFooter}>
