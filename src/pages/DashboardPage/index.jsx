@@ -10,6 +10,7 @@ import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
+import SortBy from "@/components/SortBy/SortBy";
 import styles from "./DashboardPage.module.scss";
 // Add import at the top
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
@@ -212,6 +213,39 @@ export default function DashboardPage() {
     setIsComposing(false);
   };
 
+  const handleSort = (sortValue) => {
+    let tempArray = [...posts];
+
+    switch (sortValue) {
+      case "newest":
+        tempArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        break;
+      case "oldest":
+        tempArray.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        break;
+      case "most_reactions":
+        tempArray.sort((a, b) => totalReactions(b) - totalReactions(a));
+        break;
+      case "least_reactions":
+        tempArray.sort((a, b) => totalReactions(a) - totalReactions(b));
+        break;
+      case "most_comments":
+        tempArray.sort((a, b) => b.comments.length - a.comments.length);
+        break;
+      case "least_comments":
+        tempArray.sort((a, b) => a.comments.length - b.comments.length);
+    }
+    setPosts(tempArray);
+  }
+
+  function totalReactions(post) {
+    const reactions = post.reactions;
+    return Object.values(reactions).reduce(
+      (sum, reaction) => sum + (Array.isArray(reaction) ? reaction.length : 0),
+      0
+    );
+  }
+
   return (
     <div className={styles.dashboard}>
       {/* Main Feed Section */}
@@ -307,6 +341,8 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        <SortBy onSelect={handleSort}></SortBy>
 
         {/* Posts Feed */}
         {loading ? (
