@@ -352,22 +352,20 @@ export default function GroupChatsPage() {
                   if (msg.sender === "You") {
                     return (
                       <div key={msg.id} className={styles.messageOutgoing}>
-                        <div className={styles.outgoingBubble}>
-                          <div className={styles.outgoingContent}>
-                            {linkedText}
-                            <button
-                              className={styles.optionsButton}
-                              onClick={() => handleMessageOptionsClick(msg)}
-                            >
-                              &#x22EF;
-                            </button>
-                          </div>
+                        <div className={styles.messageContent}>
+                          {linkedText}
                           {msg.image && (
                             <img src={msg.image} alt="attachment" className={styles.chatImage} />
                           )}
+                          <button
+                            className={styles.optionsButton}
+                            onClick={() => handleMessageOptionsClick(msg)}
+                          >
+                            &#x22EF;
+                          </button>
                         </div>
                         {msg.timestamp && (
-                          <span className={styles.outgoingTimestamp} title={formatExactTime(msg.timestamp)}>
+                          <span className={styles.messageTimestamp} title={formatExactTime(msg.timestamp)}>
                             {formatRelativeTime(msg.timestamp)}
                           </span>
                         )}
