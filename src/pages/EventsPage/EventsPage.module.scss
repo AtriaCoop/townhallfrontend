@@ -47,6 +47,43 @@
   gap: $spacing-4;
 }
 
+// Tab Bar (pill-style)
+.tabBar {
+  display: flex;
+  background-color: var(--bg-secondary);
+  border-radius: $radius-full;
+  padding: 3px;
+  gap: 2px;
+}
+
+.tabButton {
+  @include button-base;
+  height: $button-height-sm;
+  padding: 0 $spacing-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-full;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: none;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+  }
+}
+
+.tabButtonActive {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: $shadow-sm;
+
+  &:hover:not(:disabled) {
+    background-color: var(--card-bg);
+  }
+}
+
 // Toggle Switch
 .toggleLabel {
   display: flex;
@@ -165,7 +202,7 @@
   padding: $spacing-4;
   background-color: var(--card-bg);
   border: 1px solid var(--border-default);
-  border-radius: $radius-lg;
+  border-radius: $radius-xl;
   cursor: pointer;
   @include transition-all;
 
@@ -190,7 +227,7 @@
   height: 56px;
   min-width: 56px;
   background-color: var(--primary);
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   color: $white;
   flex-shrink: 0;
 
@@ -700,6 +737,20 @@
 .dateBadge_past {
   background-color: $neutral-100;
   color: $neutral-500;
+}
+
+// Enrolled badge
+.enrolledBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $spacing-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background-color: $secondary-100;
+  color: $secondary-700;
 }
 
 // Participant count in meta

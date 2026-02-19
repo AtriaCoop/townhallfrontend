@@ -1,38 +1,32 @@
-import Navigation from "@/components/Navigation/Navigation";
 import styles from "@/pages/GroupChatsPage/GroupChatsPage.module.scss";
 import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal";
-import { useState, useEffect, useRef } from "react";
+import MessageModal from "@/components/MessageModal/MessageModal";
+import UpdateMessageModal from "@/components/UpdateMessageModal/UpdateMessageModal";
+import MessageInput from "@/components/MessageInput/MessageInput";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { BASE_URL } from "@/constants/api";
+import { formatGroupName } from "@/utils/formatGroupName";
+import { formatRelativeTime, formatExactTime } from "@/utils/formateDatetime";
 
 export default function GroupChatsPage() {
-  const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
-
   const socketRef = useRef(null);
-  const messagesEndRef = useRef(null);
-  const postImageRef = useRef(null);
+  const messageContainerRef = useRef(null);
 
   const [showModal, setShowModal] = useState(false);
   const [joinedGroups, setJoinedGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState("");
-  const [inputText, setInputText] = useState("");
   const [groupMessages, setGroupMessages] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
   const [searchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // DISABLE GLOBAL SCROLL JUST FOR THIS PAGE
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -51,11 +45,12 @@ export default function GroupChatsPage() {
       const data = await res.json();
 
       const formatted = data.messages.map((msg) => ({
-        id: uuidv4(),
+        id: msg.id,
+        sender_id: msg.sender,
         avatar: msg.profile_image || "/assets/ProfileImage.jpg",
         sender: msg.sender === currentUserId ? "You" : msg.full_name,
         organization: msg.organization || "",
-        timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+        timestamp: msg.timestamp,
         message: msg.content,
         image: msg.image || null,
       }));
@@ -74,15 +69,16 @@ export default function GroupChatsPage() {
 
     socketRef.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      console.log("Incoming WebSocket data:", data);
+      // Skip own messages — already added optimistically in handleSendMessage
+      if (data.sender_id === currentUserId) return;
 
       const newMsg = {
-        id: uuidv4(),
+        id: data.id || uuidv4(),
         sender_id: data.sender_id,
         avatar: data.profile_image || "/assets/ProfileImage.jpg",
-        sender: data.sender_id === currentUserId ? "You" : data.full_name,
+        sender: data.full_name,
         organization: data.organization || "Atria",
-        timestamp: "just now",
+        timestamp: new Date().toISOString(),
         message: data.message,
       };
 
@@ -141,21 +137,26 @@ export default function GroupChatsPage() {
   const handleLeaveGroup = () => {
     if (!activeGroup) return;
 
-    // Filter out the group we're leaving
     const updatedGroups = joinedGroups.filter((group) => group !== activeGroup);
     setJoinedGroups(updatedGroups);
-
-    // Clear the active group
-    setActiveGroup("");
-
-    // Update localStorage directly (optional: redundant due to useEffect)
+    setActiveGroup(updatedGroups[0] || "");
     localStorage.setItem("joinedGroups", JSON.stringify(updatedGroups));
-    localStorage.removeItem("activeGroup");
+    if (updatedGroups.length === 0) localStorage.removeItem("activeGroup");
   };
 
-  const [selectedImage, setSelectedImage] = useState(null);
+  // Derive unique participants from fetched messages
+  const activeParticipants = useMemo(() => {
+    const msgs = groupMessages[activeGroup] || [];
+    const seen = new Map();
+    msgs.forEach((msg) => {
+      if (msg.sender_id && msg.sender !== "You") {
+        seen.set(msg.sender_id, { name: msg.sender, avatar: msg.avatar });
+      }
+    });
+    return Array.from(seen.values());
+  }, [groupMessages, activeGroup]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (inputText, selectedImage) => {
     if (!inputText.trim() && !selectedImage) return;
 
     const formData = new FormData();
@@ -174,13 +175,13 @@ export default function GroupChatsPage() {
     const data = await res.json();
     if (data?.data) {
       const newMsg = {
-        id: uuidv4(),
+        id: data.data.id,
         sender_id: data.data.sender,
         avatar: data.data.profile_image || "/assets/ProfileImage.jpg",
         sender:
           data.data.sender === currentUserId ? "You" : data.data.full_name,
         organization: data.data.organization || "Atria",
-        timestamp: "just now",
+        timestamp: new Date().toISOString(),
         message: data.data.content,
         image: data.data.image,
       };
@@ -190,24 +191,84 @@ export default function GroupChatsPage() {
         updated[activeGroup] = [...(updated[activeGroup] || []), newMsg];
         return updated;
       });
-    }
 
-    setInputText("");
-    setSelectedImage(null);
+      // Broadcast via WebSocket so other users see the message in real-time
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.send(
+          JSON.stringify({
+            message: data.data.content,
+            sender: data.data.sender,
+          })
+        );
+      }
+    }
+  };
+
+  const handleMessageOptionsClick = (msg) => {
+    setSelectedMessage(msg);
+    setShowMessageModal(true);
+  };
+
+  const handleEditClick = () => {
+    setShowMessageModal(false);
+    setShowUpdateModal(true);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!selectedMessage) return;
+    try {
+      const res = await authenticatedFetch(
+        `${BASE_URL}/groups/messages/${selectedMessage.id}/`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setGroupMessages((prev) => {
+          const updated = { ...prev };
+          updated[activeGroup] = (updated[activeGroup] || []).filter(
+            (m) => m.id !== selectedMessage.id
+          );
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+    setShowMessageModal(false);
+    setSelectedMessage(null);
+  };
+
+  const handleUpdateMessage = (msgId, newText) => {
+    setGroupMessages((prev) => {
+      const updated = { ...prev };
+      updated[activeGroup] = (updated[activeGroup] || []).map((m) =>
+        m.id === msgId ? { ...m, message: newText } : m
+      );
+      return updated;
+    });
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messageContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [groupMessages, activeGroup]);
 
   return (
     <div className={styles.container}>
       {/* Group Chats Sidebar */}
       <div className={styles.groupChatsSidebar}>
-        <h2>Group Chats</h2>
-        <button className={styles.joinButton} onClick={handleChatClick}>
-          + JOIN A GROUP
-        </button>
+        <div className={styles.sidebarHeader}>
+          <h2>Group Chats</h2>
+          <button
+            className={styles.joinButton}
+            onClick={handleChatClick}
+            aria-label="Join a group"
+          >
+            <Icon name="plus" size={20} />
+          </button>
+        </div>
 
         <div className={styles.chatList}>
           {joinedGroups.length === 0 ? (
@@ -219,7 +280,7 @@ export default function GroupChatsPage() {
                 className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ''}`}
                 onClick={() => setActiveGroup(group)}
               >
-                {group}
+                {formatGroupName(group)}
               </button>
             ))
           )}
@@ -227,36 +288,126 @@ export default function GroupChatsPage() {
       </div>
 
       <div className={styles.chatWrapper}>
-        {/* Chat Header */}
-        <div className={styles.chatHeader}>
-          <h2 className={styles.chatTitle}>{activeGroup}</h2>
-          <div className={styles.chatIcons}>
-            {searchMode && (
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search messages..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    setSearchMode(false);
-                    setSearchQuery("");
+        {activeGroup ? (
+          <>
+            {/* Chat Header */}
+            <div className={styles.chatHeader}>
+              <div className={styles.headerLeft}>
+                <h2 className={styles.chatTitle}>{formatGroupName(activeGroup)}</h2>
+                {activeParticipants.length > 0 && (
+                  <span className={styles.memberCount}>
+                    {activeParticipants.length + 1} participants
+                  </span>
+                )}
+              </div>
+              <div className={styles.chatIcons}>
+                {searchMode && (
+                  <input
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="Search messages..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        setSearchMode(false);
+                        setSearchQuery("");
+                      }
+                    }}
+                  />
+                )}
+                <button
+                  className={styles.iconButton}
+                  onClick={() => setSearchMode((prev) => !prev)}
+                >
+                  <Icon name="search" />
+                </button>
+                <button className={styles.iconButton} onClick={handleLeaveGroup}>
+                  <Icon name="leave" />
+                </button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div ref={messageContainerRef} className={styles.messageContainer}>
+              {(groupMessages[activeGroup] || [])
+                .filter((msg) =>
+                  msg.message.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((msg) => {
+                  const linkedText = (
+                    <p>
+                      {msg.message.split(/(\s+)/).map((part, i) =>
+                        /^https?:\/\/\S+$/.test(part) ? (
+                          <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                            {part}
+                          </a>
+                        ) : (
+                          part
+                        )
+                      )}
+                    </p>
+                  );
+
+                  if (msg.sender === "You") {
+                    return (
+                      <div key={msg.id} className={styles.messageOutgoing}>
+                        <div className={styles.messageContent}>
+                          {linkedText}
+                          {msg.image && (
+                            <img src={msg.image} alt="attachment" className={styles.chatImage} />
+                          )}
+                          <button
+                            className={styles.optionsButton}
+                            onClick={() => handleMessageOptionsClick(msg)}
+                          >
+                            &#x22EF;
+                          </button>
+                        </div>
+                        {msg.timestamp && (
+                          <span className={styles.messageTimestamp} title={formatExactTime(msg.timestamp)}>
+                            {formatRelativeTime(msg.timestamp)}
+                          </span>
+                        )}
+                      </div>
+                    );
                   }
-                }}
-              />
-            )}
-            <button
-              className={styles.iconButton}
-              onClick={() => setSearchMode((prev) => !prev)}
-            >
-              <Icon name="search" />
-            </button>
-            <button className={styles.iconButton} onClick={handleLeaveGroup}>
-              <Icon name="leave" />
-            </button>
+
+                  return (
+                    <div key={msg.id} className={styles.messageIncoming}>
+                      <MessageBubble
+                        avatar={msg.avatar}
+                        sender={msg.sender}
+                        organization={msg.organization}
+                        timestamp={msg.timestamp}
+                        message={
+                          <div>
+                            {linkedText}
+                            {msg.image && (
+                              <img src={msg.image} alt="attachment" className={styles.chatImage} />
+                            )}
+                          </div>
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              <div />
+            </div>
+
+            {/* Chat Input */}
+            <MessageInput
+              onSend={handleSendMessage}
+              placeholder="Type your message..."
+            />
+          </>
+        ) : (
+          <div className={styles.noChatSelected}>
+            <Icon name="message" size={64} />
+            <h2>Join a Group Chat</h2>
+            <p>Select a group from the sidebar or join a new one to start chatting.</p>
           </div>
-        </div>
+        )}
 
         {showModal && (
           <JoinGroupModal
@@ -266,113 +417,28 @@ export default function GroupChatsPage() {
           />
         )}
 
-        {/* Message Bubble */}
-        <div className={styles.messageContainer}>
-          {(groupMessages[activeGroup] || [])
-            .filter((msg) =>
-              msg.message.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((msg) => (
-              <div
-                key={msg.id}
-                className={
-                  msg.sender === "You"
-                    ? styles.messageOutgoing
-                    : styles.messageIncoming
-                }
-              >
-                <MessageBubble
-                  avatar={msg.avatar}
-                  sender={msg.sender}
-                  organization={msg.organization}
-                  timestamp={msg.timestamp}
-                  message={
-                    <div>
-                      {/* Text with hyperlinking */}
-                      <p>
-                        {msg.message.split(/(\s+)/).map((part, i) =>
-                          /^https?:\/\/\S+$/.test(part) ? (
-                            <a
-                              key={i}
-                              href={part}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {part}
-                            </a>
-                          ) : (
-                            part
-                          )
-                        )}
-                      </p>
-
-                      {/* Conditionally show image */}
-                      {msg.image && (
-                        <img
-                          src={msg.image}
-                          alt="attachment"
-                          className={styles.chatImage}
-                        />
-                      )}
-                    </div>
-                  }
-                />
-              </div>
-            ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Chat Input */}
-        <div className={styles.chatInputContainer}>
-          <EmojiPickerButton
-            onSelect={(emoji) => setInputText((prev) => prev + emoji)}
-          />
-          <button
-            className={styles.iconButton}
-            onClick={() => postImageRef.current.click()}
-          >
-            <Icon name="image" />
-          </button>
-          <input
-            type="file"
-            accept="image/*"
-            ref={postImageRef}
-            hidden
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) setSelectedImage(file);
+        {showMessageModal && (
+          <MessageModal
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+            onClose={() => {
+              setShowMessageModal(false);
+              setSelectedMessage(null);
             }}
           />
+        )}
 
-          {selectedImage && (
-            <div className={styles.imagePreviewWrapper}>
-              <img
-                src={URL.createObjectURL(selectedImage)}
-                alt="preview"
-                className={styles.previewImage}
-              />
-              <button
-                className={styles.removePreviewButton}
-                onClick={() => setSelectedImage(null)}
-                type="button"
-              >
-                ×
-              </button>
-            </div>
-          )}
-
-          <input
-            type="text"
-            className={styles.chatInput}
-            placeholder="Enter message"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+        {showUpdateModal && selectedMessage && (
+          <UpdateMessageModal
+            msg={{ id: selectedMessage.id, text: selectedMessage.message }}
+            onCancel={() => {
+              setShowUpdateModal(false);
+              setSelectedMessage(null);
+            }}
+            onUpdate={handleUpdateMessage}
+            apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
           />
-          <button className={styles.sendButton} onClick={handleSendMessage}>
-            <Icon name="send" />
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
