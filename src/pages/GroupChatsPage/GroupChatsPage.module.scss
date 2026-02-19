@@ -2,91 +2,48 @@
 @use '@/styles/mixins' as *;
 
 .container {
-  @include tablet {
-    margin-left: calc(#{$sidebar-width-collapsed} + 240px);
-  }
-
-  @include laptop {
-    margin-left: calc(#{$sidebar-width-expanded} + 240px);
-  }
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bg-primary);
+  overflow: hidden;
 }
 
 .chatWrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
+  background-color: var(--bg-secondary);
 }
 
 .chatHeader {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eaeaea;
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
-  margin-left: 2px;
-  gap: 16px;
-  padding: 1rem;
+  @include flex-between;
+  border-bottom: 1px solid var(--border-default);
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background: var(--bg-primary);
+  flex-shrink: 0;
 }
 
 .chatTitle {
-  font-size: 1.1rem;
+  margin: 0;
+  @include heading-4;
 }
 
 .chatIcons {
   display: flex;
-  gap: 16px;
-}
-
-.search, .exit {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
+  gap: $spacing-4;
+  align-items: center;
 }
 
 .searchInput {
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  @include input-base;
+  padding: $spacing-1 $spacing-2;
   max-width: 200px;
-  margin-right: 8px;
-}
-
-// Chat Input
-.chatInputContainer {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  padding: $spacing-4;
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-default);
-  z-index: 9;
-  gap: $spacing-3;
-  flex-wrap: wrap;
-
-  @include tablet {
-    margin-left: calc(#{$sidebar-width-collapsed} + 240px);
-  }
-
-  @include laptop {
-    margin-left: calc(#{$sidebar-width-expanded} + 240px);
-  }
-}
-
-.chatInput {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
+  font-size: $font-size-sm;
 }
 
 .iconButton {
@@ -101,167 +58,221 @@
   }
 }
 
-.imagePreviewWrapper {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  margin-right: 1rem;
-
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid #ccc;
-  }
-}
-
-.removePreviewButton {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-  padding: 0;
-
-  &:hover {
-    background: #d9363e;
-  }
-}
-
-.sendButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--icons);
-  img {
-    width: 20px;
-  }
-  &:hover {
-    color: var(--icons-bg);
-  }
-}
-
-// Group Chats Sidebar
-
-.groupsSvg {
-  @include tablet {
-      display: none;
-  }
-}
-
-.groupChatsSidebar {
-  display: none;
-
-  @include tablet {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    left: $sidebar-width-collapsed;
-    height: 100vh;
-    background-color: var(--bg-secondary);
-    border-right: 1px solid var(--border-default);
-    padding: $spacing-5 $spacing-4;
-    z-index: 10;
-    width: 240px;
-    overflow-y: auto;
-    @include custom-scrollbar;
-  }
-
-  @include laptop {
-    left: $sidebar-width-expanded;
-  }
-
-  h2 {
-    @include heading-5;
-    margin-bottom: $spacing-4;
-  }
-}
-  
-.joinButton {
-  @include button-primary;
-  @include button-md;
-  width: 100%;
-  margin-bottom: $spacing-4;
-}
-  
-.chatList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-  
-.chatItem {
-  background-color: var(--card-bg);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  border-radius: $radius-md;
-  padding: $spacing-3;
-  text-align: left;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  @include transition-colors;
-
-  &:hover {
-    background-color: var(--bg-hover);
-    border-color: var(--primary);
-  }
-}
-
-.chatItemActive {
-  background-color: var(--primary);
-  color: $white;
-  border-color: var(--primary);
-  font-weight: $font-weight-semibold;
-
-  &:hover {
-    background-color: var(--primary);
-    border-color: var(--primary);
-  }
-}
-
 .chatImage {
   width: 100%;
+  max-width: 400px;
+  border-radius: $radius-md;
+  margin-top: $spacing-2;
 }
 
 .messageContainer {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: $spacing-4;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 5rem;
+  gap: $spacing-2;
+  background: var(--bg-secondary);
+  min-height: 0;
+  overscroll-behavior: contain;
+  @include custom-scrollbar;
 }
 
 .messageOutgoing,
 .messageIncoming {
-  max-width: 50%;
+  max-width: 70%;
+  width: fit-content;
   word-wrap: break-word;
   word-break: break-word;
 }
 
 .messageOutgoing {
   align-self: flex-end;
-  text-align: right;
 }
 
 .messageIncoming {
   align-self: flex-start;
-  text-align: left;
 }
 
+.outgoingBubble {
+  background: var(--primary);
+  color: $white;
+  padding: 0.5rem 0.875rem;
+  border-radius: 18px 18px 4px 18px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: $white;
+    text-decoration: underline;
+  }
+}
+
+.outgoingTimestamp {
+  display: block;
+  text-align: right;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.messageOutgoing:hover .outgoingTimestamp {
+  opacity: 1;
+}
+
+.outgoingContent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.optionsButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 4px;
+  color: inherit;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.messageOutgoing:hover .optionsButton {
+  opacity: 0.6;
+}
+
+.optionsButton:hover {
+  opacity: 1 !important;
+}
+
+// Group Chats Sidebar — flex child, not fixed
+
+.groupChatsSidebar {
+  display: none;
+
+  @include md {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    min-width: 320px;
+    background-color: var(--card-bg);
+    border-right: 1px solid var(--border-default);
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.sidebarHeader {
+  @include flex-between;
+  padding: $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+
+  h2 {
+    margin: 0;
+    @include heading-4;
+  }
+}
+
+.joinButton {
+  @include button-primary;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.chatList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  @include custom-scrollbar;
+}
+
+.chatItem {
+  background: none;
+  color: var(--text-primary);
+  border: none;
+  padding: $spacing-3 $spacing-4;
+  text-align: left;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  width: 100%;
+  line-height: 1.4;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+}
+
+.chatItemActive {
+  background-color: var(--sidebar-item-active);
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background-color: var(--sidebar-item-active);
+  }
+}
+
+.noChats {
+  color: var(--text-muted);
+  @include body-2;
+  text-align: center;
+  padding: $spacing-4;
+}
+
+// Member count in header
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.memberCount {
+  @include caption;
+  color: var(--text-muted);
+}
+
+// Empty state when no group selected
+
+.noChatSelected {
+  @include flex-column-center;
+  flex: 1;
+  gap: $spacing-4;
+  padding: $spacing-8;
+  text-align: center;
+  color: var(--text-muted);
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.3;
+  }
+
+  h2 {
+    color: var(--text-secondary);
+    margin: 0;
+    @include heading-4;
+  }
+
+  p {
+    margin: 0;
+    max-width: 400px;
+    @include body-1;
+  }
+}

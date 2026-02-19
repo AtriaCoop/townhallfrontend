@@ -3,11 +3,10 @@
 
 .messagesPage {
   display: flex;
-  height: calc(100vh - $header-height - $spacing-8);
+  flex: 1;
+  min-height: 0;
   background-color: var(--bg-primary);
-  border-radius: $radius-lg;
   overflow: hidden;
-  border: 1px solid var(--border-default);
 }
 
 // Conversations List Panel
@@ -151,6 +150,30 @@
   height: 10px;
   background-color: var(--primary);
   border-radius: $radius-full;
+}
+
+.removeChatButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  align-self: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: $error-500;
+  }
+}
+
+.chatItem:hover .removeChatButton {
+  opacity: 1;
 }
 
 // Empty State

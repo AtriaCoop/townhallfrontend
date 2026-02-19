@@ -67,10 +67,11 @@ export default function DashboardPage() {
 
     async function loadEvents() {
       try {
+        const user = getStoredUser();
         const events = await fetchAllEvents();
         const today = new Date().toISOString().split("T")[0];
         const upcoming = events
-          .filter((e) => e.date >= today)
+          .filter((e) => e.date >= today && (e.isEnrolled || e.admin?.id === user?.id))
           .sort((a, b) => new Date(a.date) - new Date(b.date))
           .slice(0, 5);
         setUpcomingEvents(upcoming);
@@ -384,7 +385,7 @@ export default function DashboardPage() {
       <aside className={styles.sidebar}>
         {/* Upcoming Events Widget */}
         <div className={styles.widget}>
-          <h2 className={styles.widgetTitle}>Upcoming Events</h2>
+          <h2 className={styles.widgetTitle}>My Upcoming Events</h2>
           {upcomingEvents.length > 0 ? (
             <div className={styles.eventsList}>
               {upcomingEvents.map(event => {

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { authenticatedFetch } from "@/utils/authHelpers";
-import ChatCard from "@/components/ChatCard/ChatCard";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";
 import Icon from "@/icons/Icon";
@@ -13,7 +12,6 @@ export default function DirectMessagesPage({
   setUnreadMap,
 }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
-  const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || "ws://127.0.0.1:8000";
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
 
   const [csrfToken, setCsrfToken] = useState(null);
@@ -211,6 +209,16 @@ export default function DirectMessagesPage({
                 {unreadMap[chat.id] > 0 && (
                   <span className={styles.unreadBadge} />
                 )}
+                <button
+                  className={styles.removeChatButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteChat(chat.id);
+                  }}
+                  aria-label="Remove conversation"
+                >
+                  <Icon name="close" size={14} />
+                </button>
               </div>
             ))
           ) : (
