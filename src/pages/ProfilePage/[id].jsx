@@ -77,7 +77,6 @@ export default function ProfilePage({ hasNewDm = false }) {
           {toast.message}
         </div>
       )}
-
       {/* Cover Image Section */}
       <div className={styles.coverSection}>
         <div className={styles.coverImage}>
@@ -123,7 +122,12 @@ export default function ProfilePage({ hasNewDm = false }) {
 
         {/* Name and Edit Button */}
         <div className={styles.profileHeader}>
-          <h1 className={styles.name}>{profileData.full_name}</h1>
+          <div className={styles.nameRow}>
+            <h1 className={styles.name}>{profileData.full_name}</h1>
+            {profileData.pronouns && (
+              <div className={styles.pronouns}>{profileData.pronouns}</div>
+            )}
+          </div>
           {isCurrentUser && (
             <button
               onClick={() => router.push("/EditProfilePage")}
@@ -134,7 +138,6 @@ export default function ProfilePage({ hasNewDm = false }) {
           )}
         </div>
       </div>
-
       {/* Content Cards */}
       <div className={styles.contentGrid}>
         {/* Basic Information Card */}
@@ -149,12 +152,6 @@ export default function ProfilePage({ hasNewDm = false }) {
               <span className={styles.infoLabel}>Email:</span>
               <span className={styles.infoValue}>{profileData.email}</span>
             </div>
-            {profileData.title && (
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Title:</span>
-                <span className={styles.infoValue}>{profileData.title}</span>
-              </div>
-            )}
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>
