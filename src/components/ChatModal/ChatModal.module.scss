@@ -4,141 +4,128 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  background-color: rgba($black, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
 }
 
 .modalContent {
-  background: var(--modal-bg);
-  border: 2px solid #f9b233;
-  padding: 2rem 1.25rem;
-  border-radius: 12px;
-  width: 325px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  h1 {
-    text-align: center;
-  }
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-5 $spacing-5 $spacing-2;
 
-  @include tablet {
-    width: 525px;
+  h2 {
+    margin: 0;
+    @include heading-4;
   }
 }
 
 .closeButton {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  font-size: 3rem;
-  font-weight: 100; 
-  color: #666;
-  cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 1001;
-
-  &:hover {
-    color: #424242;
-  }
-}
-
-.textInput {
-  width: 80%;
-  height: 20px;
-  margin: 0 auto 1rem;
-  padding: 8px 16px;
-  border: 0.5px solid #ccc;
-  border-radius: 20px;
-  color: #424242;
-  font-size: 16px;
-  display: block;
-}
-
-.errorMessage {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-
-.modalButton {
-  margin-top: 1rem;
-}
-
-.postButton {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background-color: #24873d;
-  color: white;
+  width: 32px;
+  height: 32px;
+  background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: $radius-md;
   cursor: pointer;
+  color: var(--text-muted);
+  @include transition-colors;
 
   &:hover {
-    background-color: rgb(30, 100, 50);
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
   }
 }
 
-.instructionText {
-  text-align: center;
-  color: #666;
-  margin: -1rem 0 1rem;
+.subtitle {
+  padding: 0 $spacing-5;
+  margin: 0 0 $spacing-4;
+  color: var(--text-muted);
+  @include body-2;
+}
+
+.searchWrapper {
+  position: relative;
+  padding: 0 $spacing-5;
+  margin-bottom: $spacing-3;
+}
+
+.searchIcon {
+  position: absolute;
+  left: calc(#{$spacing-5} + #{$spacing-3});
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  @include input-base;
+  @include input-md;
+  padding-left: $spacing-10;
+  border-radius: $radius-full;
 }
 
 .userList {
-  width: 80%;
-  margin: 0 auto;
-  max-height: 300px;
+  flex: 1;
   overflow-y: auto;
+  padding: 0 $spacing-3 $spacing-3;
+  @include custom-scrollbar;
 }
 
 .userItem {
-
-  --hover-color: #cfcfcf;
-
-  display: flex;
-  align-items: center;
-  padding: 8px;
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3;
   cursor: pointer;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.226);
+  border-radius: $radius-md;
+  @include transition-colors;
 
   &:hover {
-    background-color: var(--hover-color);
+    background-color: var(--bg-hover);
   }
 }
 
-:global(body.dark) .userItem {
-  --hover-color: #424242;
+.userAvatar {
+  @include avatar($avatar-md);
+  flex-shrink: 0;
 }
 
-.userImage {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  margin-right: 12px;
-  object-fit: cover;
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.userInfo h3 {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-color);
-  font-weight: normal;
+.userName {
+  @include subheading-2;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.userTitle {
+  @include caption;
+  color: var(--text-muted);
+  @include truncate;
 }
 
 .noResults {
   text-align: center;
-  font-style: italic;
-  color: #888;
-  margin-top: 2rem;
+  padding: $spacing-8 $spacing-4;
+  color: var(--text-muted);
+  @include body-2;
 }
