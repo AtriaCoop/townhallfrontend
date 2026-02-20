@@ -140,6 +140,98 @@
 }
 
 .name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-align: center;
+}
+
+ // new modifications
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.pronouns {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
+.pronunciation {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+  margin-top: -0.25rem;
+}
+
+.dateJoined {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  width: 100%;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+  margin-top: 1rem;
+}
+
+.profileInfo {
+  width: 100%;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+}
+
+.aboutBox {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.editButton, .signoutButton, .darkModeButton {
+  flex: 1 1 45%;
+  padding: 0.6rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.darkModeButton {
+  background-color: #371950;
+  color: white;
+}
+
+.isDark {
+  background-color: rgb(243, 227, 196);
+  color: black;
   margin: 0;
   @include heading-2;
 }

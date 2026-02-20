@@ -3,9 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import Navigation from "@/components/Navigation/Navigation";
 import styles from "./ProfilePage.module.scss";
 
-export default function ProfilePage() {
+export default function ProfilePage({ hasNewDm = false }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -59,6 +60,10 @@ export default function ProfilePage() {
   if (!profileData) return null;
 
   return (
+    <div className={styles.container}>
+      <Navigation hasNewDm={hasNewDm} />
+
+
     <div className={styles.profilePage}>
       {/* Toast Notification */}
       {toast && (
@@ -72,7 +77,6 @@ export default function ProfilePage() {
           {toast.message}
         </div>
       )}
-
       {/* Cover Image Section */}
       <div className={styles.coverSection}>
         <div className={styles.coverImage}>
@@ -118,7 +122,12 @@ export default function ProfilePage() {
 
         {/* Name and Edit Button */}
         <div className={styles.profileHeader}>
-          <h1 className={styles.name}>{profileData.full_name}</h1>
+          <div className={styles.nameRow}>
+            <h1 className={styles.name}>{profileData.full_name}</h1>
+            {profileData.pronouns && (
+              <div className={styles.pronouns}>{profileData.pronouns}</div>
+            )}
+          </div>
           {isCurrentUser && (
             <button
               onClick={() => router.push("/EditProfilePage")}
@@ -129,7 +138,6 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
-
       {/* Content Cards */}
       <div className={styles.contentGrid}>
         {/* Basic Information Card */}
@@ -144,12 +152,6 @@ export default function ProfilePage() {
               <span className={styles.infoLabel}>Email:</span>
               <span className={styles.infoValue}>{profileData.email}</span>
             </div>
-            {profileData.title && (
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Title:</span>
-                <span className={styles.infoValue}>{profileData.title}</span>
-              </div>
-            )}
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>
@@ -222,6 +224,7 @@ export default function ProfilePage() {
         )}
 
       </div>
+    </div>
     </div>
   );
 }

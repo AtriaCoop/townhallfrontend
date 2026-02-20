@@ -41,6 +41,7 @@ const UploadIcon = () => (
 );
 
 export default function SetUpPage() {
+  // Merge conflict resolved - using cleaner initialization with INITIAL_FORM_DATA and necessary state hooks
   const router = useRouter();
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
@@ -206,6 +207,21 @@ export default function SetUpPage() {
           </p>
         </div>
 
+          <FormInputText
+            name="pronouns"
+            label="What are your pronouns?"
+            placeholder="Share your pronouns (Optional)"
+            value={formData.pronouns}
+            onChange={handleInputChange}
+          />
+          {/* --- name pronunciation --- */}
+          <FormInputText
+            name="name_pronunciation"
+            label="Name Pronunciation"
+            placeholder="Enter name pronunciation..."
+            value={formData.name_pronunciation}
+            onChange={handleInputChange}
+          />
         <div className={styles.formCard}>
           {/* Basic Information */}
           <section className={styles.formSection}>
