@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import Navigation from "@/components/Navigation/Navigation";
 import styles from "./ProfilePage.module.scss";
 
 export default function ProfilePage({ hasNewDm = false }) {
@@ -62,62 +63,6 @@ export default function ProfilePage({ hasNewDm = false }) {
     <div className={styles.container}>
       <Navigation hasNewDm={hasNewDm} />
 
-      <div className={styles.profileContainer}>
-        {toast && (
-          <div
-            className={`${styles.toast} ${
-              toast.type === "success" ? styles.toastSuccess : styles.toastError
-            }`}
-            role="status"
-            aria-live="assertive"
-          >
-            {toast.message}
-          </div>
-        )}
-        <div className={styles.cardHeader}>Profile Overview</div>
-
-        <img
-          className={styles.profilePic}
-          src={profileData.profile_image || "/assets/ProfileImage.jpg"}
-          alt="Profile"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/assets/ProfileImage.jpg";
-          }}
-        />
-
-        {isCurrentUser && (
-          <button
-            onClick={() => router.push("/EditProfilePage")}
-            className={styles.editButtonInline}
-          >
-            <Icon name="edit" className={styles.icon} />
-            Edit Profile
-          </button>
-        )}
-
-      {/* --- name + pronouns --- */}
-      <div className={styles.nameRow}>
-        <div className={styles.name}>{profileData.full_name}</div>
-        {profileData.pronouns && (
-          <div className={styles.pronouns}>{profileData.pronouns}</div>
-        )}
-      </div>
-
-      {/* --- pronunciation line (optional) --- */}
-      {profileData.name_pronunciation && (
-        <div className={styles.pronunciation}>
-          <strong>Name pronunciation:</strong> {profileData.name_pronunciation}
-        </div>
-      )}
-
-        <div className={styles.dateJoined}>
-          Joined{" "}
-          {formatDistanceToNow(new Date(profileData.date_joined), {
-            addSuffix: true,
-          })}
-        </div>
-      </div>
 
     <div className={styles.profilePage}>
       {/* Toast Notification */}

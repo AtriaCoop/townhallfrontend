@@ -243,79 +243,9 @@ export default function EditProfilePage() {
         </div>
       </div>
 
-<<<<<<< HEAD
-        <FormInputText
-          name="pronouns"
-          label="Preferred Pronouns"
-          placeholder="Share your pronouns (Optional)"
-          value={formData.pronouns}
-          onChange={handleInputChange}
-        />
-
-        {/* --- name pronunciation --- */}
-        <FormInputText
-          name="name_pronunciation"
-          label="Name Pronunciation"
-          placeholder="Enter name pronunciation..."
-          value={formData.name_pronunciation}
-          onChange={handleInputChange}
-        />
-        
-        <FormInputText
-          name="title"
-          label="Title"
-          placeholder="Enter title..."
-          value={formData.title}
-          onChange={handleInputChange}
-        />
-
-        <FormInputText
-          name="primary_organization"
-          label="Primary Organization"
-          placeholder="What is the main organization you work for?"
-          value={formData.primary_organization}
-          onChange={handleInputChange}
-        />
-
-        <FormInputText
-          name="other_organizations"
-          label="Other Organization"
-          placeholder="Enter other organizations you are a part of..."
-          value={formData.other_organizations}
-          onChange={handleInputChange}
-        />
-
-        <FormInputText
-          name="other_networks"
-          label="Other Networks"
-          placeholder="List any coalitions or networks you are connected to other than the VFJC."
-          value={formData.other_networks}
-          onChange={handleInputChange}
-        />
-
-        <FormInputText
-          name="about_me"
-          label="About Me"
-          placeholder="Tell us about yourself!"
-          value={formData.about_me}
-          onChange={handleInputChange}
-        />
-
-        <FormInputText
-          name="skills_interests"
-          label="Skills & Interests"
-          placeholder="Enter any skills & interests that may benfeit the coalition."
-          value={formData.skills_interests}
-          onChange={handleInputChange}
-        />
-
-        <p>Profile Header</p>
-        <div className={styles.profileHeaderInput}>
-=======
       {/* Banner Image */}
       <div className={styles.bannerSection}>
         <label htmlFor="bannerImageUpload" className={styles.bannerImageLabel}>
->>>>>>> origin
           <img
             src={
               formData.profile_header instanceof File
