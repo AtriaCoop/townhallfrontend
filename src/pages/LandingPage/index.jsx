@@ -51,14 +51,22 @@ export default function LandingPage() {
     };
   }, []);
 
-  // Check for existing user session
+  // Check for existing user session — validate with server before redirecting
   useEffect(() => {
     if (!router.isReady) return;
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      router.push("/HomePage");
-    }
-  }, [router.isReady, router]);
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    if (!storedUser) return;
+
+    fetch(`${BASE_URL}/auth/session/`, { credentials: "include" })
+      .then((res) => {
+        if (res.ok) {
+          router.push("/HomePage");
+        } else {
+          localStorage.removeItem("user");
+        }
+      })
+      .catch(() => {});
+  }, [router.isReady, router, BASE_URL]);
 
   const clearMessages = useCallback(() => {
     setError("");

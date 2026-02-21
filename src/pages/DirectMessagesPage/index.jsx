@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";
@@ -11,6 +12,7 @@ export default function DirectMessagesPage({
   unreadMap,
   setUnreadMap,
 }) {
+  const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
 
@@ -40,15 +42,16 @@ export default function DirectMessagesPage({
   useEffect(() => {
     const fetchChats = async () => {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = Number(userData.id);
       const res = await authenticatedFetch(
-        `${BASE_URL}/chats/?user_id=${userData.id}`,
+        `${BASE_URL}/chats/?user_id=${userId}`,
         { credentials: "include" }
       );
       const data = await res.json();
       const chatsFromServer = data?.data || [];
 
       const processedChats = chatsFromServer.map((chat) => {
-        const otherUser = chat.participants.find((p) => p.id !== userData.id);
+        const otherUser = chat.participants.find((p) => p.id !== userId);
         return {
           ...chat,
           name: otherUser?.full_name || "Unknown",
@@ -64,22 +67,31 @@ export default function DirectMessagesPage({
       });
 
       setChats(processedChats);
+
+      // Auto-open chat when navigating from a profile page (?chatWith=userId)
+      const chatWithId = Number(router.query.chatWith);
+      if (chatWithId) {
+        const match = processedChats.find((c) =>
+          c.participants.some((p) =>
+            (typeof p === "object" ? p.id : p) === chatWithId
+          )
+        );
+        if (match) setActiveChat(match);
+      }
     };
 
     fetchChats();
-  }, [BASE_URL, CLOUD_NAME]);
+  }, [BASE_URL, CLOUD_NAME, router.query.chatWith]);
 
   const handleStartChat = async (user) => {
     const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    const currentUserId = userData.id;
+    const currentUserId = Number(userData.id);
 
-    if (!csrfToken || csrfToken.length < 10) {
-      console.error("Invalid CSRF token:", csrfToken);
-      return;
-    }
-
+    // Check if a chat with this user already exists in local state
     const existingChat = chats.find((chat) => {
-      const participantIds = chat.participants.map((p) => p.id);
+      const participantIds = chat.participants.map((p) =>
+        typeof p === "object" ? p.id : p
+      );
       return (
         participantIds.includes(currentUserId) &&
         participantIds.includes(user.id)
@@ -92,32 +104,42 @@ export default function DirectMessagesPage({
       return;
     }
 
-    const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: `chat-${currentUserId}-${user.id}`,
-        participants: [currentUserId, user.id],
-      }),
-    });
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `chat-${currentUserId}-${user.id}`,
+          participants: [currentUserId, user.id],
+        }),
+      });
 
-    const data = await res.json();
-    const chatId = data?.data?.id;
+      const data = await res.json();
+      const chatData = data?.data;
+      if (!chatData?.id) return;
 
-    const chatObj = {
-      id: chatId,
-      name: user.full_name,
-      title: user.title || "VFJC Member",
-      time: new Date().toISOString(),
-      imageSrc: user.profile_image || "/assets/ProfileImage.jpg",
-      participants: [currentUserId, user.id],
-      messages: [],
-      lastMessage: "Start a conversation...",
-    };
+      // Process the backend response the same way fetchChats does
+      const otherUser = chatData.participants.find((p) => p.id !== currentUserId);
 
-    setChats((prev) => [...prev, chatObj]);
-    setActiveChat(chatObj);
-    setShowModal(false);
+      const chatObj = {
+        ...chatData,
+        name: otherUser?.full_name || user.full_name || "Unknown",
+        title: otherUser?.title || user.title || "VFJC Member",
+        imageSrc: otherUser?.profile_image
+          ? otherUser.profile_image.startsWith("http")
+            ? otherUser.profile_image
+            : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
+          : "/assets/ProfileImage.jpg",
+        time: chatData.created_at || new Date().toISOString(),
+        lastMessage: "Start a conversation...",
+      };
+
+      setChats((prev) => [...prev, chatObj]);
+      setActiveChat(chatObj);
+      setShowModal(false);
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+    }
   };
 
   const handleChatClick = (chat) => {

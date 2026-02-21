@@ -31,7 +31,7 @@ export default function GroupChatsPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
-      setCurrentUserId(userData.id);
+      setCurrentUserId(Number(userData.id));
     }
   }, []);
 
@@ -378,6 +378,7 @@ export default function GroupChatsPage() {
                       <MessageBubble
                         avatar={msg.avatar}
                         sender={msg.sender}
+                        senderId={msg.sender_id}
                         organization={msg.organization}
                         timestamp={msg.timestamp}
                         message={

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import "@/styles/globals.scss";
 import Layout from "@/components/Layout/Layout";
+import { PUBLIC_PAGES } from "@/constants/api";
 
 export default function App({ Component, pageProps }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || "ws://127.0.0.1:8000";
+  const router = useRouter();
 
   const [hasNewDm, setHasNewDm] = useState(false);
   const [unreadMap, setUnreadMap] = useState({});
@@ -18,6 +21,21 @@ export default function App({ Component, pageProps }) {
       headers: { Accept: "application/json" },
     }).catch((err) => console.error("CSRF Error:", err));
   }, []);
+
+  // Validate session on app load — if the server session expired, clear local state
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user || PUBLIC_PAGES.includes(router.pathname)) return;
+
+    fetch(`${BASE_URL}/auth/session/`, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) {
+          localStorage.removeItem("user");
+          router.replace("/");
+        }
+      })
+      .catch(() => {});
+  }, [router.pathname]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
