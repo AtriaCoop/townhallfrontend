@@ -94,9 +94,9 @@ export default function LandingPage() {
       setError(result.error);
       setLoading(false);
     } else {
-      setMessage(result.success);
+      setMessage("Account created! Please check your email to verify.");
       localStorage.setItem("user", JSON.stringify(result.data.user));
-      setTimeout(() => router.push("/SetUpPage"), 1000);
+      setTimeout(() => router.push("/VerifyEmailPage"), 1500);
     }
   }, [formData, router]);
 
@@ -132,7 +132,12 @@ export default function LandingPage() {
 
         if (response.ok) {
           localStorage.setItem("user", JSON.stringify(data.user));
-          router.push("/HomePage");
+          // Redirect based on profile completion
+          if (!data.user.full_name) {
+            router.push("/SetUpPage");
+          } else {
+            router.push("/HomePage");
+          }
         } else {
           setLoading(false);
           setError(data.error || "Invalid email or password");

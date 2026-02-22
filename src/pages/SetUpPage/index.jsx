@@ -437,13 +437,6 @@ export default function SetUpPage() {
           <div className={styles.formActions}>
             <button
               type="button"
-              className={styles.skipButton}
-              onClick={() => router.push("/HomePage")}
-            >
-              Skip for now
-            </button>
-            <button
-              type="button"
               className={styles.submitButton}
               onClick={handleSubmit}
               disabled={isSubmitting}

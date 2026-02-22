@@ -3,7 +3,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 import styles from "./Layout.module.scss";
 
-const noNavPages = ["/", "/LandingPage", "/SetUpPage", "/ForgotPasswordPage", "/ResetPasswordPage"];
+const noNavPages = ["/", "/LandingPage", "/SetUpPage", "/VerifyEmailPage", "/ForgotPasswordPage", "/ResetPasswordPage"];
 const fullBleedPages = ["/DirectMessagesPage", "/GroupChatsPage"];
 
 function Layout({ children, hasNewDm }) {

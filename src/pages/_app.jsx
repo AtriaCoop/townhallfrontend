@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }) {
     }).catch((err) => console.error("CSRF Error:", err));
   }, []);
 
-  // Validate session on app load — if the server session expired, clear local state
+  // Validate session + enforce profile completion on protected pages
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!user || PUBLIC_PAGES.includes(router.pathname)) return;
@@ -32,6 +32,15 @@ export default function App({ Component, pageProps }) {
         if (!res.ok) {
           localStorage.removeItem("user");
           router.replace("/");
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!data) return;
+        // If profile is incomplete, redirect to SetUpPage
+        if (!data.user.full_name && router.pathname !== "/SetUpPage") {
+          router.replace("/SetUpPage");
         }
       })
       .catch(() => {});
