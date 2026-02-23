@@ -35,10 +35,10 @@
 
 .rightSection {
   @include flex-end;
-  gap: $spacing-2;
+  gap: $spacing-3;
 
   @include md {
-    gap: $spacing-3;
+    gap: $spacing-4;
   }
 }
 
