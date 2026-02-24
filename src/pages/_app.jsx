@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import "@/styles/globals.scss";
 import Layout from "@/components/Layout/Layout";
+import { PUBLIC_PAGES } from "@/constants/api";
+import useNotificationStore from "@/stores/notificationStore";
+import { authenticatedFetch } from "@/utils/authHelpers";
 
 export default function App({ Component, pageProps }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE || "ws://127.0.0.1:8000";
+  const router = useRouter();
 
-  const [hasNewDm, setHasNewDm] = useState(false);
-  const [unreadMap, setUnreadMap] = useState({});
   const [darkMode, setDarkMode] = useDarkMode();
 
+  const addNotification = useNotificationStore((s) => s.addNotification);
+  const addUnreadDm = useNotificationStore((s) => s.addUnreadDm);
+  const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
+
+  // Fetch CSRF token on mount
   useEffect(() => {
     fetch(`${BASE_URL}/auth/csrf/`, {
       method: "GET",
@@ -19,6 +27,46 @@ export default function App({ Component, pageProps }) {
     }).catch((err) => console.error("CSRF Error:", err));
   }, []);
 
+  // Validate session + enforce profile completion on protected pages
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user || PUBLIC_PAGES.includes(router.pathname)) return;
+
+    fetch(`${BASE_URL}/auth/session/`, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) {
+          localStorage.removeItem("user");
+          router.replace("/");
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!data) return;
+        if (!data.user.full_name && router.pathname !== "/SetUpPage") {
+          router.replace("/SetUpPage");
+        }
+      })
+      .catch(() => {});
+  }, [router.pathname]);
+
+  // Fetch initial unread notification count on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user?.id) return;
+
+    authenticatedFetch(`${BASE_URL}/notifications/unread-count/`)
+      .then((res) => {
+        if (res.ok) return res.json();
+        return null;
+      })
+      .then((data) => {
+        if (data) setUnreadCount(data.unread_count);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Global WebSocket connection for user-level events
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (!user?.id) return;
@@ -26,14 +74,14 @@ export default function App({ Component, pageProps }) {
     const socket = new WebSocket(`${WS_BASE_URL}/ws/users/${user.id}/`);
 
     socket.onmessage = (e) => {
-      const { chat_id, sender } = JSON.parse(e.data);
+      const data = JSON.parse(e.data);
 
-      if (sender !== user.id) {
-        setHasNewDm(true);
-        setUnreadMap((prev) => ({
-          ...prev,
-          [chat_id]: (prev[chat_id] || 0) + 1,
-        }));
+      if (data.type === "notification") {
+        // Bell icon notification (reaction, comment, event, etc.)
+        addNotification(data.notification);
+      } else if (data.sender && data.sender !== user.id) {
+        // DM message notification (existing behavior)
+        addUnreadDm(data.chat_id);
       }
     };
 
@@ -41,15 +89,11 @@ export default function App({ Component, pageProps }) {
   }, []);
 
   return (
-    <Layout hasNewDm={hasNewDm}>
+    <Layout>
       <Component
         {...pageProps}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
-        hasNewDm={hasNewDm}
-        setHasNewDm={setHasNewDm}
-        unreadMap={unreadMap}
-        setUnreadMap={setUnreadMap}
       />
     </Layout>
   );

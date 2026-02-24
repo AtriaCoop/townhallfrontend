@@ -1,17 +1,39 @@
-import Navigation from "../Navigation/Navigation";
 import { useRouter } from "next/router";
+import Sidebar from "../Sidebar/Sidebar";
+import Header from "../Header/Header";
+import styles from "./Layout.module.scss";
 
-const noNavPages = ["/", "/LandingPage", "/SetUpPage"];
+const noNavPages = [
+  "/",
+  "/LandingPage",
+  "/SetUpPage",
+  "/VerifyEmailPage",
+  "/ForgotPasswordPage",
+  "/ResetPasswordPage",
+];
+const fullBleedPages = ["/DirectMessagesPage", "/GroupChatsPage"];
 
-function Layout({ children, hasNewDm }) {
+function Layout({ children }) {
   const router = useRouter();
   const showNav = !noNavPages.includes(router.pathname);
+  const isFullBleed = fullBleedPages.includes(router.pathname);
+
+  if (!showNav) {
+    return <>{children}</>;
+  }
 
   return (
-    <>
-      {showNav && <Navigation hasNewDm={hasNewDm} />}
-      {children}
-    </>
+    <div className={styles.layout}>
+      <Sidebar />
+      <div className={styles.mainArea}>
+        <Header />
+        <main
+          className={`${styles.content} ${isFullBleed ? styles.fullBleed : ""}`}
+        >
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }
 

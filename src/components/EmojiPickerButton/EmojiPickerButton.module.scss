@@ -10,14 +10,28 @@
   z-index: 100;
 }
 
+.emojiPickerBottom {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  z-index: 100;
+}
+
 .iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   background: none;
   border: none;
-  font-size: 1.25rem;
+  border-radius: 8px;
   cursor: pointer;
-  color: var(--icons);
+  color: var(--icon-default, var(--icons));
 
   &:hover {
-    color: var(--icons-hover);
+    background-color: var(--bg-hover);
+    color: var(--icon-hover, var(--icons-hover));
   }
 }

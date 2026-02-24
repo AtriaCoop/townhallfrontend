@@ -1,251 +1,306 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  inset: 0;
+  background-color: rgba($black, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
 }
 
 .modalContent {
-
-  --text-secondary: #333333;
-  --text-tertiary: #5c5c5c;
-
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--modal-bg);
-  border: 2px solid #f9b233;
-  padding: 2rem 1.25rem;
-  border-radius: 12px;
-  width: 100%;
-  width: 400px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-
-  h1 {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-
-  @include tablet {
-    width: 800px;
-  }
 }
 
-:global(body.dark) .modalContent {
-  --text-secondary: #929292;
-  --text-tertiary: #e7e7e7;
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-5;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  margin: 0;
+  @include heading-5;
 }
 
 .closeButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
-  font-size: 1.5rem;
-  color: var(--icons);
+  background-color: transparent;
+  color: var(--icon-muted);
+  border-radius: $radius-full;
   cursor: pointer;
+  @include transition-colors;
 
   &:hover {
-    color: var(--icons-hover);
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
   }
+}
+
+// Input Section
+.inputSection {
+  padding: $spacing-4 $spacing-5;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: $spacing-3;
 }
 
 .textInput {
-  background-color: white;
-  color: rgb(66, 66, 66);
-  font-size: 16px;
-  border-radius: 4.5px;
-  border: 1px solid #ccc;
-  padding: 8px 0px 96px 8px;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+  width: 100%;
+  min-height: 80px;
+  padding: $spacing-3;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  color: var(--text-primary);
+  resize: none;
+  @include body-1;
+  @include transition-colors;
 
-  &:empty:before {
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+  }
+
+  &:empty::before {
     content: attr(placeholder);
-    color: #999;
+    color: var(--text-muted);
   }
 }
 
-.modalButton {
+.buttonContainer {
   display: flex;
   justify-content: flex-end;
 }
 
-.postButton {
-  padding: 8px 16px;
-  background-color: #24873d;
-  border: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: rgb(30, 100, 50);
-  }
+.submitButton {
+  @include button-primary;
+  @include button-sm;
 }
 
+// Comment List
 .commentList {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-3;
+  @include custom-scrollbar;
 }
 
 .commentItem {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid #ddd;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border-radius: $radius-md;
+  @include transition-colors;
 
-  img {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
+  &:hover {
+    background-color: var(--bg-hover);
   }
 
-  div {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.3;
-
-    p {
-      color: var(--text-tertiary);
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
+  & + & {
+    border-top: 1px solid var(--border-default);
   }
 }
 
-.commentContentWrapper {
+.commentAvatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 2px solid var(--border-default);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--primary);
+  }
+}
+
+.commentBody {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: $spacing-1;
 }
 
 .commentHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: baseline;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+}
 
-  div {
-    flex: 1;
+.commentAuthor {
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  cursor: pointer;
+  @include body-2;
+
+  &:hover {
+    color: var(--primary);
   }
 }
 
+.commentTime {
+  color: var(--text-muted);
+  @include caption;
+}
+
+.commentText {
+  margin: 0;
+  color: var(--text-secondary);
+  word-break: break-word;
+  white-space: pre-wrap;
+  @include body-2;
+}
+
 .deleteButton {
-  background: transparent;
-  color: crimson;
+  align-self: flex-start;
+  padding: $spacing-1 $spacing-2;
+  background-color: transparent;
   border: none;
+  color: $error-500;
   cursor: pointer;
-  font-size: 0.8rem;
-  margin-top: 4px;
+  @include caption;
+  @include transition-colors;
 
   &:hover {
+    color: $error-600;
     text-decoration: underline;
   }
 }
 
-.mentionWrapper{
+// Empty State
+.emptyState {
   display: flex;
   flex-direction: column;
-  align-items: start;
-  border-radius: 6px;
-  padding: 5px 10px;
-  width: 200px;      
-  border: 1px solid #e2e8f0;  
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-              0 1px 2px rgba(0, 0, 0, 0.06);  
-
-}
-
-.mention{
-  display: flex;
-  flex-direction: row;
-  gap:10px;
   align-items: center;
-  justify-content: start;
-  padding: 5px 10px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  width: 100%;
-  box-sizing: border-box;
-  font-size: smaller;
+  justify-content: center;
+  gap: $spacing-3;
+  padding: $spacing-8;
+  text-align: center;
+  color: var(--text-muted);
 
-  &:hover {
-    background-color: #f0f0f0;
-    color: black;
-    cursor: pointer;
+  svg {
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    @include body-2;
   }
 }
 
-.mention span {
-  background-color: #dbeafe;
-  color: #1e3a8a;
-  border-radius: 4px;
-  padding: 2px 4px;
+// Mention Styles
+.mentionWrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  padding: $spacing-2;
+  max-width: 240px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
 }
 
+.mention {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  @include caption;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  span {
+    background-color: $primary-100;
+    color: $primary-700;
+    padding: 2px 6px;
+    border-radius: $radius-sm;
+  }
+}
 
 .mentionChip {
   display: inline-block;
-  background-color: #e0f3ff;
-  color: #0077cc;
+  background-color: $primary-100;
+  color: $primary-700;
   padding: 2px 6px;
   margin-right: 2px;
-  border-radius: 4px;
-  font-weight: bold;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
 }
+
+// Error States
 .errorMessage {
-  color: red;
-  font-size: 0.875rem;
+  color: $error-500;
   text-align: center;
+  @include caption;
 }
 
 .characterCount {
-  width: 100%;
   text-align: right;
-  margin-top: 15px;
-  color: #737373; 
+  color: var(--text-muted);
+  @include caption;
 }
 
 .characterCountError {
-  width: 100%;
   text-align: right;
-  margin-top: 15px;
-  color: red;
+  color: $error-500;
+  @include caption;
 }
 
 .textInputError {
-  color: rgb(66, 66, 66);
-  font-size: 16px;
-  border-radius: 4.5px;
-  border: 1px solid red;
-  padding: 8px 0px 96px 8px;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-  
+  width: 100%;
+  min-height: 80px;
+  padding: $spacing-3;
+  background-color: var(--input-bg);
+  border: 1px solid $error-500;
+  border-radius: $radius-md;
+  color: var(--text-primary);
+  resize: none;
+  @include body-1;
+
   &:focus {
-    outline: {color: red};
-  }  
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($error-500, 0.1);
+  }
 }

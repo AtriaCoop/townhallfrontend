@@ -1,0 +1,94 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.skeletonPost {
+  @include card;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+}
+
+.skeletonAvatar {
+  width: $avatar-md;
+  height: $avatar-md;
+  border-radius: $radius-full;
+  background-color: var(--skeleton-base);
+  flex-shrink: 0;
+}
+
+.skeletonInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.skeletonName {
+  width: 140px;
+  height: 16px;
+  background-color: var(--skeleton-base);
+  border-radius: $radius-sm;
+}
+
+.skeletonOrg {
+  width: 100px;
+  height: 12px;
+  background-color: var(--skeleton-base);
+  border-radius: $radius-sm;
+}
+
+.skeletonDate {
+  width: 80px;
+  height: 12px;
+  background-color: var(--skeleton-base);
+  border-radius: $radius-sm;
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  margin-bottom: $spacing-4;
+}
+
+.skeletonLine {
+  width: 100%;
+  height: 14px;
+  background-color: var(--skeleton-base);
+  border-radius: $radius-sm;
+}
+
+.skeletonFooter {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding-top: $spacing-3;
+  border-top: 1px solid var(--border-default);
+}
+
+.skeletonAction {
+  width: 80px;
+  height: 24px;
+  background-color: var(--skeleton-base);
+  border-radius: $radius-sm;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

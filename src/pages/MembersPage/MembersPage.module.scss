@@ -1,108 +1,190 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-.container {
-  @include tablet { margin-left: 89px; }
-  @include laptop { margin-left: 289px; }
+.membersPage {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.main {
-  padding: 1rem 2rem;
-  --text-color: #111827;
-  --text-color-secondary: #6b7280;
-  --bg-color-secondary: #f5f5f5;
-}
-
-:global(body.dark) .main {
-  --text-color: #e7e7e7;
-  --text-color-secondary: #d1d1d1;
-  --bg-color-secondary: #3d3d3d;
-}
-
-.header {
+// Page Header
+.pageHeader {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
 
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 0.25rem;
-  }
-
-  p {
-    color: var(--text-color-secondary);
-    font-size: 0.95rem;
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
   }
 }
 
-.search {
-  flex: 1 1 250px;
-  max-width: 300px;
-  padding: 0.6rem 0.9rem;
-  font-size: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  transition: border 0.2s ease;
-  color: var(--text-color);
-  background-color: var(--bg-color-secondary);
+.headerContent {
+  flex: 1;
+}
 
-  &:focus {
-    outline: none;
-    border-color: #24873d;
+.pageTitle {
+  margin: 0 0 $spacing-2 0;
+  @include heading-3;
+}
+
+.pageDescription {
+  margin: 0;
+  color: var(--text-secondary);
+  @include body-1;
+}
+
+// Search
+.searchWrapper {
+  position: relative;
+  width: 100%;
+
+  @include md {
+    width: 280px;
   }
 }
 
-.grid {
+.searchIcon {
+  position: absolute;
+  left: $spacing-3;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--icon-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  @include input-base;
+  @include input-md;
+  // Override padding to account for search icon
+  padding-left: 44px !important;
+}
+
+// Members Grid
+.membersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-4;
+
+  @include md {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
 }
 
-.card {
-  background: var(--bg-color-secondary);
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+// Member Card
+.memberCard {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  @include transition-all;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.memberAvatar {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 2px solid var(--border-default);
+  background-color: var(--bg-secondary);
+}
+
+.memberInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.memberName {
+  margin: 0 0 $spacing-1 0;
+  color: var(--text-primary);
+  @include subheading-2;
+  @include truncate;
+}
+
+.memberMeta {
+  margin: 0;
+  color: var(--text-secondary);
+  @include body-2;
+  @include truncate;
+}
+
+.memberOrg {
+  margin: $spacing-1 0 0 0;
+  color: var(--text-muted);
+  @include caption;
+  @include truncate;
+}
+
+// Loading State
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  padding: $spacing-12;
+  color: var(--text-muted);
+  grid-column: 1 / -1;
+  @include body-1;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--primary);
+  border-radius: $radius-full;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+  color: var(--text-muted);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  grid-column: 1 / -1;
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.4;
   }
 
   h3 {
-    font-size: 1rem;
-    font-weight: 600;
+    color: var(--text-secondary);
     margin: 0;
-    color: var(--text-color);
+    @include heading-5;
   }
 
-  .meta {
-    font-size: 0.85rem;
-    color: var(--text-color-secondary);
-    margin-top: 0.25rem;
+  p {
+    margin: 0;
+    @include body-2;
   }
-}
-
-.avatar {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 1px solid #e5e7eb;
-}
-
-.noResults {
-  text-align: center;
-  font-style: italic;
-  color: var(--text-color-secondary);
-  grid-column: 1 / -1;
 }

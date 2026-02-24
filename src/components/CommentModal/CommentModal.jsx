@@ -1,13 +1,13 @@
-import styles from './CommentModal.module.scss';
+import { useRouter } from 'next/router';
 import { formatDistance } from 'date-fns';
-import { getCookie, authenticatedFetch } from '@/utils/authHelpers';
+import { authenticatedFetch } from '@/utils/authHelpers';
 import MentionTextInput from '../MentionTextInput/MentionTextInput';
-import { useState } from 'react';
+import Icon from '@/icons/Icon';
+import styles from './CommentModal.module.scss';
 
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
   const MAX_COMMENT_LEN = 250;
-
-
+  const router = useRouter();
 
   async function onSubmit(inputContent) {
     try {
@@ -20,13 +20,9 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
           created_at: new Date().toISOString(),
         }),
       });
-      console.log(postId, inputContent)
-      console.log('response is ', response)
       const data = await response.json();
-      console.log('data', data)
       if (!response.ok) throw new Error(data.message || "Comment failed");
 
-      // Update comment list in parent post
       setPosts(prev =>
         prev.map(post =>
           post.id === postId
@@ -34,7 +30,6 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
             : post
         )
       );
-
     } catch (err) {
       console.error("Failed to add comment:", err);
     }
@@ -44,16 +39,13 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
     try {
       const response = await authenticatedFetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete comment");
       }
-  
-      // Remove comment from the state
+
       setPosts(prev =>
         prev.map(post =>
           post.id === postId
@@ -67,65 +59,86 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
     } catch (err) {
       console.error("Failed to delete comment:", err);
     }
-  }  
+  }
 
- 
+  const handleUserClick = (userId) => {
+    onClose();
+    router.push(`/ProfilePage/${userId}`);
+  };
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Comments</h2>
+          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+            <Icon name="close" size={20} />
+          </button>
+        </div>
 
-      <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
-        <h1>Comments</h1>
+        <div className={styles.inputSection}>
+          <MentionTextInput
+            placeholder="Write a comment..."
+            onSubmit={onSubmit}
+            inputClassName={styles.textInput}
+            formClassName={styles.form}
+            buttonContainerClassName={styles.buttonContainer}
+            buttonClassName={styles.submitButton}
+            mentionWrapperClassName={styles.mentionWrapper}
+            mentionClassName={styles.mention}
+            mentionChipClassName={styles.mentionChip}
+            maxLength={MAX_COMMENT_LEN}
+          />
+        </div>
 
-
-        <MentionTextInput 
-          placeholder='Write a comment' onSubmit={onSubmit} inputClassName={styles.textInput} 
-          formClassName={styles.form} buttonContainerClassName={styles.modalButton} buttonClassName={styles.postButton}
-          mentionWrapperClassName={styles.mentionWrapper} mentionClassName={styles.mention} 
-          mentionChipClassName={styles.mentionChip} maxLength={MAX_COMMENT_LEN}
-        />
-
-
-        {/* Show existing comments */}
         <div className={styles.commentList}>
-            
-          {comments.map((comment, idx) => (
-            <div className={styles.commentItem} key={idx}>
-            <img
-              src={comment.user?.profile_image || '/assets/ProfileImage.jpg'}
-              alt="user"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = '/assets/ProfileImage.jpg';
-              }}
-            />
-
-            <div className={styles.commentContentWrapper}>
-              <div className={styles.commentHeader}>
-                <div>
-                  <strong>{comment.user?.full_name}</strong> – {
-                    comment.created_at ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true }) : ''
-                  }
-                  <p>{comment.content}</p>
-                </div>
-
-                {comment.user?.id === currentUserId && (
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    Delete
-                  </button>
-                )}
-
-              </div>
+          {comments.length === 0 ? (
+            <div className={styles.emptyState}>
+              <Icon name="message" size={32} />
+              <p>No comments yet</p>
             </div>
-          </div>
-          ))}
+          ) : (
+            comments.map((comment, idx) => (
+              <div className={styles.commentItem} key={idx}>
+                <img
+                  src={comment.user?.profile_image || '/assets/ProfileImage.jpg'}
+                  alt={comment.user?.full_name}
+                  className={styles.commentAvatar}
+                  onClick={() => comment.user?.id && handleUserClick(comment.user.id)}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/assets/ProfileImage.jpg';
+                  }}
+                />
+                <div className={styles.commentBody}>
+                  <div className={styles.commentHeader}>
+                    <span
+                      className={styles.commentAuthor}
+                      onClick={() => comment.user?.id && handleUserClick(comment.user.id)}
+                    >
+                      {comment.user?.full_name}
+                    </span>
+                    <span className={styles.commentTime}>
+                      {comment.created_at
+                        ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true })
+                        : ''}
+                    </span>
+                  </div>
+                  <p className={styles.commentText}>{comment.content}</p>
+                  {comment.user?.id === currentUserId && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleDeleteComment(comment.id)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
-      
     </div>
   );
 }

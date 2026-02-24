@@ -1,0 +1,281 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.header {
+  @include flex-between;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  height: $header-height-mobile;
+  padding: 0 $spacing-4;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+
+  @include md {
+    height: $header-height;
+    padding: 0 $spacing-6;
+  }
+
+  @include lg {
+    padding: 0 $spacing-8;
+  }
+}
+
+.leftSection {
+  @include flex-start;
+  gap: $spacing-4;
+
+  // Reserve space for mobile menu button
+  min-width: 48px;
+
+  @include md {
+    min-width: auto;
+  }
+}
+
+.rightSection {
+  @include flex-end;
+  gap: $spacing-3;
+
+  @include md {
+    gap: $spacing-4;
+  }
+}
+
+// Atria logo
+.atriaLogo {
+  height: 24px;
+  width: auto;
+
+  @include md {
+    height: 28px;
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-default);
+  flex-shrink: 0;
+}
+
+// Icon buttons (bell, messages)
+.iconButton {
+  @include button-ghost;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: $radius-full;
+  color: var(--icon-default);
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
+  }
+
+  @include md {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+// Notification badge
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: $error-500;
+  border-radius: $radius-full;
+  border: 2px solid var(--header-bg);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+// Bell wrapper (positioned container for the notification dropdown)
+.bellWrapper {
+  position: relative;
+}
+
+// Numeric count badge on the bell icon
+.countBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background-color: $error-500;
+  border-radius: $radius-full;
+  border: 2px solid var(--header-bg);
+  color: $white;
+  font-family: $font-family-body;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+// Profile button wrapper
+.profileWrapper {
+  position: relative;
+}
+
+.profileButton {
+  @include flex-center;
+  gap: $spacing-2;
+  padding: $spacing-1;
+  background: transparent;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.avatar {
+  @include avatar($avatar-sm);
+  border: 2px solid var(--border-default);
+
+  @include md {
+    @include avatar($avatar-md);
+  }
+}
+
+.chevron {
+  color: var(--icon-muted);
+  @include transition-transform;
+
+  .profileButton[aria-expanded="true"] & {
+    transform: rotate(180deg);
+  }
+}
+
+// Dropdown menu
+.dropdown {
+  position: absolute;
+  top: calc(100% + $spacing-2);
+  right: 0;
+  min-width: 240px;
+  background-color: var(--modal-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-lg);
+  padding: $spacing-2;
+  z-index: $z-dropdown;
+  animation: dropdownFadeIn 150ms $ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownHeader {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3;
+}
+
+.dropdownAvatar {
+  @include avatar($avatar-md);
+  border: 2px solid var(--border-default);
+}
+
+.dropdownInfo {
+  @include flex-column;
+  gap: $spacing-1;
+  min-width: 0;
+  flex: 1;
+}
+
+.dropdownName {
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.dropdownEmail {
+  @include caption;
+  color: var(--text-muted);
+  @include truncate;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background-color: var(--border-default);
+  margin: $spacing-2 0;
+}
+
+.dropdownItem {
+  @include flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  padding: $spacing-3;
+  background: transparent;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: $font-family-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-align: left;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  svg {
+    color: var(--icon-default);
+    flex-shrink: 0;
+  }
+
+  &.logout {
+    color: $error-500;
+
+    svg {
+      color: $error-500;
+    }
+
+    &:hover {
+      background-color: $error-50;
+    }
+  }
+}
+
+:global(body.dark) {
+  .dropdownItem.logout:hover {
+    background-color: rgba($error-500, 0.15);
+  }
+}

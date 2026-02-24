@@ -2,11 +2,14 @@ import styles from './MessageModal.module.scss';
 
 export default function MessageModal({ onDelete, onEdit, onClose }) {
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalCard}>
-        <button className={styles.actionButtons} onClick={onEdit}>Edit</button>
-        <button className={styles.actionButtons} onClick={onDelete}>Delete</button>
-        <button className={styles.closeButton} onClick={onClose}>X</button>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.actionButton} onClick={onEdit}>
+          Edit
+        </button>
+        <button className={`${styles.actionButton} ${styles.deleteButton}`} onClick={onDelete}>
+          Delete
+        </button>
       </div>
     </div>
   );

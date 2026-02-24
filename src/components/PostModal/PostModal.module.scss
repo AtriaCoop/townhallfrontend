@@ -1,175 +1,242 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  background-color: rgba($black, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
 }
 
-.modalCard {
-
-  background: var(--modal-bg);
-  border-radius: 16px;
-  padding: 1.5rem;
+.modalContent {
   width: 90%;
-  max-width: 600px;
-  position: relative;
+  max-width: 560px;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-5;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .modalTitle {
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  @include heading-5;
 }
 
 .closeButton {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
-  font-size: 1.5rem;
+  background-color: transparent;
+  color: var(--icon-muted);
+  border-radius: $radius-full;
   cursor: pointer;
-  color: var(--icons);
+  @include transition-colors;
 
   &:hover {
-    color: var(--icons-hover);
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
   }
 }
 
+.modalBody {
+  padding: $spacing-5;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
 .textArea {
-  min-height: 120px;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  width: 100%;
+  min-height: 140px;
+  padding: $spacing-3;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  color: var(--text-primary);
   resize: vertical;
+  @include body-1;
+  @include transition-colors;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+  }
 }
 
 .textAreaError {
-  min-height: 120px;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid red;
-  border-radius: 8px;
+  width: 100%;
+  min-height: 140px;
+  padding: $spacing-3;
+  background-color: var(--input-bg);
+  border: 1px solid $error-500;
+  border-radius: $radius-md;
+  color: var(--text-primary);
   resize: vertical;
+  @include body-1;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
 
   &:focus {
-    outline: {color: red};
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($error-500, 0.1);
   }
 }
 
 .imageGrid {
   display: flex;
-  gap: 1rem;
+  gap: $spacing-3;
   overflow-x: auto;
-  padding-top: 1rem;
+  padding-bottom: $spacing-2;
+  @include custom-scrollbar;
 }
 
 .imagePreviewContainer {
   position: relative;
-  display: inline-block;
-  width: fit-content;
+  flex-shrink: 0;
 }
 
 .previewImage {
-  width: 120px;
-  height: auto;
-  border-radius: 10px;
-  object-fit: contain;
-  border: 1px solid #ccc;
+  width: 100px;
+  height: 100px;
+  border-radius: $radius-md;
+  object-fit: cover;
+  border: 1px solid var(--border-default);
 }
 
 .removeImageButton {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  color: #333;
-  font-size: 1rem;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.2s;
+  width: 24px;
+  height: 24px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-full;
+  color: var(--icon-default);
+  cursor: pointer;
+  box-shadow: $shadow-sm;
+  @include transition-colors;
 
   &:hover {
-    background-color: #eee;
+    background-color: $error-50;
+    border-color: $error-500;
+    color: $error-500;
+  }
+}
+
+.errorMessage {
+  color: $error-500;
+  text-align: center;
+  @include body-2;
+}
+
+.modalFooter {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  padding: $spacing-4 $spacing-5;
+  border-top: 1px solid var(--border-default);
+  background-color: var(--bg-secondary);
+
+  @include sm {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 
 .actionRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  gap: $spacing-2;
 }
 
 .iconButton {
-  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border: none;
-  font-size: 1.25rem;
+  background-color: transparent;
+  color: var(--icon-default);
+  border-radius: $radius-md;
   cursor: pointer;
-  color: var(--icons);
+  @include transition-colors;
 
   &:hover {
-    color: var(--icons-hover);
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
   }
 }
 
 .pinned {
-  color: #e44e4e;
-}
-
-.flexSpacer {
-  flex-grow: 1;
-}
-
-.postButton {
-  background-color: #24873d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
+  color: $error-500;
+  background-color: $error-50;
 
   &:hover {
-    background-color: #1e6f35;
+    color: $error-600;
+    background-color: $error-100;
   }
 }
 
-.errorMessage {
-  color: red;
-  font-size: 0.875rem;
-  text-align: center;
+.submitRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  justify-content: flex-end;
+
+  @include sm {
+    justify-content: flex-end;
+  }
 }
 
 .characterCount {
-  width: 100%;
-  text-align: right;
-  margin-top: 15px;
-  color: #737373; 
+  color: var(--text-muted);
+  @include caption;
 }
 
 .characterCountError {
-  width: 100%;
-  text-align: right;
-  margin-top: 15px;
+  color: $error-500;
+  @include caption;
+}
+
+.postButton {
+  @include button-primary;
+  @include button-md;
+  min-width: 100px;
+}
+
+.tagList {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.tagWarning {
   color: red;
 }

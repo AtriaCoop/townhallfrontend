@@ -1,80 +1,260 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-.homeContainer {
-    padding: 0 1rem 0 1rem;
-
-    @include tablet {
-        margin-left: 89px;
-        padding: 0 6rem 0 6rem;
-    }
-
-    @include laptop {
-        margin-left: 289px;
-        padding: 0 8rem 0 8rem;
-    }
-
-    @include desktop {
-        padding: 0 12rem 0 12rem;
-    }
+.messagesPage {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bg-primary);
+  overflow: hidden;
 }
 
-.titleContainer {
+// Conversations List Panel
+.conversationsPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border-right: 1px solid var(--border-default);
+  min-height: 0; // Important for nested flex containers
+  overflow: hidden;
 
-    p {
-        color: rgb(117, 117, 117);
-    }
-}
-
-.title {
-    display: flex;
-    justify-content: space-between;
-}
-
-.titleButton {
-    background-color: #24873d;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-
-    &:hover {
-      background-color: rgb(30, 100, 50);
-    }     
-}
-
-.searchBar {
-    width: 100%;
-    color: rgb(0, 0, 0);
-    font-size: 16px;
-    font-weight: 400;
-    height: 33px;
-    padding: 0px 8px;
-    line-height: 20px;
-    border-radius: 4.5px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgb(189, 189, 189);
-
-    @include tablet {
-        width: 70%;
-    }
-
-    @include laptop {
-        width: 50%;
-    }
-
-    @include desktop {
-        width: 30%;
-    }
-}
-
-.noChatsMessage {
-    text-align: center;
-    color: #777;
-    padding: 40px 0;
-    font-size: 1.1rem;
+  @include md {
+    width: 320px;
+    min-width: 320px;
   }
 
+  @include lg {
+    width: 380px;
+    min-width: 380px;
+  }
+}
+
+.hideOnMobile {
+  @include below-md {
+    display: none;
+  }
+}
+
+.panelHeader {
+  @include flex-between;
+  padding: $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.panelTitle {
+  margin: 0;
+  @include heading-4;
+}
+
+.newChatButton {
+  @include button-primary;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: $radius-full;
+}
+
+// Search
+.searchWrapper {
+  position: relative;
+  padding: $spacing-3 $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.searchIcon {
+  position: absolute;
+  left: $spacing-6;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--icon-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  @include input-base;
+  @include input-md;
+  padding-left: $spacing-12;
+}
+
+// Chat List
+.chatList {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; // Important for flex overflow
+  overscroll-behavior: contain; // Prevent scroll chaining
+  @include custom-scrollbar;
+}
+
+.chatItem {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  cursor: pointer;
+  position: relative;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  &.active {
+    background-color: var(--sidebar-item-active);
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+}
+
+.chatAvatar {
+  @include avatar($avatar-lg);
+  flex-shrink: 0;
+}
+
+.chatInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatHeader {
+  @include flex-between;
+  margin-bottom: $spacing-1;
+}
+
+.chatName {
+  @include subheading-2;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.chatTime {
+  @include caption;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.chatPreview {
+  @include body-2;
+  @include truncate;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.unreadBadge {
+  position: absolute;
+  top: 50%;
+  right: $spacing-4;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary);
+  border-radius: $radius-full;
+}
+
+.removeChatButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  align-self: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: $error-500;
+  }
+}
+
+.chatItem:hover .removeChatButton {
+  opacity: 1;
+}
+
+// Empty State
+.emptyState {
+  @include flex-column-center;
+  gap: $spacing-4;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+  color: var(--text-muted);
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.4;
+  }
+
+  h3 {
+    color: var(--text-secondary);
+    margin: 0;
+    @include heading-5;
+  }
+
+  p {
+    margin: 0;
+    @include body-2;
+  }
+}
+
+.startChatButton {
+  @include button-primary;
+  @include button-md;
+  margin-top: $spacing-2;
+}
+
+// Chat Panel
+.chatPanel {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+  min-height: 0; // Important for nested flex containers
+
+  @include md {
+    display: flex;
+  }
+}
+
+.showOnMobile {
+  @include below-md {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: $z-fixed;
+  }
+}
+
+.noChatSelected {
+  @include flex-column-center;
+  flex: 1;
+  gap: $spacing-4;
+  padding: $spacing-8;
+  text-align: center;
+  color: var(--text-muted);
+
+  svg {
+    color: var(--text-muted);
+    opacity: 0.3;
+  }
+
+  h2 {
+    color: var(--text-secondary);
+    margin: 0;
+    @include heading-4;
+  }
+
+  p {
+    margin: 0;
+    max-width: 400px;
+    @include body-1;
+  }
+}

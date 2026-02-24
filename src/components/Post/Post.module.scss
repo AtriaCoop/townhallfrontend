@@ -1,265 +1,412 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
-.homeContainer {
-  padding: 0 1rem;
-  @include tablet {
-    margin-left: 89px;
-    padding: 0 2rem;
-  }
-  @include laptop {
-    margin-left: 289px;
-  }
-}
-
+// Base Post Card
 .post {
-  --post-bg: white;
-
   position: relative;
-  background: var(--post-bg);
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s;
-  &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  }
-}
+  @include card;
+  @include transition-shadow;
 
-:global(body.dark) .post {
-  --post-bg: #353535;
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .postPinned {
-  --post-pinned-bg: rgb(238, 238, 238);
-
   position: relative;
-  background: var(--post-pinned-bg);
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s;
+  background-color: var(--primary-subtle);
+  border-color: var(--primary);
+  @include card;
+  @include transition-shadow;
+
   &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-md);
   }
 }
 
-:global(body.dark) .postPinned {
-  --post-pinned-bg: #464545;
-}
-
+// Post Header
 .postHeader {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
+  @include flex-start;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+  position: relative;
 }
 
 .profilePic {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.75rem;
-  border: 1px solid #ddd;
+  @include avatar($avatar-md);
   cursor: pointer;
+  @include transition-opacity;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .postInfo {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
+  @include flex-column;
+  gap: $spacing-1;
+  flex: 1;
+  min-width: 0;
   cursor: pointer;
 }
 
 .fullName {
-  font-weight: 600;
-  color: var(--text-color);
+  @include subheading-2;
+  color: var(--text-primary);
+  @include truncate;
 }
 
 .organizationName {
+  @include caption;
+  color: var(--text-tertiary);
   font-style: italic;
-  font-size: 0.85rem;
-  color: #777;
+  @include truncate;
 }
 
 .date {
-  font-size: 0.75rem;
-  color: #aaa;
+  @include caption;
+  color: var(--text-muted);
 }
 
-.postContent {
-  margin: 1rem 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--text-color);
-  white-space: pre-wrap;
-  a {
-    color: #24873d;
-    text-decoration: underline;
+// More Options Menu
+.moreOptions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  cursor: pointer;
+  font-size: $font-size-xl;
+  color: var(--icon-muted);
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
+  }
+}
+
+.optionsMenu {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background-color: var(--modal-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  padding: $spacing-1;
+  box-shadow: var(--shadow-lg);
+  z-index: $z-dropdown;
+  min-width: 120px;
+
+  button {
+    @include button-ghost;
+    width: 100%;
+    justify-content: flex-start;
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-sm;
+    border-radius: $radius-sm;
+  }
+
+  .reportText {
+    color: $error-500;
+
     &:hover {
-      opacity: 0.8;
+      background-color: $error-50;
+    }
+  }
+}
+
+// Post Content
+.postContent {
+  margin: $spacing-4 0;
+  @include body-1;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  line-height: $line-height-relaxed;
+
+  a {
+    color: var(--primary);
+    text-decoration: underline;
+    @include transition-colors;
+
+    &:hover {
+      color: var(--primary-hover);
+    }
+  }
+
+  p {
+    margin-bottom: $spacing-2;
+
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 }
 
 .postImage {
   width: 100%;
-  max-height: 400px;
+  max-height: 480px;
   object-fit: contain;
-  margin-top: 10px;
-  border-radius: 8px;
+  margin-top: $spacing-4;
+  border-radius: $radius-md;
+  background-color: var(--bg-secondary);
 }
 
-.postFooter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+// Reactions Display
+.reactionsDisplay {
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: $spacing-2;
 }
 
-.reactions {
-  display: flex;
-  gap: 0.75rem;
-  img {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    transition: transform 0.1s, filter 0.2s;
-    &:hover {
-      transform: scale(1.2);
-      filter: brightness(1.2);
+.reactionGroup {
+  position: relative;
+  @include flex-center;
+  gap: 4px;
+  padding: 4px 10px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  cursor: default;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-subtle);
+
+    .reactionTooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
     }
   }
 }
 
+.reactionEmoji {
+  font-size: $font-size-base;
+  line-height: 1;
+}
+
+.reactionCount {
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  font-size: $font-size-xs;
+}
+
+.reactionTooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 6px 12px;
+  background-color: #1f2937;
+  color: #ffffff;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1.4;
+  border-radius: $radius-md;
+  white-space: normal;
+  max-width: 220px;
+  width: max-content;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+  pointer-events: none;
+  z-index: $z-tooltip;
+
+  // Arrow
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1f2937;
+  }
+}
+
+// Post Footer
+.postFooter {
+  display: flex;
+  flex-direction: column;
+  padding-top: $spacing-3;
+}
+
+.postFooterTop {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.reactions {
+  @include flex-start;
+  gap: $spacing-3;
+  flex-wrap: wrap;
+}
+
 .postIcon {
-  color: var(--icons);
+  width: 20px;
+  height: 20px;
+  color: var(--icon-default);
   cursor: pointer;
-  transition: transform 0.1s, filter 0.2s;
+  @include transition-all;
+
   &:hover {
-    transform: scale(1.2);
-    filter: brightness(1.2);
+    color: var(--icon-hover);
+    transform: scale(1.15);
   }
 }
 
 .liked {
-  color: #e44e4e;
-}
+  color: $error-500;
 
-.pinned {
-  color: #e44e4e;
-}
-
-.likesComments {
-
-  --likes-comments-color: #555;
-  font-size: 0.85rem;
-  color: var(--likes-comments-color);
-  cursor: pointer;
-}
-
-:global(body.dark) .likesComments {
-  --likes-comments-color: #bbbbbb;
-}
-
-.pin {
-  width: 30px;
-  height: 30px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.moreOptions {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  cursor: pointer;
-  font-size: 20px;
-}
-
-.optionsMenu {
-  position: absolute;
-  top: 36px;
-  right: 12px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 6px;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  button {
-    background: none;
-    border: none;
-    padding: 6px 10px;
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.9rem;
-    &:hover {
-      background-color: #f5f5f5;
-    }
+  &:hover {
+    color: $error-600;
   }
 }
 
-.modalOverlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex; justify-content: center; align-items: center;
-  z-index: 1000;
+.pinned {
+  color: var(--primary);
 }
 
-.modalContentEdit, .modalContentDelete {
+.likesComments {
+  @include caption;
+  color: var(--text-secondary);
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+// Likes tooltip wrapper
+.likesWrapper {
+  position: relative;
+}
+
+// Active state for comment icon
+.active {
+  color: var(--primary);
+
+  &:hover {
+    color: var(--primary-hover);
+  }
+}
+
+.pin {
+  @include button-ghost;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-full;
+}
+
+// Reaction Picker Integration
+.reactionWrapper {
+  position: relative;
+}
+
+.reactionTrigger {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  color: var(--icon-default);
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
+  }
+
+  &.active {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Modals
+.modalOverlay {
+  @include backdrop;
+  @include flex-center;
+}
+
+.modalContentEdit,
+.modalContentDelete {
   background: var(--modal-bg);
   border-radius: 10px;
   padding: 1.5rem;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  position: relative;
+  max-width: 480px;
+  padding: $spacing-6;
+  margin: $spacing-4;
+
   h1 {
+    @include heading-4;
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-4;
   }
 }
 
 .closeButton {
+  @include button-ghost;
   position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  color: #666;
-  cursor: pointer;
+  top: $spacing-3;
+  right: $spacing-3;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-full;
+  font-size: $font-size-xl;
+  color: var(--icon-muted);
+
+  &:hover {
+    color: var(--icon-hover);
+  }
 }
 
 .textInput {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  margin-bottom: 1rem;
+  @include input-base;
+  @include input-md;
+  min-height: 120px;
+  padding: $spacing-3;
+  resize: vertical;
+  margin-bottom: $spacing-4;
 }
 
 .imageInput {
-  padding: 2rem;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
+  @include flex-center;
+  @include flex-column;
+  gap: $spacing-2;
+  padding: $spacing-8;
+  border: 2px dashed var(--border-default);
+  border-radius: $radius-md;
   text-align: center;
   cursor: pointer;
-  color: #888;
+  color: var(--text-muted);
+  @include transition-all;
+  margin-bottom: $spacing-4;
+
   &:hover {
-    border-color: #24873d;
-    opacity: 0.85;
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: var(--primary-subtle);
   }
 }
 
@@ -267,85 +414,33 @@
   max-height: 200px;
   max-width: 100%;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: $radius-md;
 }
 
-.updateButton, .deleteButton {
-  width: 100%;
-  padding: 0.75rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.modalButton {
+  margin-top: $spacing-4;
 }
 
 .updateButton {
-  background: #24873d;
-  color: white;
-  &:hover {
-    background: #1e6e32;
-  }
+  @include button-primary;
+  @include button-md;
+  width: 100%;
 }
 
 .deleteButton {
   background: #d9534f;
   color: white;
+
   &:hover {
     background: #c9302c;
   }
 }
 
-.reactionsDisplay {
-
-  --border-color: #b9b9b9;
-
+.tagList {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  margin: 0.5rem 0;
+  margin-bottom: 10px;
 }
 
-:global(body.dark) .reactionsDisplay {
-  --border-color: #dddddd;
-}
-
-.reactionGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-}
-
-.reactionEmoji {
-  font-size: 1rem;
-}
-
-.reactionCount {
-  font-weight: 600;
-}
-
-.reactButton {
-  background: none;
-  color: var(--text-color);
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;            
-  padding: 4px 10px;             
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.85rem;           
-  line-height: 1;               
-  vertical-align: middle;       
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-
-  &:hover {
-    color: black;
-    background-color: #f2f2f2;
-    border-color: #c0c0c0;
-  }
+.tagWarning {
+  color: red;
 }

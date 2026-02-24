@@ -1,0 +1,294 @@
+// ============================================
+// Design System Variables - VFJC Townhall
+// Based on Figma Hi-Fi Design System
+// ============================================
+
+// --------------------------------------------
+// COLOR PALETTE
+// --------------------------------------------
+
+// Primary Colors (Blue - Trust, Stability)
+$primary-50: #EBF4FB;
+$primary-100: #D7E9F7;
+$primary-200: #B0D3EF;
+$primary-300: #88BDE7;
+$primary-400: #7CAEE0;
+$primary-500: #5B99D3;  // Main brand blue from Figma
+$primary-600: #4A87C1;
+$primary-700: #3A75AF;
+$primary-800: #2A639D;
+$primary-900: #1A518B;
+
+// Secondary Colors (Green - VFJC, Nature, Growth)
+$secondary-50: #EDF5EC;
+$secondary-100: #DBEBd9;
+$secondary-200: #B7D7B3;
+$secondary-300: #93C38D;
+$secondary-400: #85B77C;
+$secondary-500: #6BA660;  // VFJC green from Figma
+$secondary-600: #5A9550;
+$secondary-700: #4A8440;
+$secondary-800: #3A7330;
+$secondary-900: #2A6220;
+
+// Accent Colors (Orange - Warmth, Energy)
+$accent-50: #FEF3EB;
+$accent-100: #FDE7D7;
+$accent-200: #FBCFAF;
+$accent-300: #F9B787;
+$accent-400: #E99558;
+$accent-500: #E17C34;  // Accent orange from Figma
+$accent-600: #D06A22;
+$accent-700: #B85A1C;
+$accent-800: #A04A16;
+$accent-900: #883A10;
+
+// Neutral Colors
+$neutral-50: #FAFAFA;
+$neutral-100: #F5F5F0;  // Off-white from Figma
+$neutral-200: #E5E7EB;
+$neutral-300: #D1D5DB;
+$neutral-400: #9CA3AF;
+$neutral-500: #6B7280;
+$neutral-600: #4B5563;
+$neutral-700: #343A40;  // Dark gray from Figma
+$neutral-800: #1F2937;
+$neutral-900: #111827;
+$neutral-950: #000000;  // Pure black from Figma
+
+// Pure colors
+$white: #FFFFFF;
+$black: #000000;
+
+// Semantic Colors
+$success-50: #ECFDF5;
+$success-100: #D1FAE5;
+$success-500: #22C55E;
+$success-600: #16A34A;
+$success-700: #15803D;
+
+$warning-50: #FFFBEB;
+$warning-100: #FEF3C7;
+$warning-500: #F59E0B;
+$warning-600: #D97706;
+$warning-700: #B45309;
+
+$error-50: #FEF2F2;
+$error-100: #FEE2E2;
+$error-500: #EF4444;
+$error-600: #DC2626;
+$error-700: #B91C1C;
+
+$info-50: #EFF6FF;
+$info-100: #DBEAFE;
+$info-500: #3B82F6;
+$info-600: #2563EB;
+$info-700: #1D4ED8;
+
+// --------------------------------------------
+// DARK MODE COLORS
+// --------------------------------------------
+$dark-bg-primary: #0D0D0D;
+$dark-bg-secondary: #1A1A1A;
+$dark-bg-tertiary: #262626;
+$dark-bg-elevated: #2D2D2D;
+$dark-border: #333333;
+$dark-border-subtle: #404040;
+$dark-text-primary: #FFFFFF;
+$dark-text-secondary: #A1A1AA;
+$dark-text-tertiary: #71717A;
+$dark-text-muted: #52525B;
+
+// --------------------------------------------
+// TYPOGRAPHY
+// --------------------------------------------
+
+// Font Families (from Figma Design System)
+$font-family-headlines: 'Nobile', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-body: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+// Font Weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Font Sizes (from Figma: 40/55, 32/40, 26/32, 24/32, 22/24, 20/24, 18/24, 16/24, 14/16, 12/16)
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.375rem;  // 22px
+$font-size-3xl: 1.5rem;    // 24px
+$font-size-4xl: 1.625rem;  // 26px
+$font-size-5xl: 2rem;      // 32px
+$font-size-6xl: 2.5rem;    // 40px
+
+// Line Heights
+$line-height-tight: 1.1;
+$line-height-snug: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 1.75;
+
+// Letter Spacing
+$letter-spacing-tighter: -0.02em;
+$letter-spacing-tight: -0.01em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.08em;
+
+// --------------------------------------------
+// SPACING (8-point grid from Figma)
+// --------------------------------------------
+$spacing-0: 0;
+$spacing-1: 0.25rem;   // 4px  - spacing-xs
+$spacing-2: 0.5rem;    // 8px  - spacing-sm
+$spacing-3: 0.75rem;   // 12px
+$spacing-4: 1rem;      // 16px - spacing-md
+$spacing-5: 1.25rem;   // 20px
+$spacing-6: 1.5rem;    // 24px - spacing-lg
+$spacing-8: 2rem;      // 32px - spacing-xl
+$spacing-10: 2.5rem;   // 40px - spacing-2xl
+$spacing-12: 3rem;     // 48px - spacing-3xl
+$spacing-16: 4rem;     // 64px - spacing-4xl
+$spacing-20: 5rem;     // 80px
+$spacing-24: 6rem;     // 96px
+
+// Semantic spacing
+$spacing-xs: $spacing-1;   // 4px
+$spacing-sm: $spacing-2;   // 8px
+$spacing-md: $spacing-4;   // 16px
+$spacing-lg: $spacing-6;   // 24px
+$spacing-xl: $spacing-8;   // 32px
+$spacing-2xl: $spacing-10; // 40px
+$spacing-3xl: $spacing-12; // 48px
+$spacing-4xl: $spacing-16; // 64px
+
+// --------------------------------------------
+// BORDER RADIUS
+// --------------------------------------------
+$radius-none: 0;
+$radius-sm: 0.25rem;    // 4px
+$radius-md: 0.5rem;     // 8px
+$radius-lg: 0.75rem;    // 12px
+$radius-xl: 1rem;       // 16px
+$radius-2xl: 1.5rem;    // 24px
+$radius-full: 9999px;   // Pills, avatars
+
+// --------------------------------------------
+// SHADOWS / ELEVATION (from Figma)
+// --------------------------------------------
+
+// Light Mode Shadows
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+
+// Dark Mode Shadows (subtle glow effect)
+$shadow-dark-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+$shadow-dark-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+$shadow-dark-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+$shadow-dark-lg: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+$shadow-dark-xl: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+// Focus ring
+$shadow-focus: 0 0 0 3px rgba($primary-500, 0.4);
+$shadow-focus-error: 0 0 0 3px rgba($error-500, 0.4);
+
+// --------------------------------------------
+// TRANSITIONS
+// --------------------------------------------
+$transition-fast: 150ms;
+$transition-normal: 200ms;
+$transition-slow: 300ms;
+$transition-slower: 400ms;
+
+// Easing functions
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// Transition presets
+$transition-colors: color $transition-fast $ease-out,
+                    background-color $transition-fast $ease-out,
+                    border-color $transition-fast $ease-out;
+$transition-opacity: opacity $transition-fast $ease-out;
+$transition-transform: transform $transition-normal $ease-out;
+$transition-shadow: box-shadow $transition-normal $ease-out;
+$transition-all: all $transition-normal $ease-out;
+
+// --------------------------------------------
+// BREAKPOINTS
+// --------------------------------------------
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// --------------------------------------------
+// LAYOUT
+// --------------------------------------------
+
+// Sidebar
+$sidebar-width-collapsed: 80px;
+$sidebar-width-expanded: 260px;
+
+// Content
+$content-max-width: 1280px;
+$content-max-width-narrow: 720px;
+
+// Header
+$header-height: 76px;
+$header-height-mobile: 64px;
+
+// Z-index layers
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-popover: 600;
+$z-tooltip: 700;
+$z-toast: 800;
+
+// --------------------------------------------
+// COMPONENT-SPECIFIC TOKENS
+// --------------------------------------------
+
+// Buttons
+$button-height-sm: 32px;
+$button-height-md: 40px;
+$button-height-lg: 48px;
+
+$button-padding-sm: $spacing-3;
+$button-padding-md: $spacing-4;
+$button-padding-lg: $spacing-6;
+
+// Inputs
+$input-height-sm: 36px;
+$input-height-md: 44px;
+$input-height-lg: 52px;
+
+$input-padding-x: $spacing-3;
+$input-border-width: 1px;
+
+// Cards
+$card-padding: $spacing-4;
+$card-padding-lg: $spacing-6;
+$card-border-radius: $radius-lg;
+
+// Avatar sizes
+$avatar-xs: 24px;
+$avatar-sm: 32px;
+$avatar-md: 40px;
+$avatar-lg: 56px;
+$avatar-xl: 80px;
+$avatar-2xl: 120px;
