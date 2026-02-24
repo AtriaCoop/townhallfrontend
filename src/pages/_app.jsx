@@ -80,8 +80,14 @@ export default function App({ Component, pageProps }) {
         // Bell icon notification (reaction, comment, event, etc.)
         addNotification(data.notification);
       } else if (data.sender && data.sender !== user.id) {
-        // DM message notification (existing behavior)
-        addUnreadDm(data.chat_id);
+        // DM message notification with sender preview info
+        addUnreadDm(data.chat_id, {
+          senderId: data.sender,
+          senderName: data.full_name || "Someone",
+          senderImage: data.profile_image || null,
+          lastMessage: data.message || "",
+          timestamp: new Date().toISOString(),
+        });
       }
     };
 

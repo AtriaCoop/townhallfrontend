@@ -109,6 +109,11 @@
   position: relative;
 }
 
+// Message wrapper (positioned container for the message dropdown)
+.messageWrapper {
+  position: relative;
+}
+
 // Numeric count badge on the bell icon
 .countBadge {
   position: absolute;

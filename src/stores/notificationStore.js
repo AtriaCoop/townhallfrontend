@@ -9,6 +9,8 @@ const useNotificationStore = create((set) => ({
   // Message icon (DM unread)
   hasNewDm: false,
   unreadDmMap: {},
+  dmPreviews: {},
+  messageDropdownOpen: false,
 
   // Bell icon actions
   setNotifications: (notifications) => set({ notifications }),
@@ -43,36 +45,47 @@ const useNotificationStore = create((set) => ({
     }),
 
   toggleBellDropdown: () =>
-    set((state) => ({ bellDropdownOpen: !state.bellDropdownOpen })),
+    set((state) => ({ bellDropdownOpen: !state.bellDropdownOpen, messageDropdownOpen: false })),
 
   closeBellDropdown: () => set({ bellDropdownOpen: false }),
 
   // DM actions
   setHasNewDm: (value) => set({ hasNewDm: value }),
 
-  addUnreadDm: (chatId) =>
+  addUnreadDm: (chatId, preview) =>
     set((state) => ({
       hasNewDm: true,
       unreadDmMap: {
         ...state.unreadDmMap,
         [chatId]: (state.unreadDmMap[chatId] || 0) + 1,
       },
+      dmPreviews: preview
+        ? { ...state.dmPreviews, [chatId]: preview }
+        : state.dmPreviews,
     })),
 
   clearUnreadDm: (chatId) =>
     set((state) => {
       const newMap = { ...state.unreadDmMap };
       delete newMap[chatId];
+      const newPreviews = { ...state.dmPreviews };
+      delete newPreviews[chatId];
       const anyUnread = Object.keys(newMap).length > 0;
       return {
         unreadDmMap: newMap,
+        dmPreviews: newPreviews,
         hasNewDm: anyUnread,
       };
     }),
 
   setUnreadDmMap: (map) => set({ unreadDmMap: map }),
 
-  clearAllUnreadDm: () => set({ hasNewDm: false, unreadDmMap: {} }),
+  clearAllUnreadDm: () => set({ hasNewDm: false, unreadDmMap: {}, dmPreviews: {} }),
+
+  toggleMessageDropdown: () =>
+    set((state) => ({ messageDropdownOpen: !state.messageDropdownOpen, bellDropdownOpen: false })),
+
+  closeMessageDropdown: () => set({ messageDropdownOpen: false }),
 }));
 
 export default useNotificationStore;

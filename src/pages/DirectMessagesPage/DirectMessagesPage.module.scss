@@ -142,14 +142,13 @@
 }
 
 .unreadBadge {
-  position: absolute;
-  top: 50%;
-  right: $spacing-4;
-  transform: translateY(-50%);
   width: 10px;
   height: 10px;
+  min-width: 10px;
   background-color: var(--primary);
   border-radius: $radius-full;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .removeChatButton {
