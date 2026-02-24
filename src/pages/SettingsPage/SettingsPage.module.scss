@@ -1,5 +1,5 @@
-@use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
 
 .settingsPage {
   max-width: 640px;
@@ -141,6 +141,73 @@
   font-family: $font-family-body;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
+}
+
+// Language
+.languageOption {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 2px solid var(--border-default);
+  border-radius: $radius-lg;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+  }
+
+  &.active {
+    border-color: var(--primary);
+    background-color: var(--primary-subtle, rgba($primary-500, 0.05));
+  }
+}
+
+.languageFlag {
+  font-size: 28px;
+  margin-right: 16px;
+}
+
+.languageInfo {
+  flex: 1;
+}
+
+.languageName {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.languageNative {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.languageRadioBtn {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-primary);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.languageOption.active .languageRadioBtn {
+  border-color: var(--primary);
+}
+
+.languageOption.active .languageRadioBtn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 50%;
 }
 
 // Settings List

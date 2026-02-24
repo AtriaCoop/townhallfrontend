@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import styles from "./SettingsPage.module.scss";
+import { LANGUAGES } from "@/constants/languages";
 
 export default function SettingsPage({ darkMode, setDarkMode }) {
   const router = useRouter();
@@ -67,15 +68,33 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
         </div>
       </div>
 
+      {/* Language Section */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>Language</h2>
+        <p className={styles.cardDescription}>
+          Choose your preferred language for the Townhall interface
+        </p>
+
+        <div>
+          {LANGUAGES.map((language) => (
+            <div class={styles.languageOption}>
+              <div class={styles.languageFlag}>{language.flag}</div>
+              <div class={styles.languageInfo}>
+                <div class={styles.languageName}>{language.name}</div>
+                <div class={styles.languageNative}>{language.nativeName}</div>
+              </div>
+              <div class={styles.languageRadioBtn}></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Account Section */}
       <div className={styles.card}>
         <h2 className={styles.cardTitle}>Account</h2>
 
         <div className={styles.settingsList}>
-          <button
-            className={styles.logoutButton}
-            onClick={handleLogout}
-          >
+          <button className={styles.logoutButton} onClick={handleLogout}>
             <Icon name="leave" size={20} />
             <span>Logout</span>
           </button>
