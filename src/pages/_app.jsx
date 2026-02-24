@@ -17,6 +17,9 @@ export default function App({ Component, pageProps }) {
   const addNotification = useNotificationStore((s) => s.addNotification);
   const addUnreadDm = useNotificationStore((s) => s.addUnreadDm);
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
+  const setUnreadDmMap = useNotificationStore((s) => s.setUnreadDmMap);
+  const setDmPreviews = useNotificationStore((s) => s.setDmPreviews);
+  const setHasNewDm = useNotificationStore((s) => s.setHasNewDm);
 
   // Fetch CSRF token on mount
   useEffect(() => {
@@ -50,7 +53,7 @@ export default function App({ Component, pageProps }) {
       .catch(() => {});
   }, [router.pathname]);
 
-  // Fetch initial unread notification count on mount
+  // Fetch initial unread counts on mount (notifications + DMs)
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!user?.id) return;
@@ -62,6 +65,31 @@ export default function App({ Component, pageProps }) {
       })
       .then((data) => {
         if (data) setUnreadCount(data.unread_count);
+      })
+      .catch(() => {});
+
+    authenticatedFetch(`${BASE_URL}/chats/unread-counts/`)
+      .then((res) => {
+        if (res.ok) return res.json();
+        return null;
+      })
+      .then((data) => {
+        if (!data?.data) return;
+        const countMap = {};
+        const previewMap = {};
+        for (const [chatId, info] of Object.entries(data.data)) {
+          countMap[chatId] = info.count;
+          previewMap[chatId] = {
+            senderId: info.sender_id,
+            senderName: info.sender_name,
+            senderImage: info.sender_image,
+            lastMessage: info.last_message,
+            timestamp: info.timestamp,
+          };
+        }
+        setUnreadDmMap(countMap);
+        setDmPreviews(previewMap);
+        if (Object.keys(countMap).length > 0) setHasNewDm(true);
       })
       .catch(() => {});
   }, []);

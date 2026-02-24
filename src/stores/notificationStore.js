@@ -80,6 +80,8 @@ const useNotificationStore = create((set) => ({
 
   setUnreadDmMap: (map) => set({ unreadDmMap: map }),
 
+  setDmPreviews: (previews) => set({ dmPreviews: previews }),
+
   clearAllUnreadDm: () => set({ hasNewDm: false, unreadDmMap: {}, dmPreviews: {} }),
 
   toggleMessageDropdown: () =>

@@ -81,6 +81,10 @@ export default function ChatWindow({ chat, onClose }) {
     useEffect(() => {
       if (!chat?.id) return;
       clearUnreadDm(chat.id);
+      // Mark chat as read on the backend so unread counts persist across refreshes
+      authenticatedFetch(`${BASE_URL}/chats/${chat.id}/read/`, {
+        method: "POST",
+      }).catch(() => {});
     }, [chat?.id]);
 
     useEffect(() => {
