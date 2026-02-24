@@ -107,7 +107,7 @@ export default function App({ Component, pageProps }) {
       if (data.type === "notification") {
         // Bell icon notification (reaction, comment, event, etc.)
         addNotification(data.notification);
-      } else if (data.sender && data.sender !== user.id) {
+      } else if (data.type === "dm" && data.sender != user.id) {
         // DM message notification with sender preview info
         addUnreadDm(data.chat_id, {
           senderId: data.sender,
