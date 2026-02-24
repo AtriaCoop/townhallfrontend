@@ -8,6 +8,7 @@ import MessageModal from '@/components/MessageModal/MessageModal';
 import UpdateMessageModal from '../UpdateMessageModal/UpdateMessageModal';
 import MessageInput from '@/components/MessageInput/MessageInput';
 import { formatRelativeTime, formatExactTime } from '@/utils/formateDatetime';
+import useNotificationStore from '@/stores/notificationStore';
 
 
 // Formats URLs in message text as clickable links
@@ -27,8 +28,9 @@ function formatMessageWithLinks(text) {
   );
 }
 
-export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm }) {
+export default function ChatWindow({ chat, onClose }) {
     const router = useRouter();
+    const clearUnreadDm = useNotificationStore((s) => s.clearUnreadDm);
 
     const [messages, setMessages] = useState([]);
     const [showMessageModal, setShowMessageModal] = useState(false);
@@ -78,13 +80,7 @@ export default function ChatWindow({ chat, onClose, setUnreadMap, setHasNewDm })
 
     useEffect(() => {
       if (!chat?.id) return;
-
-      setUnreadMap(prev => {
-        const updated = { ...prev, [chat.id]: 0 };
-        const stillUnread = Object.entries(updated).some(([_, count]) => count > 0);
-        setHasNewDm(stillUnread);
-        return updated;
-      });
+      clearUnreadDm(chat.id);
     }, [chat?.id]);
 
     useEffect(() => {

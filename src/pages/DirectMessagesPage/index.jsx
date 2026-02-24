@@ -4,17 +4,16 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";
 import Icon from "@/icons/Icon";
+import useNotificationStore from "@/stores/notificationStore";
 import styles from "./DirectMessagesPage.module.scss";
 
-export default function DirectMessagesPage({
-  currentUserId,
-  setHasNewDm,
-  unreadMap,
-  setUnreadMap,
-}) {
+export default function DirectMessagesPage() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
+
+  const unreadDmMap = useNotificationStore((s) => s.unreadDmMap);
+  const clearUnreadDm = useNotificationStore((s) => s.clearUnreadDm);
 
   const [csrfToken, setCsrfToken] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -144,12 +143,7 @@ export default function DirectMessagesPage({
 
   const handleChatClick = (chat) => {
     setActiveChat(chat);
-    setUnreadMap((prev) => {
-      const updatedMap = { ...prev, [chat.id]: 0 };
-      const anyUnread = Object.values(updatedMap).some((count) => count > 0);
-      setHasNewDm(anyUnread);
-      return updatedMap;
-    });
+    clearUnreadDm(chat.id);
   };
 
   const handleDeleteChat = async (chatId) => {
@@ -228,7 +222,7 @@ export default function DirectMessagesPage({
                   </div>
                   <p className={styles.chatPreview}>{chat.lastMessage}</p>
                 </div>
-                {unreadMap[chat.id] > 0 && (
+                {unreadDmMap[chat.id] > 0 && (
                   <span className={styles.unreadBadge} />
                 )}
                 <button
@@ -265,8 +259,6 @@ export default function DirectMessagesPage({
           <ChatWindow
             chat={activeChat}
             onClose={() => setActiveChat(null)}
-            setUnreadMap={setUnreadMap}
-            setHasNewDm={setHasNewDm}
           />
         ) : (
           <div className={styles.noChatSelected}>
@@ -281,7 +273,7 @@ export default function DirectMessagesPage({
       {showModal && (
         <ChatModal
           currUserId={(() => {
-            const userData = JSON.parse(localStorage.getItem("user"));
+            const userData = JSON.parse(localStorage.getItem("user") || "{}");
             return userData.id ? userData.id : -1;
           })()}
           onClose={() => setShowModal(false)}
