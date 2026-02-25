@@ -99,6 +99,14 @@ export default function Header() {
 
       {/* Right section - icons and profile */}
       <div className={styles.rightSection}>
+        {/* VFJC Logo */}
+        <img
+          src="/assets/VFJC.png"
+          alt="VFJC Logo"
+          className={styles.brandLogo}
+        />
+        <div className={styles.divider} />
+
         {/* Notification Bell with Dropdown */}
         <div className={styles.bellWrapper} ref={bellRef}>
           <button

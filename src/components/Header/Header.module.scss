@@ -42,21 +42,29 @@
   }
 }
 
-// Atria logo
-.atriaLogo {
-  height: 24px;
+// Brand logo (VFJC)
+.brandLogo {
+  height: 36px;
   width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 
   @include md {
-    height: 28px;
+    height: 40px;
   }
 }
 
 .divider {
   width: 1px;
-  height: 24px;
+  height: 28px;
   background-color: var(--border-default);
   flex-shrink: 0;
+  margin: 0 $spacing-1;
+
+  @include md {
+    height: 32px;
+    margin: 0 $spacing-2;
+  }
 }
 
 // Icon buttons (bell, messages)
