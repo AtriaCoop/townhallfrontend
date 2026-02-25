@@ -421,37 +421,38 @@ export default function GroupChatsPage() {
           </div>
         )}
 
-        {showModal && (
-          <JoinGroupModal
-            onClose={() => setShowModal(false)}
-            onJoinGroup={handleJoinGroup}
-            title="Join Groups"
-          />
-        )}
-
-        {showMessageModal && (
-          <MessageModal
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            onClose={() => {
-              setShowMessageModal(false);
-              setSelectedMessage(null);
-            }}
-          />
-        )}
-
-        {showUpdateModal && selectedMessage && (
-          <UpdateMessageModal
-            msg={{ id: selectedMessage.id, text: selectedMessage.message }}
-            onCancel={() => {
-              setShowUpdateModal(false);
-              setSelectedMessage(null);
-            }}
-            onUpdate={handleUpdateMessage}
-            apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
-          />
-        )}
       </div>
+
+      {showModal && (
+        <JoinGroupModal
+          onClose={() => setShowModal(false)}
+          onJoinGroup={handleJoinGroup}
+          title="Join Groups"
+        />
+      )}
+
+      {showMessageModal && (
+        <MessageModal
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onClose={() => {
+            setShowMessageModal(false);
+            setSelectedMessage(null);
+          }}
+        />
+      )}
+
+      {showUpdateModal && selectedMessage && (
+        <UpdateMessageModal
+          msg={{ id: selectedMessage.id, text: selectedMessage.message }}
+          onCancel={() => {
+            setShowUpdateModal(false);
+            setSelectedMessage(null);
+          }}
+          onUpdate={handleUpdateMessage}
+          apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
+        />
+      )}
     </div>
   );
 }
