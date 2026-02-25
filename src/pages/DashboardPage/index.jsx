@@ -9,6 +9,7 @@ import { fetchAllEvents } from "@/api/event";
 import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
+import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Icon from "@/icons/Icon";
 import styles from "./DashboardPage.module.scss";
 // Add import at the top
@@ -36,6 +37,9 @@ export default function DashboardPage() {
   const [postError, setPostError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [tag, setTag] = useState("");
+  const [tags, setTags] = useState([]);
+  const [tagErrorText, setTagErrorText] = useState("");
   const postImageRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -170,7 +174,7 @@ export default function DashboardPage() {
 
     setIsPosting(true);
     try {
-      const data = await createPost({ content: postText, images: postImages });
+      const data = await createPost({ content: postText, images: postImages, tags: tags });
 
       const newPost = {
         id: data.post.id,
@@ -182,6 +186,7 @@ export default function DashboardPage() {
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
+        tags: data.post.tags || [],
         links: [],
         comments: data.post.comments || [],
         reactions: data.post.reactions || {},
@@ -189,6 +194,9 @@ export default function DashboardPage() {
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
 
+      setTags([]);
+      setTag('');
+      setTagErrorText("");
       setPostText("");
       setPostImages([]);
       setPostError("");
@@ -262,6 +270,15 @@ export default function DashboardPage() {
           )}
 
           {postError && <p className={styles.postErrorMessage}>{postError}</p>}
+
+          <TagCreationField
+            tag={tag}
+            setTag={setTag}
+            tags={tags}
+            setTags={setTags}
+            tagErrorText={tagErrorText}
+            setTagErrorText={setTagErrorText}
+          />
 
           {/* Action Bar */}
           <div className={styles.createPostActions}>

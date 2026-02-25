@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import CommentModal from '@/components/CommentModal/CommentModal'
 import LikeModal from '@/components/LikeModal/LikeModal';
+import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from '@/components/Tag/Tag';
 import { getCookie } from '@/utils/authHelpers';
 import InlineComments from '@/components/InlineComments/InlineComments';
@@ -46,33 +47,8 @@ export default function Post({
   const [tag, setTag] = useState("");
   const [editTags, setEditTags] = useState(tags);
   const [tagErrorText, setTagErrorText] = useState("");
-  const MAX_TAGS = 5;
 
   const isMyOwnPost = userId === currentUserId;
-
-  const handleTagAdd = () => {
-    if (!tag.trim()) return;
-    if (editTags.length >= MAX_TAGS) {
-      setTagErrorText("Can't add more than 5 tags.");
-      return;
-    };
-
-    const exists = editTags.some(
-      (t) => t.toLowerCase() === tag.toLowerCase()
-    );
-    if (exists) {
-      setTagErrorText("Can't add duplicate tag.");
-      return;
-    };
-
-    setEditTags((prev) => [...prev, tag]);
-    setTag("");
-    setTagErrorText("");
-  }
-
-  const removeTag = (idx) => {
-    setEditTags((prev) => prev.filter((_, i) => i !== idx));
-  };
 
   // UPDATE POST
   async function handleUpdatePost() {
@@ -235,21 +211,14 @@ export default function Post({
               />
 
               {/* Tag Creation */}
-              <div className={styles.createTags}>
-                <div className={styles.tagList}>
-                  {editTags.map((tag, index) => (
-                    <Tag key={index} name={tag} onRemove={() => removeTag(index)} />
-                  ))}
-                </div>
-
-                <input value={tag} onChange={(e) => setTag(e.target.value)} />
-                <button onClick={handleTagAdd}>ADD</button>
-                <div>
-                  {tagErrorText.length > 0 && (
-                    <span className={styles.tagWarning}>{tagErrorText}</span>
-                  )}
-                </div>
-              </div>
+              <TagCreationField
+                tag={tag}
+                setTag={setTag}
+                tags={editTags}
+                setTags={setEditTags}
+                tagErrorText={tagErrorText}
+                setTagErrorText={setTagErrorText}
+              />
 
               <div
                 className={styles.imageInput}
@@ -374,16 +343,16 @@ export default function Post({
         </div>
       )}
 
-      <div className={styles.postFooter}>
-        {/* Post Tags */}
-        {tags?.length > 0 && (
-          <div className={styles.postFooterTop}>
-            {tags.map((tag, index) => (
-              <Tag key={index} removable={false} name={tag} />
-            ))}
-          </div>
-        )}
+      {/* Post Tags */}
+      {tags?.length > 0 && (
+        <div className={styles.postFooterTop}>
+          {tags.map((tag, index) => (
+            <Tag key={index} removable={false} name={tag} />
+          ))}
+        </div>
+      )}
 
+      <div className={styles.postFooter}>
         <div className={styles.reactions}>
           <Icon name="message" className={`${styles.postIcon} ${showComments ? styles.active : ''}`} onClick={handleCommentClick} />
           <div className={styles.likesComments} onClick={handleCommentClick}>
