@@ -144,7 +144,17 @@
   @include heading-2;
 }
 
+.profileActions {
+  display: flex;
+  gap: $spacing-2;
+}
+
 .editButton {
+  @include button-primary;
+  @include button-md;
+}
+
+.messageButton {
   @include button-primary;
   @include button-md;
 }

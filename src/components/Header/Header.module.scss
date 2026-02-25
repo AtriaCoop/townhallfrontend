@@ -35,28 +35,36 @@
 
 .rightSection {
   @include flex-end;
-  gap: $spacing-2;
+  gap: $spacing-3;
 
   @include md {
-    gap: $spacing-3;
+    gap: $spacing-4;
   }
 }
 
-// Atria logo
-.atriaLogo {
-  height: 24px;
+// Brand logo (VFJC)
+.brandLogo {
+  height: 36px;
   width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 
   @include md {
-    height: 28px;
+    height: 40px;
   }
 }
 
 .divider {
   width: 1px;
-  height: 24px;
+  height: 28px;
   background-color: var(--border-default);
   flex-shrink: 0;
+  margin: 0 $spacing-1;
+
+  @include md {
+    height: 32px;
+    margin: 0 $spacing-2;
+  }
 }
 
 // Icon buttons (bell, messages)
@@ -102,6 +110,38 @@
     transform: scale(1.2);
     opacity: 0.8;
   }
+}
+
+// Bell wrapper (positioned container for the notification dropdown)
+.bellWrapper {
+  position: relative;
+}
+
+// Message wrapper (positioned container for the message dropdown)
+.messageWrapper {
+  position: relative;
+}
+
+// Numeric count badge on the bell icon
+.countBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background-color: $error-500;
+  border-radius: $radius-full;
+  border: 2px solid var(--header-bg);
+  color: $white;
+  font-family: $font-family-body;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 // Profile button wrapper

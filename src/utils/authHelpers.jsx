@@ -1,3 +1,5 @@
+import { PUBLIC_PAGES } from '@/constants/api';
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
 export function getCookie(name) {
@@ -61,7 +63,17 @@ export async function authenticatedFetch(url, options = {}) {
     requestOptions.body = body;
   }
   
-  return fetch(url, requestOptions);
+  const response = await fetch(url, requestOptions);
+
+  // If the server says unauthorized, the session has expired — redirect to login
+  if (response.status === 401 && typeof window !== 'undefined') {
+    if (!PUBLIC_PAGES.includes(window.location.pathname)) {
+      localStorage.removeItem("user");
+      window.location.href = "/";
+    }
+  }
+
+  return response;
 }
 
 

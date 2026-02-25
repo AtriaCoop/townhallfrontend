@@ -84,7 +84,7 @@
 }
 
 .logo {
-  height: 44px;
+  height: 48px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
@@ -103,12 +103,12 @@
 
   @include lg {
     display: block;
-    height: 48px;
+    height: 56px;
   }
 }
 
 .logoSmall {
-  height: 36px;
+  height: 40px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
@@ -151,7 +151,7 @@
   display: flex;
   flex-direction: column;
   padding: $spacing-4 $spacing-3;
-  gap: $spacing-1;
+  gap: $spacing-2;
   overflow-y: auto;
   @include custom-scrollbar;
 

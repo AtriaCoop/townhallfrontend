@@ -116,17 +116,43 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Name and Edit Button */}
+        {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
           <h1 className={styles.name}>{profileData.full_name}</h1>
-          {isCurrentUser && (
-            <button
-              onClick={() => router.push("/EditProfilePage")}
-              className={styles.editButton}
-            >
-              Edit Profile
-            </button>
-          )}
+          <div className={styles.profileActions}>
+            {isCurrentUser ? (
+              <button
+                onClick={() => router.push("/EditProfilePage")}
+                className={styles.editButton}
+              >
+                Edit Profile
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+                  const currentUserId = Number(userData.id);
+                  try {
+                    const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        name: `chat-${currentUserId}-${id}`,
+                        participants: [currentUserId, Number(id)],
+                      }),
+                    });
+                    if (!res.ok) return;
+                    router.push(`/DirectMessagesPage?chatWith=${id}`);
+                  } catch (err) {
+                    console.error("Failed to start chat:", err);
+                  }
+                }}
+                className={styles.messageButton}
+              >
+                Message
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
