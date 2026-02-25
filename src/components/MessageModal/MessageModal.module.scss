@@ -4,37 +4,38 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba($black, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: $z-modal;
 }
 
 .modalCard {
   background: var(--modal-bg);
-  border-radius: 12px;
-  padding: 0.5rem;
+  border-radius: $radius-lg;
+  padding: $spacing-2;
   width: 200px;
   position: relative;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: $shadow-xl;
 }
 
 .actionButton {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: $spacing-3;
   width: 100%;
   background: none;
   border: none;
-  padding: 0.625rem 0.875rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: $spacing-3 $spacing-3;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-family: $font-family-body;
   color: var(--text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
+  @include transition-colors;
 
   &:hover {
     background-color: var(--bg-hover);
@@ -42,9 +43,15 @@
 }
 
 .deleteButton {
-  color: #dc3545;
+  color: $error-500;
 
   &:hover {
-    background-color: rgba(220, 53, 69, 0.08);
+    background-color: $error-50;
+  }
+}
+
+:global(body.dark) {
+  .deleteButton:hover {
+    background-color: rgba($error-500, 0.15);
   }
 }

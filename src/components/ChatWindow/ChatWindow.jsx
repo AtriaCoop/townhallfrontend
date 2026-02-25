@@ -230,7 +230,7 @@ export default function ChatWindow({ chat, onClose }) {
                         e.target.src = "/assets/ProfileImage.jpg";
                     }}
                 />
-                <div className={styles.clickable} onClick={goToProfile}>
+                <div className={`${styles.headerInfo} ${styles.clickable}`} onClick={goToProfile}>
                     <h2>{chat.name}</h2>
                     <p>{chat.title}</p>
                 </div>

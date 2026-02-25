@@ -2,6 +2,7 @@
 @use '@/styles/mixins' as *;
 
 .messagesPage {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
