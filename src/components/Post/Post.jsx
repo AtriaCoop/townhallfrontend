@@ -197,67 +197,78 @@ export default function Post({
         )}
         {/* Show Edit Modal */}
         {showEditModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modalContentEdit}>
-              <button className={styles.closeButton} onClick={() => setShowEditModal(false)}>×</button>
-              <h1>Edit Post</h1>
-
-              <p>Text</p>
-              <textarea
-                placeholder="Enter text..."
-                className={styles.textInput}
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-              />
-
-              {/* Tag Creation */}
-              <TagCreationField
-                tag={tag}
-                setTag={setTag}
-                tags={editTags}
-                setTags={setEditTags}
-                tagErrorText={tagErrorText}
-                setTagErrorText={setTagErrorText}
-              />
-
-              <div
-                className={styles.imageInput}
-                onClick={() => document.getElementById(`editImg-${postId}`).click()}
-              >
-                {editImage ? (
-                  <img
-                    src={URL.createObjectURL(editImage)}
-                    alt="Preview"
-                    className={styles.previewImage}
-                  />
-                ) : isValidImage(postImage) ? (
-                  <img
-                    src={postImage}
-                    alt="Current Post Image"
-                    className={styles.previewImage}
-                  />
-                ) : (
-                  <span>Choose Photo</span>
-                )}
+          <div className={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
+            <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.editModalHeader}>
+                <h2 className={styles.editModalTitle}>Edit Post</h2>
+                <button className={styles.editCloseButton} onClick={() => setShowEditModal(false)} aria-label="Close">
+                  <Icon name="close" size={20} />
+                </button>
               </div>
 
-              <input
-                type="file"
-                accept="image/*"
-                id={`editImg-${postId}`}
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file && file.type.startsWith("image/")) {
-                    setEditImage(file);
-                  }
-                }}
-              />
+              <div className={styles.editModalBody}>
+                <textarea
+                  className={styles.editTextArea}
+                  placeholder="What's on your mind?"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                />
 
-              <div className={styles.modalButton}>
-                <button className={styles.updateButton} onClick={handleUpdatePost}>
-                  Update
-                </button>
+                {/* Image preview */}
+                {(editImage || isValidImage(postImage)) && (
+                  <div className={styles.editImagePreview}>
+                    <img
+                      src={editImage ? URL.createObjectURL(editImage) : postImage}
+                      alt="Preview"
+                      className={styles.editPreviewImg}
+                    />
+                    <button
+                      className={styles.editRemoveImage}
+                      onClick={() => setEditImage(null)}
+                      aria-label="Remove image"
+                    >
+                      <Icon name="close" size={14} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Tags */}
+                <TagCreationField
+                  tag={tag}
+                  setTag={setTag}
+                  tags={editTags}
+                  setTags={setEditTags}
+                  tagErrorText={tagErrorText}
+                  setTagErrorText={setTagErrorText}
+                />
+              </div>
+
+              <div className={styles.editModalFooter}>
+                <div className={styles.editActions}>
+                  <button
+                    className={styles.editIconButton}
+                    onClick={() => document.getElementById(`editImg-${postId}`).click()}
+                    aria-label="Add image"
+                  >
+                    <Icon name="image" size={20} />
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id={`editImg-${postId}`}
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file && file.type.startsWith("image/")) {
+                        setEditImage(file);
+                      }
+                    }}
+                  />
+                </div>
+
+                <div className={styles.editSubmitRow}>
+                  <button className={styles.updateButton} onClick={handleUpdatePost}>Update</button>
+                </div>
               </div>
             </div>
           </div>
@@ -265,29 +276,52 @@ export default function Post({
         {/* Show Delete Modal */}
         {showDeleteModal && (
           <div className={styles.modalOverlay}>
-            <div className={styles.modalContentDelete}>
-              <button className={styles.closeButton} onClick={() => setShowDeleteModal(false)}>×</button>
-              <h1>Are you sure?</h1>
-              <button className={styles.deleteButton} onClick={handleDeletePost}>Delete</button>
+            <div className={styles.confirmModal}>
+              <div className={styles.confirmIcon} data-variant="danger">
+                <span>!</span>
+              </div>
+              <h3 className={styles.confirmTitle}>Delete Post</h3>
+              <p className={styles.confirmText}>Are you sure you want to delete this post? This action cannot be undone.</p>
+              <div className={styles.confirmActions}>
+                <button className={styles.cancelButton} onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                <button className={styles.deleteButton} onClick={handleDeletePost}>Delete</button>
+              </div>
             </div>
           </div>
         )}
         {/* Show Report Modal */}
         {showReportModal && (
           <div className={styles.modalOverlay}>
-            <div className={styles.modalContentDelete}>
-              <button className={styles.closeButton} onClick={() => { setReportResponse(''); setShowReportModal(false) }}>×</button>
-              {isLoading && (
-                <h1>Loading...</h1>
-              )}
-              {reportResponse ? (
+            <div className={styles.confirmModal}>
+              {isLoading ? (
                 <>
-                  <h1>{reportResponse}</h1>
+                  <div className={styles.confirmIcon} data-variant="warning">
+                    <span>...</span>
+                  </div>
+                  <h3 className={styles.confirmTitle}>Reporting</h3>
+                  <p className={styles.confirmText}>Please wait while we process your report.</p>
+                </>
+              ) : reportResponse ? (
+                <>
+                  <div className={styles.confirmIcon} data-variant="info">
+                    <span>i</span>
+                  </div>
+                  <h3 className={styles.confirmTitle}>{reportResponse}</h3>
+                  <div className={styles.confirmActions}>
+                    <button className={styles.cancelButton} onClick={() => { setReportResponse(''); setShowReportModal(false); }}>Close</button>
+                  </div>
                 </>
               ) : (
                 <>
-                  <h1>Are you sure?</h1>
-                  <button className={styles.deleteButton} onClick={handleReportPost}>Report</button>
+                  <div className={styles.confirmIcon} data-variant="warning">
+                    <span>!</span>
+                  </div>
+                  <h3 className={styles.confirmTitle}>Report Post</h3>
+                  <p className={styles.confirmText}>Are you sure you want to report this post? Our team will review it.</p>
+                  <div className={styles.confirmActions}>
+                    <button className={styles.cancelButton} onClick={() => { setReportResponse(''); setShowReportModal(false); }}>Cancel</button>
+                    <button className={styles.reportButton} onClick={handleReportPost}>Report</button>
+                  </div>
                 </>
               )}
             </div>
