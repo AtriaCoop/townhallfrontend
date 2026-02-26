@@ -385,7 +385,7 @@ export default function GroupChatsPage() {
                   }
 
                   return (
-                    <div key={msg.id} className={styles.messageIncoming}>
+                    <div key={msg.id} className={styles.messageIncomingGroup}>
                       <MessageBubble
                         avatar={msg.avatar}
                         sender={msg.sender}

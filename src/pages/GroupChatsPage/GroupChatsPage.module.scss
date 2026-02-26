@@ -147,6 +147,20 @@
   color: var(--text-primary);
 }
 
+// Incoming group messages use MessageBubble which provides its own
+// background, padding, border-radius, and box-shadow — so the wrapper
+// only needs layout properties to avoid double-styling.
+.messageIncomingGroup {
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 80%;
+  margin-bottom: 2px;
+
+  @include md {
+    max-width: 70%;
+  }
+}
+
 .messageContent {
   display: flex;
   align-items: center;
