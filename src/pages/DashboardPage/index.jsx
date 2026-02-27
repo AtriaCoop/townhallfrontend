@@ -71,11 +71,10 @@ export default function DashboardPage() {
 
     async function loadEvents() {
       try {
-        const user = getStoredUser();
         const events = await fetchAllEvents();
         const today = new Date().toISOString().split("T")[0];
         const upcoming = events
-          .filter((e) => e.date >= today && (e.isEnrolled || e.admin?.id === user?.id))
+          .filter((e) => e.date >= today && e.isEnrolled)
           .sort((a, b) => new Date(a.date) - new Date(b.date))
           .slice(0, 5);
         setUpcomingEvents(upcoming);
