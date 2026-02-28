@@ -31,7 +31,7 @@ export default function SocialLinks({ socialLinks }) {
   ];
 
   return (
-    <div className={styles.socialLinks}>
+    <div className={`${styles.socialLinks} socialLinks`}>
       {links
         .filter((link) => !!link.url)
         .map(({ url, icon, name }) => (
@@ -41,6 +41,7 @@ export default function SocialLinks({ socialLinks }) {
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
+            title={name}
           >
             {icon}
           </a>

@@ -163,7 +163,7 @@
 // Content Grid
 .contentGrid {
   display: grid;
-  gap: $spacing-4;
+  gap: $spacing-lg;
   grid-template-columns: 1fr;
 
   @include md {
@@ -178,26 +178,35 @@
 
 .cardTitle {
   @include subheading-1;
-  color: var(--text-secondary);
-  margin: 0 0 $spacing-4 0;
-  padding-bottom: $spacing-3;
+  color: var(--text-primary);
+  margin: 0 0 $spacing-lg 0;
+  padding-bottom: $spacing-md;
   border-bottom: 1px solid var(--border-default);
+  font-weight: $font-weight-semibold;
 }
 
 // Info List (Basic Information)
 .infoList {
   @include flex-column;
-  gap: $spacing-4;
+  gap: $spacing-md;
 }
 
 .infoItem {
-  @include flex-column;
-  gap: $spacing-1;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid var(--border-default);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 }
 
 .infoLabel {
-  @include caption;
-  color: var(--text-muted);
+  @include body-2;
+  color: var(--text-secondary);
   font-weight: $font-weight-medium;
 }
 
@@ -208,7 +217,7 @@
 
 // Detail Sections
 .detailSection {
-  margin-bottom: $spacing-4;
+  margin-bottom: $spacing-lg;
 
   &:last-child {
     margin-bottom: 0;
@@ -219,7 +228,10 @@
   @include body-2;
   color: var(--text-secondary);
   font-weight: $font-weight-semibold;
-  margin: 0 0 $spacing-2 0;
+  margin: 0 0 $spacing-sm 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
 }
 
 .detailContent {
@@ -227,5 +239,79 @@
   color: var(--text-primary);
   margin: 0;
   line-height: $line-height-relaxed;
+}
+
+// Image Modal
+.imageModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: $z-modal;
+  @include flex-center;
+  animation: fadeIn 200ms $ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.imageModalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: scaleIn 250ms $ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.enlargedImage {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-2xl);
+}
+
+.closeButton {
+  position: absolute;
+  top: -$spacing-12;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: $neutral-900;
+  border: none;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  @include flex-center;
+  transition: all 200ms $ease-out;
+
+  &:hover {
+    background-color: $white;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 }
 

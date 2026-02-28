@@ -33,6 +33,11 @@ import {
 	Sun,
 	Moon,
 	Monitor,
+	Lock,
+	Eye,
+	EyeOff,
+	Shield,
+	UserX,
 } from 'lucide-react';
 
 // If you update an alias, you must also update it in each component that uses the icon!
@@ -72,4 +77,9 @@ export const Icons = {
 	sun: Sun,
 	moon: Moon,
 	monitor: Monitor,
+	lock: Lock,
+	eye: Eye,
+	eyeOff: EyeOff,
+	shield: Shield,
+	userX: UserX,
 }

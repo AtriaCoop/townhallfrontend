@@ -19,6 +19,8 @@ export default function LandingPage() {
   const [error, setError] = useState("");
   const [authMode, setAuthMode] = useState(AUTH_MODES.SIGNUP);
   const [loading, setLoading] = useState(false);
+  const [deactivated, setDeactivated] = useState(false);
+  const [reactivating, setReactivating] = useState(false);
 
   // Logo animation state
   const [visibleLogos, setVisibleLogos] = useState([]);
@@ -71,6 +73,7 @@ export default function LandingPage() {
   const clearMessages = useCallback(() => {
     setError("");
     setMessage("");
+    setDeactivated(false);
   }, []);
 
   const handleChange = useCallback(
@@ -140,7 +143,12 @@ export default function LandingPage() {
           }
         } else {
           setLoading(false);
-          setError(data.error || "Invalid email or password");
+          if (data.error === "account_deactivated") {
+            setDeactivated(true);
+            setError("");
+          } else {
+            setError(data.error || "Invalid email or password");
+          }
         }
       } catch (err) {
         setError("Login failed. Please check your connection and try again.");
@@ -150,6 +158,39 @@ export default function LandingPage() {
     },
     [formData, BASE_URL, router]
   );
+
+  const handleReactivate = useCallback(async () => {
+    setReactivating(true);
+    setError("");
+
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/auth/reactivate/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setDeactivated(false);
+        setMessage("Account reactivated! Signing you in...");
+        // Auto-login after reactivation
+        setTimeout(() => {
+          handleLogIn({ preventDefault: () => {} });
+        }, 1000);
+      } else {
+        setError(data.error || "Failed to reactivate account.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setReactivating(false);
+    }
+  }, [formData, BASE_URL, handleLogIn]);
 
   const handleSubmit = useCallback(
     (e) => {
@@ -290,6 +331,22 @@ export default function LandingPage() {
 
           {message && <p className={styles.message}>{message}</p>}
           {error && <p className={styles.error}>{error}</p>}
+
+          {deactivated && (
+            <div className={styles.deactivatedNotice}>
+              <p className={styles.deactivatedMessage}>
+                Your account has been deactivated. Would you like to reactivate it?
+              </p>
+              <button
+                type="button"
+                className={styles.reactivateButton}
+                onClick={handleReactivate}
+                disabled={reactivating}
+              >
+                {reactivating ? "Reactivating..." : "Reactivate Account"}
+              </button>
+            </div>
+          )}
 
           <p className={styles.switchMode}>
             {isLoginMode
