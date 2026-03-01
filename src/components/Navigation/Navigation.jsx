@@ -24,7 +24,7 @@ export default function Navigation({ hasNewDm = false }) {
     setShowReportModal(true);
   };
 
-  useEffect (() => {
+  useEffect(() => {
     async function fetchProfile() {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
@@ -45,7 +45,7 @@ export default function Navigation({ hasNewDm = false }) {
     }
     fetchProfile();
   }, [])
-  
+
   return (
     <div className={styles.nav}>
 
@@ -63,18 +63,19 @@ export default function Navigation({ hasNewDm = false }) {
 
       <div className={styles.logos}>
         <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Home /><span className={styles.linkText}>Home</span></div>
-        <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><LayoutDashboard /><span className={styles.linkText}>Dashboard</span></div>
-        <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
-        <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
-        <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
         <div className={`${styles.link} ${pathname === '/ReportModal' ? styles.active : ''}`} onClick={() => handleReportClick()}><CircleAlert /><span className={styles.linkText}>Report problem or request feature</span></div>
+        <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Icon name="home" /><span className={styles.linkText}>Home</span></div>
+        <div className={`${styles.link} ${pathname === '/NewsfeedPage' ? styles.active : ''}`} onClick={() => router.push('/NewsfeedPage')}><Icon name="dashboard" /><span className={styles.linkText}>Newsfeed</span></div>
+        <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
+        <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
+        <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
       </div>
 
       {showReportModal && (
-      <ReportModal
-        onClose={() => setShowReportModal(false)}
-        handleSubmit={() => {}} // temporary empty function. Change later.
-      />
+        <ReportModal
+          onClose={() => setShowReportModal(false)}
+          handleSubmit={() => { }} // temporary empty function. Change later.
+        />
       )}
 
       <div className={styles.profile} onClick={() => router.push(`/ProfilePage/${profileData.id}`)}>
@@ -103,14 +104,14 @@ export default function Navigation({ hasNewDm = false }) {
           <div className={styles.separator}></div>
 
           <div className={styles.logos}>
-            <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Home /><span className={styles.linkText}>Home</span></div>
-            <div className={`${styles.link} ${pathname === '/DashboardPage' ? styles.active : ''}`} onClick={() => router.push('/DashboardPage')}><LayoutDashboard /><span className={styles.linkText}>Dashboard</span></div>
-            <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><User /><span className={styles.linkText}>Members</span></div>
-            <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Users /><span className={styles.linkText}>Group Chats</span></div>
-            <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><MessageSquare /><span className={styles.linkText}>Direct Messages</span></div>
+            <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Icon name="home" /><span className={styles.linkText}>Home</span></div>
+            <div className={`${styles.link} ${pathname === '/NewsfeedPage' ? styles.active : ''}`} onClick={() => router.push('/NewsfeedPage')}><Icon name="dashboard" /><span className={styles.linkText}>Newsfeed</span></div>
+            <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
+            <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
+            <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span></div>
             <div className={`${styles.link} ${pathname === '/ReportModal' ? styles.active : ''}`} onClick={() => handleReportClick()}><CircleAlert /><span className={styles.linkText}>Report problem or request feature</span></div>
-          </div>
-        </div>
+          </div >
+        </div >
 
         <div className={styles.modalProfile} onClick={() => router.push(`/ProfilePage/${profileData?.id}`)}>
           <img src={profileData?.profile_image || '/assets/ProfileImage.jpg'}
@@ -128,8 +129,8 @@ export default function Navigation({ hasNewDm = false }) {
             )}
           </span>
         </div>
-      </div>
-      
-    </div>
+      </div >
+
+    </div >
   );
 }

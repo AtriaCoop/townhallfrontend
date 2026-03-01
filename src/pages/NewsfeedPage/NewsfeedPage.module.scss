@@ -1,7 +1,7 @@
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
-.dashboard {
+.newsfeed {
   display: flex;
   flex-direction: column;
   gap: $spacing-6;
