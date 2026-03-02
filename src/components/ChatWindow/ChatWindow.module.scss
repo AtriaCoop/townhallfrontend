@@ -1,6 +1,7 @@
-.chatWindow {
-    --header-bg: #f7f7f7;
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
+.chatWindow {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -11,37 +12,52 @@
     overflow: hidden;
   }
 
-  :global(body.dark) .chatWindow {
-    --header-bg: #444444;
-  }
-
   .header {
     display: flex;
     align-items: center;
-    padding: 16px 20px;
-    gap: 12px;
-    background: var(--header-bg);
+    padding: $spacing-3 $spacing-4;
+    gap: $spacing-3;
+    background: var(--bg-primary);
     border-bottom: 1px solid var(--border-default);
+    flex-shrink: 0;
+
+    @include md {
+      padding: $spacing-4 $spacing-5;
+    }
+  }
+
+  .headerInfo {
+    flex: 1;
+    min-width: 0;
 
     h2 {
       margin: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
       color: var(--text-primary);
+      @include truncate;
     }
 
     p {
       margin: 0;
-      font-size: 0.85rem;
+      font-size: $font-size-sm;
       color: var(--text-muted);
+      @include truncate;
     }
   }
 
   .avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: $radius-full;
     object-fit: cover;
+
+    @include md {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+    }
   }
 
   .clickable {
@@ -54,57 +70,73 @@
 
   .closeButton {
     display: none;
-    margin-left: auto;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    color: var(--icons);
-    padding: 8px;
+    color: var(--icon-default);
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: $radius-md;
+    padding: 0;
+    flex-shrink: 0;
+    @include transition-colors;
 
     &:hover {
-      color: var(--icons-hover);
+      background-color: var(--bg-hover);
+      color: var(--icon-hover);
     }
 
-    @media (max-width: 767px) {
+    @include below-md {
       display: flex;
     }
   }
 
   .messages {
     flex: 1;
-    padding: 16px 20px;
+    padding: $spacing-3 $spacing-4;
     overflow-y: auto;
     background: var(--bg-secondary);
     min-height: 0;
     overscroll-behavior: contain;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $spacing-1;
+    @include custom-scrollbar;
+
+    @include md {
+      padding: $spacing-4 $spacing-5;
+    }
   }
 
   .messageIncoming,
   .messageOutgoing {
     width: fit-content;
-    max-width: 70%;
-    padding: 0.75rem 1rem;
+    max-width: 80%;
+    padding: $spacing-3 $spacing-4;
     margin-bottom: 2px;
     position: relative;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 
     p {
       margin: 0;
-      line-height: 1.5;
-      font-size: 1rem;
+      line-height: $line-height-normal;
+      font-size: $font-size-base;
     }
 
     img {
-      max-width: 280px;
+      max-width: 100%;
       max-height: 300px;
       object-fit: contain;
-      margin-top: 0.5rem;
-      border-radius: 8px;
+      margin-top: $spacing-2;
+      border-radius: $radius-md;
+    }
+
+    @include md {
+      max-width: 70%;
     }
   }
 
@@ -117,26 +149,32 @@
   .messageOutgoing {
     align-self: flex-end;
     background: var(--primary);
-    color: white;
+    color: $white;
   }
 
 .messageContent {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: $spacing-1;
 }
 
 .optionsButton {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.1rem;
-  padding: 2px 4px;
+  font-size: $font-size-lg;
+  padding: 2px $spacing-1;
   color: inherit;
-  opacity: 0;
   flex-shrink: 0;
-  transition: opacity 0.15s;
+  transition: opacity $transition-fast;
   line-height: 1;
+
+  // Always show on touch devices (no hover)
+  opacity: 0.5;
+
+  @include md {
+    opacity: 0;
+  }
 }
 
 .messageIncoming:hover .optionsButton,
@@ -149,12 +187,18 @@
 }
 
 .messageTimestamp {
-  font-size: 0.7rem;
-  color: var(--text-muted, #999);
+  font-size: $font-size-xs;
+  color: var(--text-muted);
   margin-top: 2px;
   display: block;
-  opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity $transition-fast;
+
+  // Always show on mobile (no hover available)
+  opacity: 1;
+
+  @include md {
+    opacity: 0;
+  }
 }
 
 .messageIncoming:hover .messageTimestamp,
@@ -164,5 +208,5 @@
 
 .messageOutgoing .messageTimestamp {
   text-align: right;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba($white, 0.7);
 }

@@ -27,9 +27,12 @@
   }
 }
 
-// Mobile overlay
+// Mobile overlay — must sit below sidebar ($z-fixed + 1)
 .overlay {
-  @include backdrop;
+  position: fixed;
+  inset: 0;
+  background-color: rgba($black, 0.4);
+  z-index: $z-fixed;
   display: block;
 
   @include md {
@@ -43,6 +46,7 @@
   top: 0;
   left: 0;
   height: 100vh;
+  height: 100dvh;
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
   display: flex;

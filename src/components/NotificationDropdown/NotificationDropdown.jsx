@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import useNotificationStore from '@/stores/notificationStore';
@@ -56,7 +56,6 @@ function timeAgo(dateString) {
 export default function NotificationDropdown() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
-  const dropdownRef = useRef(null);
 
   const notifications = useNotificationStore((s) => s.notifications);
   const setNotifications = useNotificationStore((s) => s.setNotifications);
@@ -75,26 +74,6 @@ export default function NotificationDropdown() {
       })
       .catch(() => {});
   }, []);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
-        closeBellDropdown();
-      }
-    }
-    // Use setTimeout to avoid the click that opened the dropdown from closing it
-    const timeout = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 0);
-    return () => {
-      clearTimeout(timeout);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [closeBellDropdown]);
 
   const handleMarkAllRead = async () => {
     try {
@@ -119,7 +98,7 @@ export default function NotificationDropdown() {
   };
 
   return (
-    <div className={styles.dropdown} ref={dropdownRef}>
+    <div className={styles.dropdown}>
       <div className={styles.header}>
         <span className={styles.title}>Notifications</span>
         {notifications.some((n) => !n.is_read) && (

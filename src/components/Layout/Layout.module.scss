@@ -4,6 +4,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg-secondary);
 }
 
@@ -12,6 +13,7 @@
   flex-direction: column;
   flex: 1;
   height: 100vh;
+  height: 100dvh;
   min-height: 0;
   width: 100%;
 

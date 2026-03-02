@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -109,6 +110,8 @@ export default function ProfilePage() {
             src={profileData.profile_image || "/assets/ProfileImage.jpg"}
             alt={profileData.full_name}
             className={styles.avatar}
+            onClick={() => setShowImageModal(true)}
+            style={{ cursor: "pointer" }}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "/assets/ProfileImage.jpg";
@@ -128,29 +131,31 @@ export default function ProfilePage() {
                 Edit Profile
               </button>
             ) : (
-              <button
-                onClick={async () => {
-                  const userData = JSON.parse(localStorage.getItem("user") || "{}");
-                  const currentUserId = Number(userData.id);
-                  try {
-                    const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        name: `chat-${currentUserId}-${id}`,
-                        participants: [currentUserId, Number(id)],
-                      }),
-                    });
-                    if (!res.ok) return;
-                    router.push(`/DirectMessagesPage?chatWith=${id}`);
-                  } catch (err) {
-                    console.error("Failed to start chat:", err);
-                  }
-                }}
-                className={styles.messageButton}
-              >
-                Message
-              </button>
+              profileData.allow_dms !== false && (
+                <button
+                  onClick={async () => {
+                    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+                    const currentUserId = Number(userData.id);
+                    try {
+                      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: `chat-${currentUserId}-${id}`,
+                          participants: [currentUserId, Number(id)],
+                        }),
+                      });
+                      if (!res.ok) return;
+                      router.push(`/DirectMessagesPage?chatWith=${id}`);
+                    } catch (err) {
+                      console.error("Failed to start chat:", err);
+                    }
+                  }}
+                  className={styles.messageButton}
+                >
+                  Message
+                </button>
+              )
             )}
           </div>
         </div>
@@ -166,10 +171,12 @@ export default function ProfilePage() {
               <span className={styles.infoLabel}>Name:</span>
               <span className={styles.infoValue}>{profileData.full_name}</span>
             </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Email:</span>
-              <span className={styles.infoValue}>{profileData.email}</span>
-            </div>
+            {(isCurrentUser || profileData.show_email !== false) && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Email:</span>
+                <span className={styles.infoValue}>{profileData.email}</span>
+              </div>
+            )}
             {profileData.title && (
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Title:</span>
@@ -248,6 +255,33 @@ export default function ProfilePage() {
         )}
 
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div
+          className={styles.imageModalOverlay}
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setShowImageModal(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <img
+              src={profileData.profile_image || "/assets/ProfileImage.jpg"}
+              alt={profileData.full_name}
+              className={styles.enlargedImage}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/assets/ProfileImage.jpg";
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
