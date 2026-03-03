@@ -2,17 +2,35 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import styles from "./LandingPage.module.scss";
 import { registerUser, authenticatedFetch } from "@/utils/authHelpers";
+import { getStoredUser } from "@/utils/getStoredUser";
+import { BASE_URL } from "@/constants/api";
 import Loader from "@/components/Loader/Loader";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
+import Icon from "@/icons/Icon";
 
 const AUTH_MODES = {
   LOGIN: "login",
   SIGNUP: "signup",
 };
 
+// Helper functions
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function calculatePasswordStrength(password) {
+  if (password.length === 0) return "";
+  if (password.length < 6) return "weak";
+  if (password.length < 10) return "medium";
+  if (password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+    return "strong";
+  }
+  return "medium";
+}
+
 export default function LandingPage() {
   const router = useRouter();
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
@@ -22,41 +40,19 @@ export default function LandingPage() {
   const [deactivated, setDeactivated] = useState(false);
   const [reactivating, setReactivating] = useState(false);
 
-  // Logo animation state
-  const [visibleLogos, setVisibleLogos] = useState([]);
-  const [showAuthUI, setShowAuthUI] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
+  // UX Enhancements
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState("");
+
   const isLoginMode = authMode === AUTH_MODES.LOGIN;
-
-  // Logo sequence animation
-  useEffect(() => {
-    const logoSequence = [
-      { src: "/assets/redLogo.png", delay: 500 },
-      { src: "/assets/yellowLogo.png", delay: 1250 },
-      { src: "/assets/blueLogo.png", delay: 2000 },
-    ];
-
-    const timeouts = logoSequence.map((logo) =>
-      setTimeout(() => {
-        setVisibleLogos((prev) => [...prev, logo.src]);
-      }, logo.delay)
-    );
-
-    const showUITimeout = setTimeout(() => {
-      setShowAuthUI(true);
-    }, 3000);
-
-    return () => {
-      timeouts.forEach(clearTimeout);
-      clearTimeout(showUITimeout);
-    };
-  }, []);
 
   // Check for existing user session — validate with server before redirecting
   useEffect(() => {
     if (!router.isReady) return;
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const storedUser = getStoredUser();
     if (!storedUser) return;
 
     fetch(`${BASE_URL}/auth/session/`, { credentials: "include" })
@@ -68,7 +64,7 @@ export default function LandingPage() {
         }
       })
       .catch(() => {});
-  }, [router.isReady, router, BASE_URL]);
+  }, [router.isReady, router]);
 
   const clearMessages = useCallback(() => {
     setError("");
@@ -79,9 +75,24 @@ export default function LandingPage() {
   const handleChange = useCallback(
     (e) => {
       clearMessages();
-      setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+
+      // Real-time email validation
+      if (name === "email") {
+        if (value && !validateEmail(value)) {
+          setEmailError("Please enter a valid email address");
+        } else {
+          setEmailError("");
+        }
+      }
+
+      // Real-time password strength
+      if (name === "password" && !isLoginMode) {
+        setPasswordStrength(calculatePasswordStrength(value));
+      }
     },
-    [clearMessages]
+    [clearMessages, isLoginMode]
   );
 
   const handleSignUp = useCallback(async () => {
@@ -209,40 +220,10 @@ export default function LandingPage() {
       prev === AUTH_MODES.LOGIN ? AUTH_MODES.SIGNUP : AUTH_MODES.LOGIN
     );
     clearMessages();
+    setEmailError("");
+    setPasswordStrength("");
+    setShowPassword(false);
   }, [clearMessages]);
-
-  // Render logo sequence animation
-  if (!showAuthUI) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.logoSequence}>
-          <div className={styles.logoCluster}>
-            {visibleLogos.includes("/assets/redLogo.png") && (
-              <img
-                src="/assets/redLogo.png"
-                className={styles.redLogo}
-                alt="Red logo"
-              />
-            )}
-            {visibleLogos.includes("/assets/yellowLogo.png") && (
-              <img
-                src="/assets/yellowLogo.png"
-                className={styles.yellowLogo}
-                alt="Yellow logo"
-              />
-            )}
-            {visibleLogos.includes("/assets/blueLogo.png") && (
-              <img
-                src="/assets/blueLogo.png"
-                className={styles.blueLogo}
-                alt="Blue logo"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Render loading state
   if (loading) {
@@ -262,24 +243,34 @@ export default function LandingPage() {
   // Render auth form
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.brandingPanel}>
+      {/* Left Side - Brand Section */}
+      <div className={styles.brandSection}>
+        <div className={styles.brandContent}>
+          <img
+            src="/assets/atriaLogo.png"
+            alt="Atria"
+            className={styles.atriaLogo}
+          />
+          <div className={styles.brandDivider} />
           <img
             src="/assets/VFJC.png"
             alt="Vancouver Food Justice Coalition"
             className={styles.vfjcLogo}
           />
         </div>
+      </div>
 
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h1 className={styles.cardTitle}>
+      {/* Right Side - Auth Section */}
+      <div className={styles.authSection}>
+        <div className={styles.authContent}>
+          <div className={styles.authHeader}>
+            <h1 className={styles.authTitle}>
               {isLoginMode ? "Welcome back" : "Get started"}
             </h1>
-            <p className={styles.cardDescription}>
+            <p className={styles.authDescription}>
               {isLoginMode
                 ? "Sign in to your account to continue."
-                : "Create your account to join the coalition."}
+                : "Create your account to continue."}
             </p>
           </div>
 
@@ -295,31 +286,76 @@ export default function LandingPage() {
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                className={styles.input}
+                className={`${styles.input} ${emailError ? styles.inputError : ''}`}
                 autoComplete="email"
               />
+              {emailError && (
+                <span className={styles.fieldError}>{emailError}</span>
+              )}
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.label}>
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                className={styles.input}
-                autoComplete={
-                  isLoginMode ? "current-password" : "new-password"
-                }
-              />
+              <div className={styles.passwordWrapper}>
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={styles.input}
+                  autoComplete={
+                    isLoginMode ? "current-password" : "new-password"
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.passwordToggle}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <Icon name={showPassword ? "eyeOff" : "eye"} size={20} />
+                </button>
+              </div>
+              {!isLoginMode && passwordStrength && (
+                <div className={styles.passwordStrength}>
+                  <div className={styles.strengthBar}>
+                    <div
+                      className={`${styles.strengthFill} ${styles[`strength${passwordStrength.charAt(0).toUpperCase() + passwordStrength.slice(1)}`]}`}
+                    />
+                  </div>
+                  <span className={`${styles.strengthText} ${styles[`text${passwordStrength.charAt(0).toUpperCase() + passwordStrength.slice(1)}`]}`}>
+                    {passwordStrength.charAt(0).toUpperCase() + passwordStrength.slice(1)} password
+                  </span>
+                </div>
+              )}
             </div>
 
-            <button type="submit" className={styles.submitButton}>
-              {isLoginMode ? "Sign in" : "Create account"}
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={loading || (emailError && formData.email)}
+            >
+              {loading ? (
+                <span className={styles.buttonLoading}>
+                  <svg className={styles.spinner} viewBox="0 0 24 24">
+                    <circle
+                      className={styles.spinnerCircle}
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="none"
+                      strokeWidth="3"
+                    />
+                  </svg>
+                  {isLoginMode ? "Signing in..." : "Creating account..."}
+                </span>
+              ) : (
+                isLoginMode ? "Sign in" : "Create account"
+              )}
             </button>
 
             {isLoginMode && (
@@ -356,6 +392,7 @@ export default function LandingPage() {
               {isLoginMode ? "Sign up" : "Sign in"}
             </span>
           </p>
+
           <p className={styles.privacyText}>
             By {isLoginMode ? 'signing in' : 'creating an account'}, you agree to our{' '}
             <span onClick={() => setShowPrivacyModal(true)} className={styles.privacyLink}>
@@ -365,16 +402,9 @@ export default function LandingPage() {
         </div>
       </div>
 
-        {/* Privacy Modal */}
-        {showPrivacyModal && (
+      {showPrivacyModal && (
         <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
       )}
-
-      <img
-        src="/assets/atriaLogo.png"
-        alt="Atria"
-        className={styles.atriaLogo}
-      />
     </div>
   );
 }
