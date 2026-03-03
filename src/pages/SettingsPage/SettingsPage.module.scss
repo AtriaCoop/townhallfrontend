@@ -206,36 +206,15 @@
   flex: 1;
 }
 
-.languageName {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  color: var(--text-primary);
-}
-
 .languageRadioBtn {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--text-primary);
   border-radius: 50%;
   position: relative;
-  transition: all 0.2s ease;
 }
 
-.languageOption.active .languageRadioBtn {
-  border-color: var(--primary);
-}
-
-.languageOption.active .languageRadioBtn::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  background: var(--primary);
-  border-radius: 50%;
+.languageRadioBtn:checked {
+  accent-color: $primary-500;
 }
 
 // Settings List
