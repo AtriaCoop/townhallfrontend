@@ -35,6 +35,7 @@ export default function EditProfilePage() {
 
   const dismissTimerRef = useRef(null);
 
+  const [removeBanner, setRemoveBanner] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteClick = () => setShowModal(true);
@@ -118,7 +119,9 @@ export default function EditProfilePage() {
     if (formData.profile_image instanceof File) {
       form.append("profile_image", formData.profile_image);
     }
-    if (formData.profile_header instanceof File) {
+    if (removeBanner) {
+      form.append("remove_profile_header", "true");
+    } else if (formData.profile_header instanceof File) {
       form.append("profile_header", formData.profile_header);
     }
 
@@ -279,7 +282,9 @@ export default function EditProfilePage() {
         <label htmlFor="bannerImageUpload" className={styles.bannerImageLabel}>
           <img
             src={
-              formData.profile_header instanceof File
+              removeBanner
+                ? "/assets/defaultBanner.svg"
+                : formData.profile_header instanceof File
                 ? URL.createObjectURL(formData.profile_header)
                 : profileData?.profile_header || "/assets/defaultBanner.svg"
             }
@@ -301,9 +306,24 @@ export default function EditProfilePage() {
           accept="image/*"
           style={{ display: "none" }}
           onChange={(e) => {
-            if (e.target.files[0]) handleFieldChange({ profile_header: e.target.files[0] });
+            if (e.target.files[0]) {
+              setRemoveBanner(false);
+              handleFieldChange({ profile_header: e.target.files[0] });
+            }
           }}
         />
+        {(profileData?.profile_header || formData.profile_header instanceof File) && !removeBanner && (
+          <button
+            type="button"
+            className={styles.removeBannerButton}
+            onClick={() => {
+              setRemoveBanner(true);
+              handleFieldChange({ profile_header: null });
+            }}
+          >
+            Remove Banner
+          </button>
+        )}
       </div>
 
       {/* Form Sections */}

@@ -141,7 +141,7 @@ export default function SetUpPage() {
       form.append("profile_image", profilePicRef.current.files[0]);
     }
     if (headerPicRef.current?.files[0]) {
-      form.append("header_image", headerPicRef.current.files[0]);
+      form.append("profile_header", headerPicRef.current.files[0]);
     }
 
     try {

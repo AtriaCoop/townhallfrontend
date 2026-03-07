@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import Icon from '@/icons/Icon';
 import styles from './Sidebar.module.scss';
@@ -13,8 +12,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  const pathname = usePathname();
   const router = useRouter();
+  const { pathname } = router;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleNavClick = (path) => {
