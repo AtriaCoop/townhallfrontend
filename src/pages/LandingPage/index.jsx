@@ -108,9 +108,12 @@ export default function LandingPage() {
       setError(result.error);
       setLoading(false);
     } else {
-      setMessage("Account created! Please check your email to verify.");
-      localStorage.setItem("user", JSON.stringify(result.data.user));
-      setTimeout(() => router.push("/VerifyEmailPage"), 1500);
+      // TODO: Re-enable email verification redirect once a proper sending domain is configured
+      // setMessage("Account created! Please check your email to verify.");
+      // setTimeout(() => router.push("/VerifyEmailPage"), 1500);
+      setMessage("Account created! You can now sign in.");
+      setLoading(false);
+      setTimeout(() => setAuthMode(AUTH_MODES.LOGIN), 1500);
     }
   }, [formData, router]);
 
