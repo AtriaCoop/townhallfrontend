@@ -12,13 +12,14 @@ import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton"
 import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from "@/components/Tag/Tag";
 import Icon from "@/icons/Icon";
-import styles from "./DashboardPage.module.scss";
+import styles from "./NewsfeedPage.module.scss";
+
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
 
-export default function DashboardPage() {
+export default function NewsfeedPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -259,7 +260,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.newsfeed}>
       {/* Main Feed Section */}
       <div className={styles.feedSection}>
         {/* Inline Create Post Card */}
@@ -462,12 +463,14 @@ export default function DashboardPage() {
             Privacy Notice
           </button>
         </div>
-      </div>
+      </div >
 
       {/* Privacy Modal */}
-      {showPrivacyModal && (
-        <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
-      )}
+      {
+        showPrivacyModal && (
+          <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+        )
+      }
 
       {/* Sidebar Section */}
       <aside className={styles.sidebar}>
@@ -568,6 +571,6 @@ export default function DashboardPage() {
           </button>
         </div>
       </aside>
-    </div>
+    </div >
   );
 }
