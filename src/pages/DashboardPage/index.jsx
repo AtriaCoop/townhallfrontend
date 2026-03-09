@@ -11,6 +11,7 @@ import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from "@/components/Tag/Tag";
+import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import Icon from "@/icons/Icon";
 import styles from "./DashboardPage.module.scss";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
@@ -41,9 +42,9 @@ export default function DashboardPage() {
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
+  const [postAnonymously, setPostAnonymously] = useState(false);
   const postImageRef = useRef(null);
   const textareaRef = useRef(null);
-
   const loadTrendingTags = async () => {
     try {
       const res = await authenticatedFetch(`${BASE_URL}/post/tags/trending/?limit=10`);
@@ -151,6 +152,7 @@ export default function DashboardPage() {
             comments: p.comments || [],
             reactions: p.reactions || {},
             tags: p.tags || [],
+            anonymous: !!p.anonymous,
           }));
 
         setPosts(formattedPosts);
@@ -205,7 +207,7 @@ export default function DashboardPage() {
 
     setIsPosting(true);
     try {
-      const data = await createPost({ content: postText, images: postImages, tags: tags });
+      const data = await createPost({ content: postText, images: postImages, tags: tags, anonymous: postAnonymously });
 
       const newPost = {
         id: data.post.id,
@@ -221,6 +223,7 @@ export default function DashboardPage() {
         links: [],
         comments: data.post.comments || [],
         reactions: data.post.reactions || {},
+        anonymous: !!data.post.anonymous,
       };
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
@@ -235,6 +238,7 @@ export default function DashboardPage() {
       setPostText("");
       setPostImages([]);
       setPostError("");
+      setPostAnonymously(false);
       setIsComposing(false);
     } catch (err) {
       console.error(err);
@@ -256,6 +260,7 @@ export default function DashboardPage() {
     setTag('');
     setTagErrorText('');
     setIsComposing(false);
+    setPostAnonymously(false);
   };
 
   return (
@@ -338,6 +343,12 @@ export default function DashboardPage() {
                 accept="image/*"
                 hidden
                 onChange={handleImageSelect}
+              />
+              <ToggleSwitch
+                checked={postAnonymously}
+                onChange={() => setPostAnonymously(!postAnonymously)}
+                label="Keep me anonymous"
+                aria-label={postAnonymously ? "Post as yourself" : "Post anonymously"}
               />
             </div>
 
@@ -423,6 +434,7 @@ export default function DashboardPage() {
                 setPosts={setPosts}
                 onTagClick={toggleFilter}
                 activeTagFilters={activeFilters}
+                anonymous={post.anonymous}
               />
             ))}
           </div>
