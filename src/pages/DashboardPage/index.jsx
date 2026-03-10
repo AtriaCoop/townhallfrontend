@@ -208,7 +208,6 @@ export default function DashboardPage() {
     setIsPosting(true);
     try {
       const data = await createPost({ content: postText, images: postImages, tags: tags, anonymous: postAnonymously });
-
       const newPost = {
         id: data.post.id,
         userId: data.post.user.id,
