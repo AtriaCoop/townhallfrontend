@@ -179,7 +179,7 @@ export default function Post({
         <div className={styles.postInfo} onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}>
           <div className={styles.fullName}>{hideAuthorDetails ? "Anonymous" : fullName}</div>
           <div className={styles.organizationName}>{hideAuthorDetails ? "" : organization}</div>
-          <div className={styles.date}>{date}</div>
+          <div className={styles.date}>{date} {anonymous && isMyOwnPost ? "(anonymous)" : null}</div>
         </div>
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
