@@ -180,6 +180,12 @@ export default function ProfilePage({ hasNewDm = false }) {
               <span className={styles.infoLabel}>Name:</span>
               <span className={styles.infoValue}>{profileData.full_name}</span>
             </div>
+            {profileData.pronouns && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Pronouns:</span>
+                <span className={styles.infoValue}>{profileData.pronouns}</span>
+              </div>
+            )}
             {(isCurrentUser || profileData.show_email !== false) && (
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Email:</span>
