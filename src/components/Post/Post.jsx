@@ -31,6 +31,7 @@ export default function Post({
   reactions = {},
   onTagClick,
   activeTagFilters = [],
+  anonymous,
 }) {
 
   const optionsRef = useRef(null);
@@ -51,7 +52,7 @@ export default function Post({
   const [tagErrorText, setTagErrorText] = useState("");
 
   const isMyOwnPost = userId === currentUserId;
-
+  const hideAuthorDetails = anonymous && !isMyOwnPost;
   // UPDATE POST
   async function handleUpdatePost() {
     try {
@@ -166,19 +167,19 @@ export default function Post({
 
       <div className={styles.postHeader}>
         <img
-          src={userImage || '/assets/ProfileImage.jpg'}
+          src={(userImage && !hideAuthorDetails) ? userImage : '/assets/ProfileImage.jpg'}
           alt="User profile"
           className={styles.profilePic}
-          onClick={() => router.push(`/ProfilePage/${userId}`)}
+          onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = '/assets/ProfileImage.jpg'
           }}
         />
-        <div className={styles.postInfo} onClick={() => router.push(`/ProfilePage/${userId}`)}>
-          <div className={styles.fullName}>{fullName}</div>
-          <div className={styles.organizationName}>{organization}</div>
-          <div className={styles.date}>{date}</div>
+        <div className={styles.postInfo} onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}>
+          <div className={styles.fullName}>{hideAuthorDetails ? "Anonymous" : fullName}</div>
+          <div className={styles.organizationName}>{hideAuthorDetails ? "" : organization}</div>
+          <div className={styles.date}>{date} {anonymous && isMyOwnPost ? "(anonymous)" : null}</div>
         </div>
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯

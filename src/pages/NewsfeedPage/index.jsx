@@ -11,6 +11,7 @@ import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from "@/components/Tag/Tag";
+import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import Icon from "@/icons/Icon";
 import SortBy from "@/components/SortBy/SortBy";
 import { SORT_VALUES } from "@/constants/sort";
@@ -43,9 +44,9 @@ export default function NewsfeedPage() {
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
+  const [postAnonymously, setPostAnonymously] = useState(false);
   const postImageRef = useRef(null);
   const textareaRef = useRef(null);
-
   const loadTrendingTags = async () => {
     try {
       const res = await authenticatedFetch(`${BASE_URL}/post/tags/trending/?limit=10`);
@@ -153,6 +154,7 @@ export default function NewsfeedPage() {
             comments: p.comments || [],
             reactions: p.reactions || {},
             tags: p.tags || [],
+            anonymous: !!p.anonymous,
           }));
 
         setPosts(formattedPosts);
@@ -207,8 +209,7 @@ export default function NewsfeedPage() {
 
     setIsPosting(true);
     try {
-      const data = await createPost({ content: postText, images: postImages, tags: tags });
-
+      const data = await createPost({ content: postText, images: postImages, tags: tags, anonymous: postAnonymously });
       const newPost = {
         id: data.post.id,
         userId: data.post.user.id,
@@ -223,6 +224,7 @@ export default function NewsfeedPage() {
         links: [],
         comments: data.post.comments || [],
         reactions: data.post.reactions || {},
+        anonymous: !!data.post.anonymous,
       };
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
@@ -237,6 +239,7 @@ export default function NewsfeedPage() {
       setPostText("");
       setPostImages([]);
       setPostError("");
+      setPostAnonymously(false);
       setIsComposing(false);
     } catch (err) {
       console.error(err);
@@ -258,6 +261,7 @@ export default function NewsfeedPage() {
     setTag('');
     setTagErrorText('');
     setIsComposing(false);
+    setPostAnonymously(false);
   };
 
   const handleSort = (sortValue) => {
@@ -374,6 +378,12 @@ export default function NewsfeedPage() {
                 hidden
                 onChange={handleImageSelect}
               />
+              <ToggleSwitch
+                checked={postAnonymously}
+                onChange={() => setPostAnonymously(!postAnonymously)}
+                label="Keep me anonymous"
+                aria-label={postAnonymously ? "Post as yourself" : "Post anonymously"}
+              />
             </div>
 
             <div className={styles.createPostSubmit}>
@@ -460,6 +470,7 @@ export default function NewsfeedPage() {
                 setPosts={setPosts}
                 onTagClick={toggleFilter}
                 activeTagFilters={activeFilters}
+                anonymous={post.anonymous}
               />
             ))}
           </div>

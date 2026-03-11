@@ -22,6 +22,17 @@
 // Input Area
 .inputWrapper {
   margin-bottom: $spacing-4;
+  
+}
+
+.anonymousToggle {
+  margin-bottom: $spacing-2;
+  
+}
+
+.anonymousText {
+  color: var(--text-muted);
+  @include caption;
 }
 
 .form {
