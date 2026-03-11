@@ -10,6 +10,7 @@ import { validateUrl } from "@/utils/validateUrl";
 const INITIAL_FORM_DATA = {
   full_name: "",
   pronouns: "",
+  name_pronunciation: "",
   title: "",
   primary_organization: "",
   other_organizations: "",
@@ -207,21 +208,6 @@ export default function SetUpPage() {
           </p>
         </div>
 
-          <FormInputText
-            name="pronouns"
-            label="What are your pronouns?"
-            placeholder="Share your pronouns (Optional)"
-            value={formData.pronouns}
-            onChange={handleInputChange}
-          />
-          {/* --- name pronunciation --- */}
-          <FormInputText
-            name="name_pronunciation"
-            label="Name Pronunciation"
-            placeholder="Enter name pronunciation..."
-            value={formData.name_pronunciation}
-            onChange={handleInputChange}
-          />
         <div className={styles.formCard}>
           {/* Basic Information */}
           <section className={styles.formSection}>
@@ -244,6 +230,15 @@ export default function SetUpPage() {
                   label="Pronouns"
                   placeholder="e.g., she/her, he/him, they/them"
                   value={formData.pronouns}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className={styles.formField}>
+                <FormInputText
+                  name="name_pronunciation"
+                  label="Name Pronunciation"
+                  placeholder="e.g., 'A-li-sha', phonetic spelling"
+                  value={formData.name_pronunciation}
                   onChange={handleInputChange}
                 />
               </div>
