@@ -9,11 +9,11 @@ import { fetchAllEvents } from "@/api/event";
 import Post from "@/components/Post/Post";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
+import TagCreationField from '@/components/TagCreationField/TagCreationField';
+import Tag from "@/components/Tag/Tag";
 import Icon from "@/icons/Icon";
 import styles from "./DashboardPage.module.scss";
-// Add import at the top
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
-
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
@@ -29,6 +29,8 @@ export default function DashboardPage() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [members, setMembers] = useState([]);
+  const [trendingTags, setTrendingTags] = useState([]);
+  const [activeFilters, setActiveFilters] = useState([]);
 
   // Inline create post state
   const [postText, setPostText] = useState("");
@@ -36,8 +38,22 @@ export default function DashboardPage() {
   const [postError, setPostError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [tag, setTag] = useState("");
+  const [tags, setTags] = useState([]);
+  const [tagErrorText, setTagErrorText] = useState("");
   const postImageRef = useRef(null);
   const textareaRef = useRef(null);
+
+  const loadTrendingTags = async () => {
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/post/tags/trending/?limit=10`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setTrendingTags(data.tags || []);
+    } catch (err) {
+      console.error("Error loading trending tags:", err);
+    }
+  };
 
   useEffect(() => {
     async function fetchProfile() {
@@ -67,11 +83,10 @@ export default function DashboardPage() {
 
     async function loadEvents() {
       try {
-        const user = getStoredUser();
         const events = await fetchAllEvents();
         const today = new Date().toISOString().split("T")[0];
         const upcoming = events
-          .filter((e) => e.date >= today && (e.isEnrolled || e.admin?.id === user?.id))
+          .filter((e) => e.date >= today && e.isEnrolled)
           .sort((a, b) => new Date(a.date) - new Date(b.date))
           .slice(0, 5);
         setUpcomingEvents(upcoming);
@@ -93,13 +108,19 @@ export default function DashboardPage() {
     fetchProfile();
     loadEvents();
     loadMembers();
+    loadTrendingTags();
   }, []);
 
   useEffect(() => {
     async function fetchPosts() {
       try {
         setLoading(true);
-        const res = await authenticatedFetch(`${BASE_URL}/post/?limit=${POSTS_PER_PAGE}&page=${currentPage}`);
+        const tagsParam = activeFilters.length > 0
+          ? `&tags=${encodeURIComponent(activeFilters.join(","))}`
+          : "";
+        const res = await authenticatedFetch(
+          `${BASE_URL}/post/?limit=${POSTS_PER_PAGE}&page=${currentPage}${tagsParam}`
+        );
         if (!res.ok) {
           console.error("Failed to fetch posts:", res.status);
           setPosts([]);
@@ -144,7 +165,21 @@ export default function DashboardPage() {
     if (profileData) {
       fetchPosts();
     }
-  }, [profileData, currentPage, refreshTrigger]);
+  }, [profileData, currentPage, refreshTrigger, activeFilters]);
+
+  const toggleFilter = (tagName) => {
+    setCurrentPage(1);
+    setActiveFilters((prev) =>
+      prev.includes(tagName)
+        ? prev.filter((t) => t !== tagName)
+        : [...prev, tagName]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setActiveFilters([]);
+    setCurrentPage(1);
+  };
 
   const handlePreviousPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
@@ -170,7 +205,7 @@ export default function DashboardPage() {
 
     setIsPosting(true);
     try {
-      const data = await createPost({ content: postText, images: postImages });
+      const data = await createPost({ content: postText, images: postImages, tags: tags });
 
       const newPost = {
         id: data.post.id,
@@ -182,6 +217,7 @@ export default function DashboardPage() {
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
         postImage: data.post.image,
+        tags: data.post.tags || [],
         links: [],
         comments: data.post.comments || [],
         reactions: data.post.reactions || {},
@@ -189,6 +225,13 @@ export default function DashboardPage() {
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
 
+      if (tags.length > 0) {
+        loadTrendingTags();
+      }
+
+      setTags([]);
+      setTag('');
+      setTagErrorText("");
       setPostText("");
       setPostImages([]);
       setPostError("");
@@ -209,6 +252,9 @@ export default function DashboardPage() {
     setPostText("");
     setPostImages([]);
     setPostError("");
+    setTags([]);
+    setTag('');
+    setTagErrorText('');
     setIsComposing(false);
   };
 
@@ -263,6 +309,18 @@ export default function DashboardPage() {
 
           {postError && <p className={styles.postErrorMessage}>{postError}</p>}
 
+          {/* Tags — only shown when composing */}
+          {isComposing && (
+            <TagCreationField
+              tag={tag}
+              setTag={setTag}
+              tags={tags}
+              setTags={setTags}
+              tagErrorText={tagErrorText}
+              setTagErrorText={setTagErrorText}
+            />
+          )}
+
           {/* Action Bar */}
           <div className={styles.createPostActions}>
             <div className={styles.createPostToolbar}>
@@ -290,10 +348,7 @@ export default function DashboardPage() {
                 </span>
               )}
               {isComposing && (
-                <button
-                  className={styles.cancelBtn}
-                  onClick={handleCancelPost}
-                >
+                <button className={styles.cancelBtn} onClick={handleCancelPost}>
                   Cancel
                 </button>
               )}
@@ -308,14 +363,44 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Active Filter Bar */}
+        {activeFilters.length > 0 && (
+          <div className={styles.filterBar}>
+            <span className={styles.filterLabel}>Filtered by:</span>
+            <div className={styles.filterTags}>
+              {activeFilters.map((f) => (
+                <Tag
+                  key={f}
+                  name={f}
+                  active
+                  removable
+                  onRemove={() => toggleFilter(f)}
+                />
+              ))}
+            </div>
+            <button className={styles.clearFilters} onClick={clearAllFilters}>
+              Clear all
+            </button>
+          </div>
+        )}
+
         {/* Posts Feed */}
         {loading ? (
           <PostSkeleton count={3} />
         ) : posts.length === 0 ? (
           <div className={styles.emptyFeed}>
             <Icon name="newsFeed" size={48} />
-            <h3>No posts yet</h3>
-            <p>Be the first to share something with the community!</p>
+            <h3>{activeFilters.length > 0 ? "No posts match these tags" : "No posts yet"}</h3>
+            <p>
+              {activeFilters.length > 0
+                ? "Try removing some filters or be the first to post with these tags."
+                : "Be the first to share something with the community!"}
+            </p>
+            {activeFilters.length > 0 && (
+              <button className={styles.clearFiltersEmpty} onClick={clearAllFilters}>
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
           <div className={styles.postsList}>
@@ -336,6 +421,8 @@ export default function DashboardPage() {
                 tags={post.tags}
                 postId={post.id}
                 setPosts={setPosts}
+                onTagClick={toggleFilter}
+                activeTagFilters={activeFilters}
               />
             ))}
           </div>
@@ -365,10 +452,11 @@ export default function DashboardPage() {
             </button>
           </div>
         )}
-         {/* Privacy Notice Footer */}
-       <div className={styles.privacyFooter}>
-          <button 
-            className={styles.privacyLink} 
+
+        {/* Privacy Notice Footer */}
+        <div className={styles.privacyFooter}>
+          <button
+            className={styles.privacyLink}
             onClick={() => setShowPrivacyModal(true)}
           >
             Privacy Notice
@@ -422,6 +510,30 @@ export default function DashboardPage() {
             View All Events
           </button>
         </div>
+
+        {/* Trending Tags Widget */}
+        {trendingTags.length > 0 && (
+          <div className={styles.widget}>
+            <h2 className={styles.widgetTitle}>Trending Topics</h2>
+            <div className={styles.trendingTagsList}>
+              {trendingTags.map(({ name, count }) => (
+                <button
+                  key={name}
+                  className={`${styles.trendingTagItem} ${activeFilters.includes(name) ? styles.trendingTagActive : ''}`}
+                  onClick={() => toggleFilter(name)}
+                >
+                  <span className={styles.trendingTagName}>{name}</span>
+                  <span className={styles.trendingCount}>{count} {count === 1 ? 'post' : 'posts'}</span>
+                </button>
+              ))}
+            </div>
+            {activeFilters.length > 0 && (
+              <button className={styles.viewAllBtn} onClick={clearAllFilters}>
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Community Members Widget */}
         <div className={styles.widget}>

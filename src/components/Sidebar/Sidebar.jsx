@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import Icon from '@/icons/Icon';
 import styles from './Sidebar.module.scss';
@@ -13,8 +12,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  const pathname = usePathname();
   const router = useRouter();
+  const { pathname } = router;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleNavClick = (path) => {
@@ -50,17 +49,17 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>
-        {/* Logo Section - VFJC Logo */}
+        {/* Logo Section - Atria Logo */}
         <div className={styles.logoSection}>
           <img
-            src="/assets/VFJC.png"
-            alt="VFJC Logo"
+            src="/assets/atriaLogo.png"
+            alt="Atria Logo"
             className={styles.logo}
             onClick={() => handleNavClick('/DashboardPage')}
           />
           <img
-            src="/assets/VFJCsm.png"
-            alt="VFJC"
+            src="/assets/atriaLogo.png"
+            alt="Atria"
             className={styles.logoSmall}
             onClick={() => handleNavClick('/DashboardPage')}
           />

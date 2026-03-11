@@ -53,10 +53,10 @@ export default function Navigation({ hasNewDm = false }) {
       <div className={styles.menu} onClick={toggleSidebar}><Icon name="menu" /></div>
 
       {/* Desktop logo */}
-      <img src="/assets/VFJC.png" alt="VFJC Logo" className={styles.logo} onClick={() => router.push('/HomePage')} />
+      <img src="/assets/atriaLogo.png" alt="Atria Logo" className={styles.logo} onClick={() => router.push('/HomePage')} />
 
       {/* Tablet sidebar */}
-      <img src="/assets/VFJCsm.png" alt="VFJC Sidebar Logo" className={styles.logoSmall} />
+      <img src="/assets/atriaLogo.png" alt="Atria Logo" className={styles.logoSmall} />
 
       {/* Separator line */}
       <div className={styles.separator}></div>
@@ -99,7 +99,7 @@ export default function Navigation({ hasNewDm = false }) {
         <div className={styles.closeIcon} onClick={() => setIsSidebarOpen(false)}>✕</div>
 
         <div className={styles.modalContent}>
-          <img src="/assets/VFJC.png" alt="VFJC Logo" className={styles.logo} onClick={() => router.push('/HomePage')} />
+          <img src="/assets/atriaLogo.png" alt="Atria Logo" className={styles.logo} onClick={() => router.push('/HomePage')} />
           <div className={styles.separator}></div>
 
           <div className={styles.logos}>

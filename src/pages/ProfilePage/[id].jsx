@@ -15,6 +15,7 @@ export default function ProfilePage({ hasNewDm = false }) {
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -113,6 +114,8 @@ export default function ProfilePage({ hasNewDm = false }) {
             src={profileData.profile_image || "/assets/ProfileImage.jpg"}
             alt={profileData.full_name}
             className={styles.avatar}
+            onClick={() => setShowImageModal(true)}
+            style={{ cursor: "pointer" }}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "/assets/ProfileImage.jpg";
@@ -120,7 +123,7 @@ export default function ProfilePage({ hasNewDm = false }) {
           />
         </div>
 
-        {/* Name and Edit Button */}
+        {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
           <div className={styles.nameRow}>
             <h1 className={styles.name}>{profileData.full_name}</h1>
@@ -128,14 +131,43 @@ export default function ProfilePage({ hasNewDm = false }) {
               <div className={styles.pronouns}>{profileData.pronouns}</div>
             )}
           </div>
-          {isCurrentUser && (
-            <button
-              onClick={() => router.push("/EditProfilePage")}
-              className={styles.editButton}
-            >
-              Edit Profile
-            </button>
-          )}
+          <div className={styles.profileActions}>
+            {isCurrentUser ? (
+              <button
+                onClick={() => router.push("/EditProfilePage")}
+                className={styles.editButton}
+              >
+                Edit Profile
+              </button>
+            ) : (
+              profileData.allow_dms !== false && (
+                <button
+                  onClick={async () => {
+                    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+                    const currentUserId = Number(userData.id);
+                    try {
+                      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: `chat-${currentUserId}-${id}`,
+                          participants: [currentUserId, Number(id)],
+                        }),
+                      });
+                      if (!res.ok) return;
+                      router.push(`/DirectMessagesPage?chatWith=${id}`);
+                    } catch (err) {
+                      console.error("Failed to start chat:", err);
+                    }
+                  }}
+                  className={styles.messageButton}
+                >
+                  Message
+                </button>
+              )
+            )}
+          </div>
+
         </div>
       </div>
       {/* Content Cards */}
@@ -148,10 +180,19 @@ export default function ProfilePage({ hasNewDm = false }) {
               <span className={styles.infoLabel}>Name:</span>
               <span className={styles.infoValue}>{profileData.full_name}</span>
             </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Email:</span>
-              <span className={styles.infoValue}>{profileData.email}</span>
-            </div>
+            {(isCurrentUser || profileData.show_email !== false) && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Email:</span>
+                <span className={styles.infoValue}>{profileData.email}</span>
+              </div>
+            )}
+            {profileData.title && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Title:</span>
+                <span className={styles.infoValue}>{profileData.title}</span>
+              </div>
+            )}
+
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>
@@ -224,6 +265,33 @@ export default function ProfilePage({ hasNewDm = false }) {
         )}
 
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div
+          className={styles.imageModalOverlay}
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setShowImageModal(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <img
+              src={profileData.profile_image || "/assets/ProfileImage.jpg"}
+              alt={profileData.full_name}
+              className={styles.enlargedImage}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/assets/ProfileImage.jpg";
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );

@@ -209,6 +209,24 @@
   filter: brightness(0.9);
 }
 
+.removeBannerButton {
+  display: block;
+  width: 100%;
+  padding: $spacing-2;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border-default);
+  color: var(--text-danger, #e53e3e);
+  font-size: $font-size-sm;
+  cursor: pointer;
+  text-align: center;
+  @include transition-all;
+
+  &:hover {
+    background: var(--bg-danger-subtle, #fff5f5);
+  }
+}
+
 // Form Sections
 .formSections {
   display: flex;

@@ -217,6 +217,57 @@
   }
 }
 
+// Active Filter Bar
+.filterBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-4;
+  background: var(--primary-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+}
+
+.filterLabel {
+  @include caption;
+  color: var(--text-secondary);
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.filterTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  flex: 1;
+}
+
+.clearFilters {
+  @include caption;
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-md;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  font-family: $font-family-body;
+  @include transition-colors;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--primary-hover);
+  }
+}
+
+.clearFiltersEmpty {
+  @include button-secondary;
+  @include button-sm;
+  margin-top: $spacing-2;
+}
+
 // Posts List
 .postsList {
   display: flex;
@@ -531,4 +582,68 @@
     color: var(--text-primary);
     font-weight: $font-weight-semibold;
   }
+}
+
+// Trending Tags Widget
+.trendingTagsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trendingTagItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-md;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: $font-family-body;
+  cursor: pointer;
+  text-align: left;
+  @include transition-colors;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.trendingTagActive {
+  background: var(--primary-subtle);
+  color: var(--primary);
+
+  .trendingCount {
+    color: var(--primary);
+    opacity: 0.7;
+  }
+
+  &:hover {
+    background: var(--primary-subtle);
+    color: var(--primary-hover);
+  }
+}
+
+.trendingTagName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  // # prefix via CSS — no gap artifact
+  &::before {
+    content: '#';
+    color: var(--primary);
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-xs;
+    margin-right: 1px;
+  }
+}
+
+.trendingCount {
+  @include caption;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  @include transition-colors;
 }

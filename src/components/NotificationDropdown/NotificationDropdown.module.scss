@@ -1,0 +1,166 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + $spacing-2);
+  right: 0;
+  width: 380px;
+  max-height: 480px;
+  background-color: var(--modal-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-lg);
+  z-index: $z-dropdown;
+  animation: fadeIn 150ms $ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include below-md {
+    position: fixed;
+    top: $header-height-mobile;
+    right: $spacing-4;
+    left: $spacing-4;
+    width: auto;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  @include flex-between;
+  padding: $spacing-4;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: $font-family-headlines;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.markAllButton {
+  @include button-base;
+  background: transparent;
+  color: $primary-500;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-md;
+
+  &:hover {
+    background-color: $primary-50;
+  }
+}
+
+:global(body.dark) {
+  .markAllButton:hover {
+    background-color: rgba($primary-500, 0.15);
+  }
+}
+
+.list {
+  overflow-y: auto;
+  flex: 1;
+  @include custom-scrollbar;
+}
+
+.empty {
+  @include flex-center;
+  padding: $spacing-8 $spacing-4;
+  color: var(--text-muted);
+  font-size: $font-size-sm;
+}
+
+.item {
+  @include flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-default);
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-family-body;
+  @include transition-colors;
+  position: relative;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.unread {
+  background-color: $primary-50;
+
+  &:hover {
+    background-color: $primary-100;
+  }
+}
+
+:global(body.dark) {
+  .unread {
+    background-color: rgba($primary-500, 0.08);
+
+    &:hover {
+      background-color: rgba($primary-500, 0.14);
+    }
+  }
+}
+
+.avatar {
+  @include avatar($avatar-sm);
+  flex-shrink: 0;
+  border: 1px solid var(--border-default);
+}
+
+.body {
+  @include flex-column;
+  gap: $spacing-1;
+  min-width: 0;
+  flex: 1;
+}
+
+.text {
+  @include body-2;
+  color: var(--text-secondary);
+  margin: 0;
+  @include line-clamp(2);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.time {
+  @include caption;
+  color: var(--text-muted);
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  background-color: $primary-500;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+  align-self: center;
+}

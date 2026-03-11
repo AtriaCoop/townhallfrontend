@@ -233,6 +233,7 @@ body {
   transition: background-color $transition-normal $ease-out,
               color $transition-normal $ease-out;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 // --------------------------------------------

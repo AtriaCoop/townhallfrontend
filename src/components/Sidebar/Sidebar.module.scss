@@ -27,9 +27,12 @@
   }
 }
 
-// Mobile overlay
+// Mobile overlay — must sit below sidebar ($z-fixed + 1)
 .overlay {
-  @include backdrop;
+  position: fixed;
+  inset: 0;
+  background-color: rgba($black, 0.4);
+  z-index: $z-fixed;
   display: block;
 
   @include md {
@@ -43,6 +46,7 @@
   top: 0;
   left: 0;
   height: 100vh;
+  height: 100dvh;
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
   display: flex;
@@ -84,7 +88,7 @@
 }
 
 .logo {
-  height: 44px;
+  height: 48px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
@@ -103,12 +107,12 @@
 
   @include lg {
     display: block;
-    height: 48px;
+    height: 56px;
   }
 }
 
 .logoSmall {
-  height: 36px;
+  height: 40px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
@@ -151,7 +155,7 @@
   display: flex;
   flex-direction: column;
   padding: $spacing-4 $spacing-3;
-  gap: $spacing-1;
+  gap: $spacing-2;
   overflow-y: auto;
   @include custom-scrollbar;
 

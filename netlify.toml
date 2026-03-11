@@ -53,6 +53,12 @@
   force = true
 
 [[redirects]]
+  from = "/notifications/*"
+  to = "https://townhallbackend.onrender.com/notifications/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/event/*"
   to = "https://townhallbackend.onrender.com/event/:splat"
   status = 200
