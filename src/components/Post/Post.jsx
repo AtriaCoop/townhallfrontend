@@ -29,6 +29,8 @@ export default function Post({
   postId,
   setPosts,
   reactions = {},
+  onTagClick,
+  activeTagFilters = [],
 }) {
 
   const optionsRef = useRef(null);
@@ -381,7 +383,13 @@ export default function Post({
       {tags?.length > 0 && (
         <div className={styles.postFooterTop}>
           {tags.map((tag, index) => (
-            <Tag key={index} removable={false} name={tag} />
+            <Tag
+              key={index}
+              removable={false}
+              name={tag}
+              onClick={onTagClick ? () => onTagClick(tag) : undefined}
+              active={activeTagFilters.includes(tag)}
+            />
           ))}
         </div>
       )}
