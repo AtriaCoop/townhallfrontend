@@ -13,6 +13,7 @@ import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from "@/components/Tag/Tag";
 import Icon from "@/icons/Icon";
 import SortBy from "@/components/SortBy/SortBy";
+import { SORT_VALUES } from "@/constants/sort";
 import styles from "./NewsfeedPage.module.scss";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
@@ -263,22 +264,22 @@ export default function NewsfeedPage() {
     let tempArray = [...posts];
 
     switch (sortValue) {
-      case "newest":
+      case SORT_VALUES.NEWEST:
         tempArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         break;
-      case "oldest":
+      case SORT_VALUES.OLDEST:
         tempArray.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         break;
-      case "most_reactions":
+      case SORT_VALUES.MOST_REACTIONS:
         tempArray.sort((a, b) => totalReactions(b) - totalReactions(a));
         break;
-      case "least_reactions":
+      case SORT_VALUES.LEAST_REACTIONS:
         tempArray.sort((a, b) => totalReactions(a) - totalReactions(b));
         break;
-      case "most_comments":
+      case SORT_VALUES.MOST_COMMENTS:
         tempArray.sort((a, b) => b.comments.length - a.comments.length);
         break;
-      case "least_comments":
+      case SORT_VALUES.LEAST_COMMENTS:
         tempArray.sort((a, b) => a.comments.length - b.comments.length);
     }
     setPosts(tempArray);
