@@ -11,11 +11,11 @@ import styles from "./EditProfilePage.module.scss";
 export default function EditProfilePage() {
   const router = useRouter();
 
-  const [showModal, setShowModal] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [formData, setFormData] = useState({
     full_name: "",
     pronouns: "",
+    name_pronunciation: "", //NEW MODIFICATIONS
     title: "",
     primary_organization: "",
     other_organizations: "",
@@ -36,40 +36,6 @@ export default function EditProfilePage() {
   const dismissTimerRef = useRef(null);
 
   const [removeBanner, setRemoveBanner] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleDeleteClick = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-
-  const handleDeleteAccount = async () => {
-    const user = getStoredUser();
-    if (!user?.id) return;
-
-    setIsDeleting(true);
-    try {
-      const res = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push("/LoginPage");
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setSaveStatus("error");
-        setSaveMessage(data.message || "Failed to delete account. Please try again.");
-        setShowModal(false);
-      }
-    } catch (err) {
-      console.error("Failed to delete account:", err);
-      setSaveStatus("error");
-      setSaveMessage("Failed to delete account. Please try again.");
-      setShowModal(false);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   useEffect(() => {
     async function fetchProfile() {
@@ -454,34 +420,7 @@ export default function EditProfilePage() {
         <button className={styles.saveButton} onClick={handleUpdateProfile}>
           Save Changes
         </button>
-        <button className={styles.deleteAccountButton} onClick={handleDeleteClick}>
-          Delete Account
-        </button>
       </div>
-
-      {/* Delete Modal */}
-      {showModal && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>Delete Account?</h2>
-            <p className={styles.modalDescription}>
-              Are you sure you want to delete your account? This action cannot be undone.
-            </p>
-            <div className={styles.modalActions}>
-              <button className={styles.cancelButton} onClick={closeModal}>
-                Cancel
-              </button>
-              <button
-                className={styles.confirmDeleteButton}
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-              >
-                {isDeleting ? "Deleting..." : "Delete My Account"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
