@@ -13,13 +13,15 @@ import TagCreationField from '@/components/TagCreationField/TagCreationField';
 import Tag from "@/components/Tag/Tag";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import Icon from "@/icons/Icon";
-import styles from "./DashboardPage.module.scss";
+import SortBy from "@/components/SortBy/SortBy";
+import { SORT_VALUES } from "@/constants/sort";
+import styles from "./NewsfeedPage.module.scss";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 250;
 
-export default function DashboardPage() {
+export default function NewsfeedPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -262,8 +264,41 @@ export default function DashboardPage() {
     setPostAnonymously(false);
   };
 
+  const handleSort = (sortValue) => {
+    let tempArray = [...posts];
+
+    switch (sortValue) {
+      case SORT_VALUES.NEWEST:
+        tempArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        break;
+      case SORT_VALUES.OLDEST:
+        tempArray.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        break;
+      case SORT_VALUES.MOST_REACTIONS:
+        tempArray.sort((a, b) => totalReactions(b) - totalReactions(a));
+        break;
+      case SORT_VALUES.LEAST_REACTIONS:
+        tempArray.sort((a, b) => totalReactions(a) - totalReactions(b));
+        break;
+      case SORT_VALUES.MOST_COMMENTS:
+        tempArray.sort((a, b) => b.comments.length - a.comments.length);
+        break;
+      case SORT_VALUES.LEAST_COMMENTS:
+        tempArray.sort((a, b) => a.comments.length - b.comments.length);
+    }
+    setPosts(tempArray);
+  }
+
+  function totalReactions(post) {
+    const reactions = post.reactions;
+    return Object.values(reactions).reduce(
+      (sum, reaction) => sum + (Array.isArray(reaction) ? reaction.length : 0),
+      0
+    );
+  }
+
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.newsfeed}>
       {/* Main Feed Section */}
       <div className={styles.feedSection}>
         {/* Inline Create Post Card */}
@@ -373,6 +408,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <SortBy onSelect={handleSort} />
+
         {/* Active Filter Bar */}
         {activeFilters.length > 0 && (
           <div className={styles.filterBar}>
@@ -473,12 +510,14 @@ export default function DashboardPage() {
             Privacy Notice
           </button>
         </div>
-      </div>
+      </div >
 
       {/* Privacy Modal */}
-      {showPrivacyModal && (
-        <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
-      )}
+      {
+        showPrivacyModal && (
+          <PrivacyModal onClose={() => setShowPrivacyModal(false)} />
+        )
+      }
 
       {/* Sidebar Section */}
       <aside className={styles.sidebar}>
@@ -579,6 +618,6 @@ export default function DashboardPage() {
           </button>
         </div>
       </aside>
-    </div>
+    </div >
   );
 }
