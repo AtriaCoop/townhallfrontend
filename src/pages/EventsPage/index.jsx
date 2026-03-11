@@ -13,8 +13,8 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [searchEvent, setSearchEvent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all");
-  const [showCalendarView, setShowCalendarView] = useState(false);
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [showCalendarView, setShowCalendarView] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -74,6 +74,13 @@ export default function EventsPage() {
   }, []);
 
   // Helpers
+  const isPastEvent = (dateString) => {
+    const eventDate = new Date(dateString + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return eventDate < today;
+  };
+
   const isEventAdmin = (event) => {
     return currentUserId && event.admin?.id === currentUserId;
   };
@@ -90,7 +97,7 @@ export default function EventsPage() {
     if (eventDate.getTime() === today.getTime()) return { label: "Today", type: "today" };
     if (eventDate.getTime() === tomorrow.getTime()) return { label: "Tomorrow", type: "tomorrow" };
     if (eventDate > today && eventDate < weekEnd) return { label: "This Week", type: "thisWeek" };
-    if (eventDate < today) return { label: "Past", type: "past" };
+    if (eventDate < today) return null;
     return null;
   };
 
@@ -112,15 +119,28 @@ export default function EventsPage() {
     };
   };
 
-  const filteredEvents = events
-    .filter((event) =>
-      event.title.toLowerCase().includes(searchEvent.toLowerCase())
-    )
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  const filteredEvents = events.filter((event) =>
+    event.title.toLowerCase().includes(searchEvent.toLowerCase())
+  );
 
-  const displayedEvents = activeTab === "my"
-    ? filteredEvents.filter((event) => event.isEnrolled)
-    : filteredEvents;
+  const displayedEvents = (() => {
+    switch (activeTab) {
+      case "upcoming":
+        return filteredEvents
+          .filter((event) => !isPastEvent(event.date))
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+      case "my":
+        return filteredEvents
+          .filter((event) => event.isEnrolled && !isPastEvent(event.date))
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+      case "past":
+        return filteredEvents
+          .filter((event) => isPastEvent(event.date))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+      default:
+        return filteredEvents;
+    }
+  })();
 
   // Calendar helpers
   const getDaysInMonth = (date) => {
@@ -133,9 +153,7 @@ export default function EventsPage() {
 
   const getEventsForDate = (date) => {
     const dateString = date.toISOString().split("T")[0];
-    return events.filter(
-      (event) => event.date === dateString && (event.isEnrolled || event.admin?.id === currentUserId)
-    );
+    return displayedEvents.filter((event) => event.date === dateString);
   };
 
   const navigateMonth = (direction) => {
@@ -386,20 +404,22 @@ export default function EventsPage() {
               </button>
             </div>
           )}
-          {event.isEnrolled ? (
-            <button
-              className={styles.unenrollButton}
-              onClick={() => handleUnenroll(event.id)}
-            >
-              Unenroll
-            </button>
-          ) : (
-            <button
-              className={styles.participateButton}
-              onClick={() => handleParticipate(event.id)}
-            >
-              Participate
-            </button>
+          {!isPastEvent(event.date) && (
+            event.isEnrolled ? (
+              <button
+                className={styles.unenrollButton}
+                onClick={() => handleUnenroll(event.id)}
+              >
+                Unenroll
+              </button>
+            ) : (
+              <button
+                className={styles.participateButton}
+                onClick={() => handleParticipate(event.id)}
+              >
+                Participate
+              </button>
+            )
           )}
         </div>
       </div>
@@ -483,11 +503,11 @@ export default function EventsPage() {
           <div className={styles.tabBar} role="tablist" aria-label="Event filter">
             <button
               role="tab"
-              aria-selected={activeTab === "all"}
-              className={`${styles.tabButton} ${activeTab === "all" ? styles.tabButtonActive : ""}`}
-              onClick={() => setActiveTab("all")}
+              aria-selected={activeTab === "upcoming"}
+              className={`${styles.tabButton} ${activeTab === "upcoming" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("upcoming")}
             >
-              All Events
+              Upcoming
             </button>
             <button
               role="tab"
@@ -496,6 +516,14 @@ export default function EventsPage() {
               onClick={() => setActiveTab("my")}
             >
               My Events
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === "past"}
+              className={`${styles.tabButton} ${activeTab === "past" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("past")}
+            >
+              Past Events
             </button>
           </div>
           <label className={styles.toggleLabel}>
@@ -522,18 +550,11 @@ export default function EventsPage() {
         </div>
       ) : (
         <>
-          {/* Calendar View */}
-          {showCalendarView && (
-            <section className={styles.eventsSection}>
-              {renderCalendar()}
-            </section>
-          )}
-
           {/* Events List */}
           <section className={styles.eventsSection}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>
-                {activeTab === "my" ? "My Events" : "All Events"}
+                {activeTab === "upcoming" ? "Upcoming Events" : activeTab === "my" ? "My Events" : "Past Events"}
               </h2>
               <div className={styles.searchWrapper}>
                 <Icon name="search" size={18} className={styles.searchIcon} />
@@ -557,13 +578,22 @@ export default function EventsPage() {
                     {searchEvent
                       ? "Try adjusting your search terms."
                       : activeTab === "my"
-                      ? "You haven't enrolled in any events yet."
+                      ? "You haven't enrolled in any upcoming events yet."
+                      : activeTab === "past"
+                      ? "No past events to show."
                       : "Check back later for upcoming events."}
                   </p>
                 </div>
               )}
             </div>
           </section>
+
+          {/* Calendar View */}
+          {showCalendarView && (
+            <section className={styles.eventsSection}>
+              {renderCalendar()}
+            </section>
+          )}
 
           {/* Create Event Modal */}
           {showCreateModal && (
@@ -722,26 +752,28 @@ export default function EventsPage() {
                       </button>
                     </>
                   )}
-                  {selectedEvent.isEnrolled ? (
-                    <button
-                      className={styles.unenrollButton}
-                      onClick={() => {
-                        handleUnenroll(selectedEvent.id);
-                        setSelectedEvent(null);
-                      }}
-                    >
-                      Unenroll
-                    </button>
-                  ) : (
-                    <button
-                      className={styles.participateButton}
-                      onClick={() => {
-                        handleParticipate(selectedEvent.id);
-                        setSelectedEvent(null);
-                      }}
-                    >
-                      Participate
-                    </button>
+                  {!isPastEvent(selectedEvent.date) && (
+                    selectedEvent.isEnrolled ? (
+                      <button
+                        className={styles.unenrollButton}
+                        onClick={() => {
+                          handleUnenroll(selectedEvent.id);
+                          setSelectedEvent(null);
+                        }}
+                      >
+                        Unenroll
+                      </button>
+                    ) : (
+                      <button
+                        className={styles.participateButton}
+                        onClick={() => {
+                          handleParticipate(selectedEvent.id);
+                          setSelectedEvent(null);
+                        }}
+                      >
+                        Participate
+                      </button>
+                    )
                   )}
                 </div>
               </div>

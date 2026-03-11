@@ -1,0 +1,199 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+// Collapsed trigger — subtle opt-in entry point
+.addTagsTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  font-family: $font-family-body;
+  cursor: pointer;
+  padding: 2px $spacing-1;
+  border-radius: $radius-sm;
+  @include transition-colors;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.addTagsHash {
+  color: var(--primary);
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xs;
+}
+
+// Single row: chips + input inline
+.row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  min-height: 28px;
+}
+
+// "+ add" re-open trigger
+.addCustomBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px $spacing-2;
+  border-radius: $radius-full;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  font-family: $font-family-body;
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-subtle);
+  }
+}
+
+// Inline custom input — pill-shaped, fits in the chip row
+.inlineInputWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: 3px $spacing-2;
+  border-radius: $radius-full;
+  border: 1px solid var(--primary);
+  background: var(--input-bg);
+  box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+  min-width: 130px;
+  max-width: 200px;
+}
+
+.inputHash {
+  color: var(--primary);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.inlineInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: $font-family-body;
+  font-size: $font-size-xs;
+  min-width: 60px;
+  padding: 0;
+  line-height: 1.4;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.confirmBtn {
+  flex-shrink: 0;
+  padding: 1px $spacing-2;
+  border-radius: $radius-full;
+  border: none;
+  background: var(--primary);
+  color: var(--text-inverse);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  font-family: $font-family-body;
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    background: var(--primary-hover);
+  }
+}
+
+.closeInputBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: $radius-full;
+  @include transition-colors;
+
+  &:hover {
+    color: var(--error);
+  }
+}
+
+// Autocomplete dropdown
+.dropdown {
+  position: absolute;
+  top: calc(100% + $spacing-1);
+  left: 0;
+  min-width: 160px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-md);
+  z-index: $z-dropdown;
+  list-style: none;
+  margin: 0;
+  padding: $spacing-1;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  cursor: pointer;
+  @include transition-colors;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.dropdownItemActive {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.dropdownHash {
+  color: var(--primary);
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xs;
+}
+
+.error {
+  font-size: $font-size-xs;
+  color: var(--error);
+  padding-left: $spacing-2;
+}

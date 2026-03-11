@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import Icon from '@/icons/Icon';
 import styles from './Sidebar.module.scss';
 
 const navItems = [
-  { name: 'Newsfeed', icon: 'dashboard', path: '/DashboardPage' },
+  { name: 'Newsfeed', icon: 'dashboard', path: '/NewsfeedPage' },
   { name: 'Events', icon: 'calendar', path: '/EventsPage' },
   { name: 'Messages', icon: 'message', path: '/DirectMessagesPage' },
   { name: 'Members', icon: 'members', path: '/MembersPage' },
@@ -13,8 +12,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  const pathname = usePathname();
   const router = useRouter();
+  const { pathname } = router;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleNavClick = (path) => {
@@ -23,8 +22,8 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => {
-    if (path === '/DashboardPage') {
-      return pathname === '/DashboardPage' || pathname === '/HomePage';
+    if (path === '/NewsfeedPage') {
+      return pathname === '/NewsfeedPage' || pathname === '/HomePage';
     }
     return pathname === path || pathname?.startsWith(path + '/');
   };
@@ -50,19 +49,19 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>
-        {/* Logo Section - VFJC Logo */}
+        {/* Logo Section - Atria Logo */}
         <div className={styles.logoSection}>
           <img
-            src="/assets/VFJC.png"
-            alt="VFJC Logo"
+            src="/assets/atriaLogo.png"
+            alt="Atria Logo"
             className={styles.logo}
-            onClick={() => handleNavClick('/DashboardPage')}
+            onClick={() => handleNavClick('/NewsfeedPage')}
           />
           <img
-            src="/assets/VFJCsm.png"
-            alt="VFJC"
+            src="/assets/atriaLogo.png"
+            alt="Atria"
             className={styles.logoSmall}
-            onClick={() => handleNavClick('/DashboardPage')}
+            onClick={() => handleNavClick('/NewsfeedPage')}
           />
 
           {/* Mobile Close Button */}

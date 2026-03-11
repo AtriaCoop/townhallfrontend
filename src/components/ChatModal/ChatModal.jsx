@@ -16,13 +16,11 @@ export default function Modal({
 
   const filteredUsers = users
     .filter((user) =>
-      `${user.full_name}`.toLowerCase().includes(searchUsers.toLowerCase()) && user.id != currUserId
+      user.full_name &&
+      user.full_name.toLowerCase().includes(searchUsers.toLowerCase()) &&
+      user.id != currUserId
     )
-    .sort((a, b) => {
-      const nameA = `${a.full_name}`.toLowerCase();
-      const nameB = `${b.full_name}`.toLowerCase();
-      return nameA.localeCompare(nameB);
-    });
+    .sort((a, b) => a.full_name.toLowerCase().localeCompare(b.full_name.toLowerCase()));
 
   useEffect(() => {
     async function fetchUsers() {

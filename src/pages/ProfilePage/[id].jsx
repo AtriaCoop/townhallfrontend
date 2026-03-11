@@ -3,9 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import Navigation from "@/components/Navigation/Navigation";
 import styles from "./ProfilePage.module.scss";
 
-export default function ProfilePage() {
+export default function ProfilePage({ hasNewDm = false }) {
   const router = useRouter();
   const { id } = router.query;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -14,6 +15,7 @@ export default function ProfilePage() {
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -59,6 +61,10 @@ export default function ProfilePage() {
   if (!profileData) return null;
 
   return (
+    <div className={styles.container}>
+      <Navigation hasNewDm={hasNewDm} />
+
+
     <div className={styles.profilePage}>
       {/* Toast Notification */}
       {toast && (
@@ -72,7 +78,6 @@ export default function ProfilePage() {
           {toast.message}
         </div>
       )}
-
       {/* Cover Image Section */}
       <div className={styles.coverSection}>
         <div className={styles.coverImage}>
@@ -109,6 +114,8 @@ export default function ProfilePage() {
             src={profileData.profile_image || "/assets/ProfileImage.jpg"}
             alt={profileData.full_name}
             className={styles.avatar}
+            onClick={() => setShowImageModal(true)}
+            style={{ cursor: "pointer" }}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "/assets/ProfileImage.jpg";
@@ -116,20 +123,53 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Name and Edit Button */}
+        {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
-          <h1 className={styles.name}>{profileData.full_name}</h1>
-          {isCurrentUser && (
-            <button
-              onClick={() => router.push("/EditProfilePage")}
-              className={styles.editButton}
-            >
-              Edit Profile
-            </button>
-          )}
+          <div className={styles.nameRow}>
+            <h1 className={styles.name}>{profileData.full_name}</h1>
+            {profileData.pronouns && (
+              <div className={styles.pronouns}>{profileData.pronouns}</div>
+            )}
+          </div>
+          <div className={styles.profileActions}>
+            {isCurrentUser ? (
+              <button
+                onClick={() => router.push("/EditProfilePage")}
+                className={styles.editButton}
+              >
+                Edit Profile
+              </button>
+            ) : (
+              profileData.allow_dms !== false && (
+                <button
+                  onClick={async () => {
+                    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+                    const currentUserId = Number(userData.id);
+                    try {
+                      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: `chat-${currentUserId}-${id}`,
+                          participants: [currentUserId, Number(id)],
+                        }),
+                      });
+                      if (!res.ok) return;
+                      router.push(`/DirectMessagesPage?chatWith=${id}`);
+                    } catch (err) {
+                      console.error("Failed to start chat:", err);
+                    }
+                  }}
+                  className={styles.messageButton}
+                >
+                  Message
+                </button>
+              )
+            )}
+          </div>
+
         </div>
       </div>
-
       {/* Content Cards */}
       <div className={styles.contentGrid}>
         {/* Basic Information Card */}
@@ -140,16 +180,19 @@ export default function ProfilePage() {
               <span className={styles.infoLabel}>Name:</span>
               <span className={styles.infoValue}>{profileData.full_name}</span>
             </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Email:</span>
-              <span className={styles.infoValue}>{profileData.email}</span>
-            </div>
+            {(isCurrentUser || profileData.show_email !== false) && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Email:</span>
+                <span className={styles.infoValue}>{profileData.email}</span>
+              </div>
+            )}
             {profileData.title && (
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Title:</span>
                 <span className={styles.infoValue}>{profileData.title}</span>
               </div>
             )}
+
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>
@@ -222,6 +265,34 @@ export default function ProfilePage() {
         )}
 
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div
+          className={styles.imageModalOverlay}
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setShowImageModal(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <img
+              src={profileData.profile_image || "/assets/ProfileImage.jpg"}
+              alt={profileData.full_name}
+              className={styles.enlargedImage}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/assets/ProfileImage.jpg";
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

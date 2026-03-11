@@ -2,9 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Icon from '@/icons/Icon';
 import { authenticatedFetch } from '@/utils/authHelpers';
+import useNotificationStore from '@/stores/notificationStore';
+import NotificationDropdown from '../NotificationDropdown/NotificationDropdown';
+import MessageDropdown from '../MessageDropdown/MessageDropdown';
 import styles from './Header.module.scss';
 
-export default function Header({ hasNewDm = false }) {
+export default function Header() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || '';
 
@@ -12,6 +15,19 @@ export default function Header({ hasNewDm = false }) {
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const bellRef = useRef(null);
+  const messageRef = useRef(null);
+
+  // Read notification state from Zustand
+  const hasNewDm = useNotificationStore((s) => s.hasNewDm);
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const unreadDmMap = useNotificationStore((s) => s.unreadDmMap);
+  const bellDropdownOpen = useNotificationStore((s) => s.bellDropdownOpen);
+  const toggleBellDropdown = useNotificationStore((s) => s.toggleBellDropdown);
+  const closeBellDropdown = useNotificationStore((s) => s.closeBellDropdown);
+  const messageDropdownOpen = useNotificationStore((s) => s.messageDropdownOpen);
+  const toggleMessageDropdown = useNotificationStore((s) => s.toggleMessageDropdown);
+  const closeMessageDropdown = useNotificationStore((s) => s.closeMessageDropdown);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -36,16 +52,22 @@ export default function Header({ hasNewDm = false }) {
     fetchProfile();
   }, [BASE_URL]);
 
-  // Close dropdown when clicking outside
+  // Close any dropdown when clicking outside its wrapper
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (bellRef.current && !bellRef.current.contains(event.target)) {
+        closeBellDropdown();
+      }
+      if (messageRef.current && !messageRef.current.contains(event.target)) {
+        closeMessageDropdown();
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [closeBellDropdown, closeMessageDropdown]);
 
   const handleLogout = async () => {
     try {
@@ -61,8 +83,12 @@ export default function Header({ hasNewDm = false }) {
 
   const navigateTo = (path) => {
     setDropdownOpen(false);
+    closeBellDropdown();
+    closeMessageDropdown();
     router.push(path);
   };
+
+  const dmCount = Object.values(unreadDmMap).reduce((sum, c) => sum + c, 0);
 
   return (
     <header className={styles.header}>
@@ -73,29 +99,49 @@ export default function Header({ hasNewDm = false }) {
 
       {/* Right section - icons and profile */}
       <div className={styles.rightSection}>
-        {/* Atria Logo */}
+        {/* VFJC Logo */}
         <img
-          src="/assets/atriaLogo.png"
-          alt="Powered by Atria"
-          className={styles.atriaLogo}
+          src="/assets/VFJC.png"
+          alt="VFJC Logo"
+          className={styles.brandLogo}
         />
-
         <div className={styles.divider} />
 
-        {/* Notification Bell */}
-        <button className={styles.iconButton} aria-label="Notifications">
-          <Icon name="bell" size={22} />
-        </button>
+        {/* Notification Bell with Dropdown */}
+        <div className={styles.bellWrapper} ref={bellRef}>
+          <button
+            className={styles.iconButton}
+            onClick={toggleBellDropdown}
+            aria-label="Notifications"
+            aria-expanded={bellDropdownOpen}
+          >
+            <Icon name="bell" size={22} />
+            {unreadCount > 0 && (
+              <span className={styles.countBadge}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+          {bellDropdownOpen && <NotificationDropdown />}
+        </div>
 
-        {/* Messages */}
-        <button
-          className={styles.iconButton}
-          onClick={() => navigateTo('/DirectMessagesPage')}
-          aria-label="Messages"
-        >
-          <Icon name="message" size={22} />
-          {hasNewDm && <span className={styles.badge} />}
-        </button>
+        {/* Messages with Dropdown */}
+        <div className={styles.messageWrapper} ref={messageRef}>
+          <button
+            className={styles.iconButton}
+            onClick={toggleMessageDropdown}
+            aria-label="Messages"
+            aria-expanded={messageDropdownOpen}
+          >
+            <Icon name="message" size={22} />
+            {hasNewDm && dmCount > 0 && (
+              <span className={styles.countBadge}>
+                {dmCount > 99 ? '99+' : dmCount}
+              </span>
+            )}
+          </button>
+          {messageDropdownOpen && <MessageDropdown />}
+        </div>
 
         {/* Profile Dropdown */}
         <div className={styles.profileWrapper} ref={dropdownRef}>

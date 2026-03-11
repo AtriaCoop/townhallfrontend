@@ -1,6 +1,44 @@
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
+// Toast
+.toast {
+  position: fixed;
+  top: $spacing-4;
+  right: $spacing-4;
+  z-index: $z-toast;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-md;
+  font-weight: $font-weight-semibold;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 300ms $ease-out;
+  @include body-2;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toastSuccess {
+  background-color: $success-50;
+  color: $success-700;
+  border: 1px solid $success-500;
+}
+
+.toastError {
+  background-color: $error-50;
+  color: $error-700;
+  border: 1px solid $error-500;
+}
+
+// Page Layout
 .settingsPage {
   max-width: 640px;
   margin: 0 auto;
@@ -149,7 +187,172 @@
   gap: $spacing-2;
 }
 
+// Toggle Switch
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-4;
+  padding: $spacing-3 0;
+  border-bottom: 1px solid var(--border-default);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.toggleInfo {
+  @include flex-column;
+  gap: $spacing-1;
+  flex: 1;
+  min-width: 0;
+}
+
+.toggleLabel {
+  @include body-1;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+}
+
+.toggleDescription {
+  @include caption;
+  color: var(--text-muted);
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  min-width: 44px;
+  background-color: var(--toggle-off, $neutral-300);
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  @include transition-all;
+  padding: 0;
+
+  &:hover {
+    background-color: var(--toggle-off-hover, $neutral-400);
+  }
+}
+
+.toggleActive {
+  background-color: $primary-500;
+
+  &:hover {
+    background-color: $primary-600;
+  }
+
+  .toggleSlider {
+    transform: translateX(20px);
+  }
+}
+
+.toggleSlider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: $white;
+  border-radius: $radius-full;
+  transition: transform $transition-fast $ease-out;
+  box-shadow: $shadow-xs;
+}
+
+// Password Form
+.passwordForm {
+  @include flex-column;
+  gap: $spacing-4;
+  margin-top: $spacing-1;
+}
+
+.formGroup {
+  @include flex-column;
+  gap: $spacing-2;
+  text-align: left;
+}
+
+.inputLabel {
+  @include body-2;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+}
+
+.inputField {
+  @include input-base;
+  @include input-md;
+  width: 100%;
+}
+
+.fieldError {
+  @include body-2;
+  color: $error-500;
+  margin: 0;
+  text-align: left;
+}
+
+.changePasswordButton {
+  @include button-tertiary;
+  @include button-md;
+  justify-content: flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  color: var(--text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--hover-subtle, $neutral-100);
+    color: var(--text-primary);
+  }
+}
+
+// Account Buttons
 .logoutButton {
+  @include button-tertiary;
+  @include button-md;
+  justify-content: flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  color: var(--text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--hover-subtle, $neutral-100);
+    color: var(--text-primary);
+  }
+}
+
+.dangerZone {
+  @include flex-column;
+  gap: $spacing-2;
+  margin-top: $spacing-3;
+  padding-top: $spacing-3;
+  border-top: 1px solid var(--border-default);
+}
+
+.deactivateButton {
+  @include button-tertiary;
+  @include button-md;
+  justify-content: flex-start;
+  gap: $spacing-3;
+  width: 100%;
+  color: $warning-600;
+
+  &:hover:not(:disabled) {
+    background-color: $warning-50;
+    color: $warning-700;
+  }
+
+  svg {
+    color: $warning-600;
+  }
+}
+
+.deleteButton {
   @include button-tertiary;
   @include button-md;
   justify-content: flex-start;
@@ -167,8 +370,183 @@
   }
 }
 
+// Modal
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($black, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
+  padding: $spacing-4;
+  animation: fadeInOverlay 200ms $ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 500px;
+  padding: $spacing-8;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-2xl;
+  animation: slideUp 250ms $ease-out;
+
+  @include sm {
+    padding: $spacing-8 $spacing-10;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalTitle {
+  margin: 0 0 $spacing-2 0;
+  padding-right: $spacing-8;
+  @include heading-4;
+  text-align: center;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: $spacing-4;
+  right: $spacing-4;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-md;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  @include flex-center;
+  font-size: 24px;
+  line-height: 1;
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--hover-subtle, $neutral-100);
+    color: var(--text-primary);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.modalDescription {
+  margin: 0 0 $spacing-6 0;
+  color: var(--text-secondary);
+  @include body-2;
+  text-align: center;
+  line-height: $line-height-relaxed;
+}
+
+.modalActions {
+  display: flex;
+  gap: $spacing-3;
+  margin-top: $spacing-6;
+  justify-content: flex-end;
+}
+
+.cancelButton {
+  @include button-secondary;
+  @include button-md;
+  min-width: 100px;
+}
+
+.confirmButton {
+  @include button-base;
+  @include button-md;
+  min-width: 140px;
+  background-color: $error-500;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: $error-600;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $error-700;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.primaryButton {
+  @include button-base;
+  @include button-md;
+  min-width: 140px;
+  background-color: $primary-500;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-600;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $primary-700;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Dark Mode Overrides
 :global(body.dark) {
-  .logoutButton:hover:not(:disabled) {
+  .toggleSwitch {
+    background-color: $dark-border-subtle;
+
+    &:hover {
+      background-color: $neutral-600;
+    }
+  }
+
+  .toggleActive {
+    background-color: $primary-500;
+
+    &:hover {
+      background-color: $primary-600;
+    }
+  }
+
+  .deactivateButton:hover:not(:disabled) {
+    background-color: rgba($warning-500, 0.15);
+  }
+
+  .deleteButton:hover:not(:disabled) {
     background-color: rgba($error-500, 0.15);
+  }
+
+  .logoutButton:hover:not(:disabled) {
+    background-color: rgba($white, 0.08);
+  }
+
+  .changePasswordButton:hover:not(:disabled) {
+    background-color: rgba($white, 0.08);
+  }
+
+  .modalCloseButton:hover {
+    background-color: rgba($white, 0.08);
   }
 }

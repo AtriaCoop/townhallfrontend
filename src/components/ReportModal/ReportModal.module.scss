@@ -1,103 +1,97 @@
-@import '@/styles/mixins.scss';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba($black, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: $z-modal;
+  padding: $spacing-4;
 }
 
 .modalCard {
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: var(--modal-bg);
+  border-radius: $radius-xl;
+  padding: $spacing-6;
   width: 90%;
   max-width: 600px;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  gap: $spacing-4;
+  box-shadow: $shadow-xl;
 }
 
 .modalTitle {
   text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  @include heading-4;
+  margin-bottom: $spacing-2;
 }
 
 .closeButton {
   position: absolute;
-  right: 1rem;
-  top: 1rem;
+  right: $spacing-4;
+  top: $spacing-4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  border-radius: $radius-full;
   cursor: pointer;
-  color: #888;
+  color: var(--icon-muted);
+  @include transition-colors;
 
   &:hover {
-    color: #000;
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
   }
 }
 
 .textArea {
+  @include input-base;
   min-height: 120px;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding: $spacing-3;
   resize: vertical;
 }
 
 .textAreaError {
+  @include input-base;
   min-height: 120px;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid red;
-  border-radius: 8px;
+  padding: $spacing-3;
   resize: vertical;
+  border-color: $error-500;
 
   &:focus {
-    outline: {color: red};
+    outline: none;
+    box-shadow: $shadow-focus-error;
   }
 }
 
 .postButton {
-  background-color: #24873d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #1e6f35;
-  }
+  @include button-primary;
+  @include button-md;
 }
 
 .errorMessage {
-  color: red;
-  font-size: 0.875rem;
+  color: $error-500;
+  @include body-2;
   text-align: center;
 }
 
 .characterCount {
-  width: 100%;
   text-align: right;
-  margin-top: 15px;
-  color: #737373; 
+  color: var(--text-muted);
+  @include caption;
 }
 
 .characterCountError {
-  width: 100%;
   text-align: right;
-  margin-top: 15px;
-  color: red;
+  color: $error-500;
+  @include caption;
 }

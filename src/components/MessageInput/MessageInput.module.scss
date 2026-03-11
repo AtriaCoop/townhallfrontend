@@ -11,7 +11,7 @@
   background: var(--bg-primary);
 }
 
-.inputArea input[type="text"] {
+.inputArea > input[type="text"] {
   flex: 1;
   min-width: 0;
   padding: $spacing-2 $spacing-3;

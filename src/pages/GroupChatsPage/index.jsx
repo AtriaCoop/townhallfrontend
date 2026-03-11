@@ -31,7 +31,7 @@ export default function GroupChatsPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
-      setCurrentUserId(userData.id);
+      setCurrentUserId(Number(userData.id));
     }
   }, []);
 
@@ -255,10 +255,18 @@ export default function GroupChatsPage() {
     }
   }, [groupMessages, activeGroup]);
 
+  const handleGroupSelect = (group) => {
+    setActiveGroup(group);
+  };
+
+  const handleBackToGroups = () => {
+    setActiveGroup("");
+  };
+
   return (
     <div className={styles.container}>
       {/* Group Chats Sidebar */}
-      <div className={styles.groupChatsSidebar}>
+      <div className={`${styles.groupChatsSidebar} ${activeGroup ? styles.hideOnMobile : ''}`}>
         <div className={styles.sidebarHeader}>
           <h2>Group Chats</h2>
           <button
@@ -278,7 +286,7 @@ export default function GroupChatsPage() {
               <button
                 key={idx}
                 className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ''}`}
-                onClick={() => setActiveGroup(group)}
+                onClick={() => handleGroupSelect(group)}
               >
                 {formatGroupName(group)}
               </button>
@@ -287,11 +295,14 @@ export default function GroupChatsPage() {
         </div>
       </div>
 
-      <div className={styles.chatWrapper}>
+      <div className={`${styles.chatWrapper} ${activeGroup ? styles.showChatOnMobile : ''}`}>
         {activeGroup ? (
           <>
             {/* Chat Header */}
             <div className={styles.chatHeader}>
+              <button className={styles.backButton} onClick={handleBackToGroups} aria-label="Back to groups">
+                <Icon name="arrowleft" size={20} />
+              </button>
               <div className={styles.headerLeft}>
                 <h2 className={styles.chatTitle}>{formatGroupName(activeGroup)}</h2>
                 {activeParticipants.length > 0 && (
@@ -374,10 +385,11 @@ export default function GroupChatsPage() {
                   }
 
                   return (
-                    <div key={msg.id} className={styles.messageIncoming}>
+                    <div key={msg.id} className={styles.messageIncomingGroup}>
                       <MessageBubble
                         avatar={msg.avatar}
                         sender={msg.sender}
+                        senderId={msg.sender_id}
                         organization={msg.organization}
                         timestamp={msg.timestamp}
                         message={
@@ -409,37 +421,38 @@ export default function GroupChatsPage() {
           </div>
         )}
 
-        {showModal && (
-          <JoinGroupModal
-            onClose={() => setShowModal(false)}
-            onJoinGroup={handleJoinGroup}
-            title="Join Groups"
-          />
-        )}
-
-        {showMessageModal && (
-          <MessageModal
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            onClose={() => {
-              setShowMessageModal(false);
-              setSelectedMessage(null);
-            }}
-          />
-        )}
-
-        {showUpdateModal && selectedMessage && (
-          <UpdateMessageModal
-            msg={{ id: selectedMessage.id, text: selectedMessage.message }}
-            onCancel={() => {
-              setShowUpdateModal(false);
-              setSelectedMessage(null);
-            }}
-            onUpdate={handleUpdateMessage}
-            apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
-          />
-        )}
       </div>
+
+      {showModal && (
+        <JoinGroupModal
+          onClose={() => setShowModal(false)}
+          onJoinGroup={handleJoinGroup}
+          title="Join Groups"
+        />
+      )}
+
+      {showMessageModal && (
+        <MessageModal
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onClose={() => {
+            setShowMessageModal(false);
+            setSelectedMessage(null);
+          }}
+        />
+      )}
+
+      {showUpdateModal && selectedMessage && (
+        <UpdateMessageModal
+          msg={{ id: selectedMessage.id, text: selectedMessage.message }}
+          onCancel={() => {
+            setShowUpdateModal(false);
+            setSelectedMessage(null);
+          }}
+          onUpdate={handleUpdateMessage}
+          apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
+        />
+      )}
     </div>
   );
 }
