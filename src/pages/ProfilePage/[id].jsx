@@ -73,7 +73,6 @@ export default function ProfilePage() {
           {toast.message}
         </div>
       )}
-
       {/* Cover Image Section */}
       <div className={styles.coverSection}>
         <div className={styles.coverImage}>
@@ -121,7 +120,12 @@ export default function ProfilePage() {
 
         {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
-          <h1 className={styles.name}>{profileData.full_name}</h1>
+          <div className={styles.nameRow}>
+            <h1 className={styles.name}>{profileData.full_name}</h1>
+            {profileData.pronouns && (
+              <div className={styles.pronouns}>{profileData.pronouns}</div>
+            )}
+          </div>
           <div className={styles.profileActions}>
             {isCurrentUser ? (
               <button
@@ -158,9 +162,9 @@ export default function ProfilePage() {
               )
             )}
           </div>
+
         </div>
       </div>
-
       {/* Content Cards */}
       <div className={styles.contentGrid}>
         {/* Basic Information Card */}
@@ -183,6 +187,7 @@ export default function ProfilePage() {
                 <span className={styles.infoValue}>{profileData.title}</span>
               </div>
             )}
+
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>

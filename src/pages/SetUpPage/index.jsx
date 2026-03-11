@@ -10,6 +10,7 @@ import { validateUrl } from "@/utils/validateUrl";
 const INITIAL_FORM_DATA = {
   full_name: "",
   pronouns: "",
+  name_pronunciation: "",
   title: "",
   primary_organization: "",
   other_organizations: "",
@@ -41,6 +42,7 @@ const UploadIcon = () => (
 );
 
 export default function SetUpPage() {
+  // Merge conflict resolved - using cleaner initialization with INITIAL_FORM_DATA and necessary state hooks
   const router = useRouter();
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
@@ -141,7 +143,7 @@ export default function SetUpPage() {
       form.append("profile_image", profilePicRef.current.files[0]);
     }
     if (headerPicRef.current?.files[0]) {
-      form.append("header_image", headerPicRef.current.files[0]);
+      form.append("profile_header", headerPicRef.current.files[0]);
     }
 
     try {
@@ -228,6 +230,15 @@ export default function SetUpPage() {
                   label="Pronouns"
                   placeholder="e.g., she/her, he/him, they/them"
                   value={formData.pronouns}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className={styles.formField}>
+                <FormInputText
+                  name="name_pronunciation"
+                  label="Name Pronunciation"
+                  placeholder="e.g., 'A-li-sha', phonetic spelling"
+                  value={formData.name_pronunciation}
                   onChange={handleInputChange}
                 />
               </div>

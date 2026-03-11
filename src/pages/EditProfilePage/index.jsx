@@ -11,11 +11,11 @@ import styles from "./EditProfilePage.module.scss";
 export default function EditProfilePage() {
   const router = useRouter();
 
-  const [showModal, setShowModal] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [formData, setFormData] = useState({
     full_name: "",
     pronouns: "",
+    name_pronunciation: "", //NEW MODIFICATIONS
     title: "",
     primary_organization: "",
     other_organizations: "",
@@ -35,40 +35,7 @@ export default function EditProfilePage() {
 
   const dismissTimerRef = useRef(null);
 
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleDeleteClick = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-
-  const handleDeleteAccount = async () => {
-    const user = getStoredUser();
-    if (!user?.id) return;
-
-    setIsDeleting(true);
-    try {
-      const res = await authenticatedFetch(`${BASE_URL}/user/${user.id}/`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push("/LoginPage");
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setSaveStatus("error");
-        setSaveMessage(data.message || "Failed to delete account. Please try again.");
-        setShowModal(false);
-      }
-    } catch (err) {
-      console.error("Failed to delete account:", err);
-      setSaveStatus("error");
-      setSaveMessage("Failed to delete account. Please try again.");
-      setShowModal(false);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  const [removeBanner, setRemoveBanner] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -118,7 +85,9 @@ export default function EditProfilePage() {
     if (formData.profile_image instanceof File) {
       form.append("profile_image", formData.profile_image);
     }
-    if (formData.profile_header instanceof File) {
+    if (removeBanner) {
+      form.append("remove_profile_header", "true");
+    } else if (formData.profile_header instanceof File) {
       form.append("profile_header", formData.profile_header);
     }
 
@@ -279,7 +248,9 @@ export default function EditProfilePage() {
         <label htmlFor="bannerImageUpload" className={styles.bannerImageLabel}>
           <img
             src={
-              formData.profile_header instanceof File
+              removeBanner
+                ? "/assets/defaultBanner.svg"
+                : formData.profile_header instanceof File
                 ? URL.createObjectURL(formData.profile_header)
                 : profileData?.profile_header || "/assets/defaultBanner.svg"
             }
@@ -301,9 +272,24 @@ export default function EditProfilePage() {
           accept="image/*"
           style={{ display: "none" }}
           onChange={(e) => {
-            if (e.target.files[0]) handleFieldChange({ profile_header: e.target.files[0] });
+            if (e.target.files[0]) {
+              setRemoveBanner(false);
+              handleFieldChange({ profile_header: e.target.files[0] });
+            }
           }}
         />
+        {(profileData?.profile_header || formData.profile_header instanceof File) && !removeBanner && (
+          <button
+            type="button"
+            className={styles.removeBannerButton}
+            onClick={() => {
+              setRemoveBanner(true);
+              handleFieldChange({ profile_header: null });
+            }}
+          >
+            Remove Banner
+          </button>
+        )}
       </div>
 
       {/* Form Sections */}
@@ -434,34 +420,7 @@ export default function EditProfilePage() {
         <button className={styles.saveButton} onClick={handleUpdateProfile}>
           Save Changes
         </button>
-        <button className={styles.deleteAccountButton} onClick={handleDeleteClick}>
-          Delete Account
-        </button>
       </div>
-
-      {/* Delete Modal */}
-      {showModal && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>Delete Account?</h2>
-            <p className={styles.modalDescription}>
-              Are you sure you want to delete your account? This action cannot be undone.
-            </p>
-            <div className={styles.modalActions}>
-              <button className={styles.cancelButton} onClick={closeModal}>
-                Cancel
-              </button>
-              <button
-                className={styles.confirmDeleteButton}
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-              >
-                {isDeleting ? "Deleting..." : "Delete My Account"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

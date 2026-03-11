@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import "@/styles/globals.scss";
+import "@/styles/tailwind.css";
 import Layout from "@/components/Layout/Layout";
 import { PUBLIC_PAGES } from "@/constants/api";
 import useNotificationStore from "@/stores/notificationStore";
