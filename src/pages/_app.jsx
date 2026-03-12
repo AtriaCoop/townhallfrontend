@@ -7,6 +7,7 @@ import Layout from "@/components/Layout/Layout";
 import { PUBLIC_PAGES } from "@/constants/api";
 import useNotificationStore from "@/stores/notificationStore";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export default function App({ Component, pageProps }) {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
@@ -124,12 +125,14 @@ export default function App({ Component, pageProps }) {
   }, []);
 
   return (
-    <Layout>
-      <Component
-        {...pageProps}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-      />
-    </Layout>
+    <LanguageProvider>
+      <Layout>
+        <Component
+          {...pageProps}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
+      </Layout>
+    </LanguageProvider>
   );
 }
