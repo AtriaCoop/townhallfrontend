@@ -4,7 +4,7 @@ import Icon from "@/icons/Icon";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { getStoredUser } from "@/utils/getStoredUser";
 import styles from "./SettingsPage.module.scss";
-import { LANGUAGES } from "@/constants/languages";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
 
@@ -35,6 +35,8 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
   const [activeModal, setActiveModal] = useState(null); // "changePassword" | "deactivate" | "delete" | null
   const [isProcessing, setIsProcessing] = useState(false);
   const [verificationInput, setVerificationInput] = useState("");
+
+  const { language, setLanguage, t, languages } = useTranslation();
 
   // Fetch user privacy settings on mount
   useEffect(() => {
@@ -234,13 +236,13 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
         </div>
       )}
 
-      <h1 className={styles.pageTitle}>Settings</h1>
+      <h1 className={styles.pageTitle}>{t("settings.title")}</h1>
 
       {/* ===== Appearance ===== */}
       <div className={styles.card}>
-        <h2 className={styles.cardTitle}>Appearance</h2>
+        <h2 className={styles.cardTitle}>{t("settings.appearanceTitle")}</h2>
         <p className={styles.cardDescription}>
-          Customize how TownHall looks for you.
+          {t("settings.appearanceDescription")}
         </p>
 
         <div className={styles.themeOptions}>
@@ -257,7 +259,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
             </div>
             <div className={styles.themeInfo}>
               <Icon name="sun" size={18} />
-              <span>Light</span>
+              <span>{t("settings.lightTheme")}</span>
             </div>
           </button>
 
@@ -274,7 +276,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
             </div>
             <div className={styles.themeInfo}>
               <Icon name="moon" size={18} />
-              <span>Dark</span>
+              <span>{t("settings.darkTheme")}</span>
             </div>
           </button>
         </div>
@@ -282,22 +284,29 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
 
       {/* ===== Language ===== */}
       <div className={styles.card}>
-        <h2 className={styles.cardTitle}>Language</h2>
+        <h2 className={styles.cardTitle}>{t("settings.languageTitle")}</h2>
         <p className={styles.cardDescription}>
-          Choose your preferred language for the Townhall interface
+          {t("settings.languageDescription")}
         </p>
 
         <div>
-          {LANGUAGES.map((language) => (
-            <div class={styles.languageOption}>
-              <div class={styles.languageFlag}>{language.flag}</div>
-              <div class={styles.languageInfo}>
-                <div class={styles.languageName}>{language.name}</div>
-                <div class={styles.languageNative}>{language.nativeName}</div>
-              </div>
-              <div class={styles.languageRadioBtn}></div>
-            </div>
-          ))}
+          {languages.map((lang, i) => {
+            const isSelected = language === lang.code;
+
+            return (
+              <label key={lang.code} className={styles.languageOption}>
+                <div className={styles.languageInfo}>{lang.name}</div>
+                <input
+                  type="radio"
+                  name="language"
+                  className={styles.languageRadioBtn}
+                  value={lang.code}
+                  checked={isSelected}
+                  onChange={() => setLanguage(lang.code)}
+                />
+              </label>
+            );
+          })}
         </div>
       </div>
 
@@ -389,12 +398,12 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
 
       {/* ===== Account ===== */}
       <div className={styles.card}>
-        <h2 className={styles.cardTitle}>Account</h2>
+        <h2 className={styles.cardTitle}>{t("settings.accountTitle")}</h2>
 
         <div className={styles.settingsList}>
           <button className={styles.logoutButton} onClick={handleLogout}>
             <Icon name="leave" size={20} />
-            <span>Logout</span>
+            <span>{t("settings.logout")}</span>
           </button>
 
           <div className={styles.dangerZone}>
