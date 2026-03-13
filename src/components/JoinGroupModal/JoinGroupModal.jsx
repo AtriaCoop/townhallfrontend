@@ -1,10 +1,12 @@
-import styles from './JoinGroupModal.module.scss';
-import { useState } from 'react';
-import Icon from '@/icons/Icon';
-import { formatGroupName } from '@/utils/formatGroupName';
+import styles from "./JoinGroupModal.module.scss";
+import { useState } from "react";
+import Icon from "@/icons/Icon";
+import { formatGroupName } from "@/utils/formatGroupName";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
+  const { t } = useTranslation();
 
   const groups = [
     { name: "atria-questions-and-support" },
@@ -17,8 +19,10 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
     { name: "wg-sustainable-resourcing-for-community-food-systems" },
   ];
 
-  const filteredGroups = groups.filter(group =>
-    formatGroupName(group.name).toLowerCase().includes(searchText.toLowerCase())
+  const filteredGroups = groups.filter((group) =>
+    formatGroupName(group.name)
+      .toLowerCase()
+      .includes(searchText.toLowerCase()),
   );
 
   return (
@@ -26,7 +30,11 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2>{title}</h2>
-          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close"
+          >
             <Icon name="close" size={20} />
           </button>
         </div>
@@ -35,7 +43,7 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
           <Icon name="search" size={16} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Search groups..."
+            placeholder={t("groupChats.searchGroupPlaceholder")}
             className={styles.searchInput}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -53,11 +61,13 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
                 <div className={styles.groupIcon}>
                   <Icon name="groupChats" size={18} />
                 </div>
-                <span className={styles.groupName}>{formatGroupName(group.name)}</span>
+                <span className={styles.groupName}>
+                  {formatGroupName(group.name)}
+                </span>
               </div>
             ))
           ) : (
-            <p className={styles.noResults}>No groups found matching your search.</p>
+            <p className={styles.noResults}>{t("groupChats.noGroupsFound")}</p>
           )}
         </div>
       </div>

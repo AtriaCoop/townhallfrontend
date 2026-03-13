@@ -11,6 +11,7 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import { BASE_URL } from "@/constants/api";
 import { formatGroupName } from "@/utils/formatGroupName";
 import { formatRelativeTime, formatExactTime } from "@/utils/formateDatetime";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function GroupChatsPage() {
   const socketRef = useRef(null);
@@ -28,6 +29,8 @@ export default function GroupChatsPage() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
@@ -40,7 +43,7 @@ export default function GroupChatsPage() {
 
     const fetchGroupMessages = async () => {
       const res = await authenticatedFetch(
-        `${BASE_URL}/groups/${activeGroup}/messages/`
+        `${BASE_URL}/groups/${activeGroup}/messages/`,
       );
       const data = await res.json();
 
@@ -102,7 +105,7 @@ export default function GroupChatsPage() {
   // Load from localStorage on mount
   useEffect(() => {
     const storedGroups = JSON.parse(
-      localStorage.getItem("joinedGroups") || "[]"
+      localStorage.getItem("joinedGroups") || "[]",
     );
     const storedActive = localStorage.getItem("activeGroup");
 
@@ -164,13 +167,10 @@ export default function GroupChatsPage() {
     formData.append("content", inputText);
     if (selectedImage) formData.append("image", selectedImage);
 
-    const res = await authenticatedFetch(
-      `${BASE_URL}/groups/messages/`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    const res = await authenticatedFetch(`${BASE_URL}/groups/messages/`, {
+      method: "POST",
+      body: formData,
+    });
 
     const data = await res.json();
     if (data?.data) {
@@ -198,7 +198,7 @@ export default function GroupChatsPage() {
           JSON.stringify({
             message: data.data.content,
             sender: data.data.sender,
-          })
+          }),
         );
       }
     }
@@ -219,14 +219,14 @@ export default function GroupChatsPage() {
     try {
       const res = await authenticatedFetch(
         `${BASE_URL}/groups/messages/${selectedMessage.id}/`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
       const data = await res.json();
       if (data.success) {
         setGroupMessages((prev) => {
           const updated = { ...prev };
           updated[activeGroup] = (updated[activeGroup] || []).filter(
-            (m) => m.id !== selectedMessage.id
+            (m) => m.id !== selectedMessage.id,
           );
           return updated;
         });
@@ -242,7 +242,7 @@ export default function GroupChatsPage() {
     setGroupMessages((prev) => {
       const updated = { ...prev };
       updated[activeGroup] = (updated[activeGroup] || []).map((m) =>
-        m.id === msgId ? { ...m, message: newText } : m
+        m.id === msgId ? { ...m, message: newText } : m,
       );
       return updated;
     });
@@ -266,9 +266,11 @@ export default function GroupChatsPage() {
   return (
     <div className={styles.container}>
       {/* Group Chats Sidebar */}
-      <div className={`${styles.groupChatsSidebar} ${activeGroup ? styles.hideOnMobile : ''}`}>
+      <div
+        className={`${styles.groupChatsSidebar} ${activeGroup ? styles.hideOnMobile : ""}`}
+      >
         <div className={styles.sidebarHeader}>
-          <h2>Group Chats</h2>
+          <h2>{t("groupChats.title")}</h2>
           <button
             className={styles.joinButton}
             onClick={handleChatClick}
@@ -280,12 +282,12 @@ export default function GroupChatsPage() {
 
         <div className={styles.chatList}>
           {joinedGroups.length === 0 ? (
-            <p className={styles.noChats}>No groups joined yet...</p>
+            <p className={styles.noChats}>{t("groupChats.noGroupsJoined")}</p>
           ) : (
             joinedGroups.map((group, idx) => (
               <button
                 key={idx}
-                className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ''}`}
+                className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ""}`}
                 onClick={() => handleGroupSelect(group)}
               >
                 {formatGroupName(group)}
@@ -295,16 +297,24 @@ export default function GroupChatsPage() {
         </div>
       </div>
 
-      <div className={`${styles.chatWrapper} ${activeGroup ? styles.showChatOnMobile : ''}`}>
+      <div
+        className={`${styles.chatWrapper} ${activeGroup ? styles.showChatOnMobile : ""}`}
+      >
         {activeGroup ? (
           <>
             {/* Chat Header */}
             <div className={styles.chatHeader}>
-              <button className={styles.backButton} onClick={handleBackToGroups} aria-label="Back to groups">
+              <button
+                className={styles.backButton}
+                onClick={handleBackToGroups}
+                aria-label="Back to groups"
+              >
                 <Icon name="arrowleft" size={20} />
               </button>
               <div className={styles.headerLeft}>
-                <h2 className={styles.chatTitle}>{formatGroupName(activeGroup)}</h2>
+                <h2 className={styles.chatTitle}>
+                  {formatGroupName(activeGroup)}
+                </h2>
                 {activeParticipants.length > 0 && (
                   <span className={styles.memberCount}>
                     {activeParticipants.length + 1} participants
@@ -316,7 +326,7 @@ export default function GroupChatsPage() {
                   <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder="Search messages..."
+                    placeholder={t("groupChats.searchMessages")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => {
@@ -333,7 +343,10 @@ export default function GroupChatsPage() {
                 >
                   <Icon name="search" />
                 </button>
-                <button className={styles.iconButton} onClick={handleLeaveGroup}>
+                <button
+                  className={styles.iconButton}
+                  onClick={handleLeaveGroup}
+                >
                   <Icon name="leave" />
                 </button>
               </div>
@@ -343,19 +356,24 @@ export default function GroupChatsPage() {
             <div ref={messageContainerRef} className={styles.messageContainer}>
               {(groupMessages[activeGroup] || [])
                 .filter((msg) =>
-                  msg.message.toLowerCase().includes(searchQuery.toLowerCase())
+                  msg.message.toLowerCase().includes(searchQuery.toLowerCase()),
                 )
                 .map((msg) => {
                   const linkedText = (
                     <p>
                       {msg.message.split(/(\s+)/).map((part, i) =>
                         /^https?:\/\/\S+$/.test(part) ? (
-                          <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                          <a
+                            key={i}
+                            href={part}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {part}
                           </a>
                         ) : (
                           part
-                        )
+                        ),
                       )}
                     </p>
                   );
@@ -366,7 +384,11 @@ export default function GroupChatsPage() {
                         <div className={styles.messageContent}>
                           {linkedText}
                           {msg.image && (
-                            <img src={msg.image} alt="attachment" className={styles.chatImage} />
+                            <img
+                              src={msg.image}
+                              alt="attachment"
+                              className={styles.chatImage}
+                            />
                           )}
                           <button
                             className={styles.optionsButton}
@@ -376,7 +398,10 @@ export default function GroupChatsPage() {
                           </button>
                         </div>
                         {msg.timestamp && (
-                          <span className={styles.messageTimestamp} title={formatExactTime(msg.timestamp)}>
+                          <span
+                            className={styles.messageTimestamp}
+                            title={formatExactTime(msg.timestamp)}
+                          >
                             {formatRelativeTime(msg.timestamp)}
                           </span>
                         )}
@@ -396,7 +421,11 @@ export default function GroupChatsPage() {
                           <div>
                             {linkedText}
                             {msg.image && (
-                              <img src={msg.image} alt="attachment" className={styles.chatImage} />
+                              <img
+                                src={msg.image}
+                                alt="attachment"
+                                className={styles.chatImage}
+                              />
                             )}
                           </div>
                         }
@@ -410,24 +439,23 @@ export default function GroupChatsPage() {
             {/* Chat Input */}
             <MessageInput
               onSend={handleSendMessage}
-              placeholder="Type your message..."
+              placeholder={t("groupChats.messagePlaceholder")}
             />
           </>
         ) : (
           <div className={styles.noChatSelected}>
             <Icon name="message" size={64} />
-            <h2>Join a Group Chat</h2>
-            <p>Select a group from the sidebar or join a new one to start chatting.</p>
+            <h2>{t("groupChats.joinGroupChat")}</h2>
+            <p>{t("groupChats.selectGroup")}</p>
           </div>
         )}
-
       </div>
 
       {showModal && (
         <JoinGroupModal
           onClose={() => setShowModal(false)}
           onJoinGroup={handleJoinGroup}
-          title="Join Groups"
+          title={t("groupChats.joinGroupsTitle")}
         />
       )}
 

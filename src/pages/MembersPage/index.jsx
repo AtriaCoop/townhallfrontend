@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
+import { useTranslation } from "@/hooks/useTranslation";
 import styles from "./MembersPage.module.scss";
 
 export default function MembersPage() {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [members, setMembers] = useState([]);
   const [searchMember, setSearchMember] = useState("");
@@ -14,7 +16,7 @@ export default function MembersPage() {
 
   const filteredMembers = members
     .filter((member) =>
-      member.full_name?.toLowerCase().includes(searchMember.toLowerCase())
+      member.full_name?.toLowerCase().includes(searchMember.toLowerCase()),
     )
     .sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
 
@@ -38,17 +40,15 @@ export default function MembersPage() {
       {/* Page Header */}
       <header className={styles.pageHeader}>
         <div className={styles.headerContent}>
-          <h1 className={styles.pageTitle}>Members</h1>
-          <p className={styles.pageDescription}>
-            Explore and connect with people across the coalition community.
-          </p>
+          <h1 className={styles.pageTitle}>{t("members.title")}</h1>
+          <p className={styles.pageDescription}>{t("members.description")}</p>
         </div>
         <div className={styles.searchWrapper}>
           <Icon name="search" size={18} className={styles.searchIcon} />
           <input
             type="search"
             className={styles.searchInput}
-            placeholder="Search members..."
+            placeholder={t("members.searchPlaceholder")}
             value={searchMember}
             onChange={(e) => setSearchMember(e.target.value)}
           />
@@ -60,7 +60,7 @@ export default function MembersPage() {
         {isLoading ? (
           <div className={styles.loadingState}>
             <div className={styles.spinner} />
-            <p>Loading members...</p>
+            <p>{t("ui.loading")}</p>
           </div>
         ) : filteredMembers.length > 0 ? (
           filteredMembers.map((member) => (
@@ -83,7 +83,7 @@ export default function MembersPage() {
                   {member.full_name || "Unnamed"}
                 </h3>
                 <p className={styles.memberMeta}>
-                  {member.title || "VFJC Member"}
+                  {member.title || t("ui.defaultTitle")}
                 </p>
                 {member.primary_organization && (
                   <p className={styles.memberOrg}>
@@ -96,10 +96,10 @@ export default function MembersPage() {
         ) : (
           <div className={styles.emptyState}>
             <Icon name="members" size={48} />
-            <h3>No members found</h3>
+            <h3>{t("members.empty")}</h3>
             <p>
               {searchMember
-                ? "Try adjusting your search terms."
+                ? t("members.adjustSearch")
                 : "No members to display yet."}
             </p>
           </div>
