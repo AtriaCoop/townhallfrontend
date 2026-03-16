@@ -439,7 +439,7 @@ export default function GroupChatsPage() {
             {/* Chat Input */}
             <MessageInput
               onSend={handleSendMessage}
-              placeholder={t("groupChats.messagePlaceholder")}
+              placeholder={t("ui.messagePlaceholder")}
             />
           </>
         ) : (
