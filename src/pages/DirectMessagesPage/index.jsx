@@ -4,6 +4,7 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import ChatModal from "@/components/ChatModal/ChatModal";
 import ChatWindow from "@/components/ChatWindow/ChatWindow";
 import Icon from "@/icons/Icon";
+import { useTranslation } from "@/hooks/useTranslation";
 import useNotificationStore from "@/stores/notificationStore";
 import styles from "./DirectMessagesPage.module.scss";
 
@@ -11,6 +12,7 @@ export default function DirectMessagesPage() {
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_ID;
+  const { t } = useTranslation();
 
   const unreadDmMap = useNotificationStore((s) => s.unreadDmMap);
   const clearUnreadDm = useNotificationStore((s) => s.clearUnreadDm);
@@ -23,7 +25,7 @@ export default function DirectMessagesPage() {
 
   const filteredChats = chats
     .filter((chat) =>
-      chat.name.toLowerCase().includes(searchUser.toLowerCase())
+      chat.name.toLowerCase().includes(searchUser.toLowerCase()),
     )
     .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
@@ -44,7 +46,7 @@ export default function DirectMessagesPage() {
       const userId = Number(userData.id);
       const res = await authenticatedFetch(
         `${BASE_URL}/chats/?user_id=${userId}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       const data = await res.json();
       const chatsFromServer = data?.data || [];
@@ -61,7 +63,7 @@ export default function DirectMessagesPage() {
               : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
             : "/assets/ProfileImage.jpg",
           time: new Date(chat.created_at).toLocaleString(),
-          lastMessage: chat.last_message || "Start a conversation...",
+          lastMessage: chat.last_message || t("messages.startConversation"),
         };
       });
 
@@ -71,9 +73,9 @@ export default function DirectMessagesPage() {
       const chatWithId = Number(router.query.chatWith);
       if (chatWithId) {
         const match = processedChats.find((c) =>
-          c.participants.some((p) =>
-            (typeof p === "object" ? p.id : p) === chatWithId
-          )
+          c.participants.some(
+            (p) => (typeof p === "object" ? p.id : p) === chatWithId,
+          ),
         );
         if (match) setActiveChat(match);
       }
@@ -89,7 +91,7 @@ export default function DirectMessagesPage() {
     // Check if a chat with this user already exists in local state
     const existingChat = chats.find((chat) => {
       const participantIds = chat.participants.map((p) =>
-        typeof p === "object" ? p.id : p
+        typeof p === "object" ? p.id : p,
       );
       return (
         participantIds.includes(currentUserId) &&
@@ -118,7 +120,9 @@ export default function DirectMessagesPage() {
       if (!chatData?.id) return;
 
       // Process the backend response the same way fetchChats does
-      const otherUser = chatData.participants.find((p) => p.id !== currentUserId);
+      const otherUser = chatData.participants.find(
+        (p) => p.id !== currentUserId,
+      );
 
       const chatObj = {
         ...chatData,
@@ -130,7 +134,7 @@ export default function DirectMessagesPage() {
             : `https://res.cloudinary.com/${CLOUD_NAME}/${otherUser.profile_image}`
           : "/assets/ProfileImage.jpg",
         time: chatData.created_at || new Date().toISOString(),
-        lastMessage: "Start a conversation...",
+        lastMessage: t("messages.startConversation"),
       };
 
       setChats((prev) => [...prev, chatObj]);
@@ -171,9 +175,11 @@ export default function DirectMessagesPage() {
   return (
     <div className={styles.messagesPage}>
       {/* Conversations List Panel */}
-      <div className={`${styles.conversationsPanel} ${activeChat ? styles.hideOnMobile : ''}`}>
+      <div
+        className={`${styles.conversationsPanel} ${activeChat ? styles.hideOnMobile : ""}`}
+      >
         <div className={styles.panelHeader}>
-          <h1 className={styles.panelTitle}>Messages</h1>
+          <h1 className={styles.panelTitle}>{t("messages.title")}</h1>
           <button
             className={styles.newChatButton}
             onClick={() => setShowModal(true)}
@@ -189,7 +195,7 @@ export default function DirectMessagesPage() {
           <input
             className={styles.searchInput}
             type="search"
-            placeholder="Search conversations..."
+            placeholder={t("messages.searchConversations")}
             value={searchUser}
             onChange={(e) => setSearchUser(e.target.value)}
           />
@@ -201,7 +207,7 @@ export default function DirectMessagesPage() {
             filteredChats.map((chat) => (
               <div
                 key={chat.id}
-                className={`${styles.chatItem} ${activeChat?.id === chat.id ? styles.active : ''}`}
+                className={`${styles.chatItem} ${activeChat?.id === chat.id ? styles.active : ""}`}
                 onClick={() => handleChatClick(chat)}
               >
                 <img
@@ -240,13 +246,13 @@ export default function DirectMessagesPage() {
           ) : (
             <div className={styles.emptyState}>
               <Icon name="message" size={48} />
-              <h3>No conversations yet</h3>
-              <p>Start chatting with other VFJC members!</p>
+              <h3>{t("messages.noConversations")}</h3>
+              <p>{t("messages.startChatting")}</p>
               <button
                 className={styles.startChatButton}
                 onClick={() => setShowModal(true)}
               >
-                Start a Conversation
+                {t("messages.startConversation")}
               </button>
             </div>
           )}
@@ -254,17 +260,16 @@ export default function DirectMessagesPage() {
       </div>
 
       {/* Chat Window Panel */}
-      <div className={`${styles.chatPanel} ${activeChat ? styles.showOnMobile : ''}`}>
+      <div
+        className={`${styles.chatPanel} ${activeChat ? styles.showOnMobile : ""}`}
+      >
         {activeChat ? (
-          <ChatWindow
-            chat={activeChat}
-            onClose={() => setActiveChat(null)}
-          />
+          <ChatWindow chat={activeChat} onClose={() => setActiveChat(null)} />
         ) : (
           <div className={styles.noChatSelected}>
             <Icon name="message" size={64} />
-            <h2>Chat with your Volunteer Orgs!</h2>
-            <p>Select a conversation or start a new one to begin messaging.</p>
+            <h2>{t("messages.chatWithOrgs")}</h2>
+            <p>{t("messages.selectConversation")}</p>
           </div>
         )}
       </div>
@@ -277,7 +282,7 @@ export default function DirectMessagesPage() {
             return userData.id ? userData.id : -1;
           })()}
           onClose={() => setShowModal(false)}
-          title="New Chat"
+          title={t("messages.chatModalTitle")}
           onUserSelect={handleStartChat}
         />
       )}
