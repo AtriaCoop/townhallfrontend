@@ -1,0 +1,68 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.track {
+  position: relative;
+  display: inline-flex;
+  height: 1.25rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease-in-out;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--primary);
+  }
+
+  &:not(.disabled):hover {
+    opacity: 0.9;
+  }
+
+  &:not(.checked) {
+    background-color: #d1d5db;
+  }
+
+  &.checked {
+    background-color: var(--primary);
+  }
+}
+
+.thumb {
+  pointer-events: none;
+  display: inline-block;
+  height: 1.00rem;
+  width: 1.00rem;
+  border-radius: 9999px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: transform 0.2s ease-in-out;
+  margin-top: 1px;
+
+  &:not(.checked) {
+    transform: translateX(2px);
+  }
+
+  &.checked {
+    transform: translateX(1.25rem);
+  }
+}
+
+.label {
+  color: var(--text-muted);
+  @include caption;
+}

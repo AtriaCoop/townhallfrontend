@@ -25,11 +25,12 @@ export async function updatePost(postId, { content, image, pinned, tags = [] }) 
 	return await response.json();
 }
 
-export async function createPost({ content, images = [], pinned, tags = [] }) {
+export async function createPost({ content, images = [], pinned, tags = [], anonymous }) {
 	const formData = new FormData();
 	formData.append("content", content)
 	images.forEach((img) => formData.append("image", img));
 	if (pinned) { formData.append("pinned", pinned) };
+	if (anonymous) { formData.append("anonymous", anonymous); }
 
 	tags.forEach((tag) => {
 		formData.append("tags", tag);

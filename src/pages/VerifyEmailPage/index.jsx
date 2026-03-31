@@ -13,12 +13,13 @@ export default function VerifyEmailPage() {
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
-  // Get email from localStorage (stored during signup)
-  const storedUser = typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("user") || "null")
-    : null;
-  const userEmail = storedUser?.email || "";
+  // Get email from localStorage after mount to avoid SSR hydration mismatch
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    setUserEmail(storedUser?.email || "");
+  }, []);
 
   // If URL has uid + token, this is a verification link click
   useEffect(() => {

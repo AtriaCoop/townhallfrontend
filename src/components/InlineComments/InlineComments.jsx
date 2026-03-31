@@ -4,6 +4,7 @@ import { formatDistance } from 'date-fns';
 import { authenticatedFetch } from '@/utils/authHelpers';
 import MentionTextInput from '../MentionTextInput/MentionTextInput';
 import Icon from '@/icons/Icon';
+import ToggleSwitch from '@/components/ToggleSwitch/ToggleSwitch';
 import styles from './InlineComments.module.scss';
 
 const MAX_COMMENT_LEN = 250;
@@ -20,6 +21,7 @@ export default function InlineComments({
 }) {
   const router = useRouter();
   const [showAllComments, setShowAllComments] = useState(false);
+  const [commentAnonymously, setCommentAnonymously] = useState(false);
 
   const displayedComments = showAllComments
     ? comments
@@ -36,6 +38,7 @@ export default function InlineComments({
           post: postId,
           content: inputContent,
           created_at: new Date().toISOString(),
+          anonymous: commentAnonymously,
         }),
       });
       const data = await response.json();
@@ -84,6 +87,14 @@ export default function InlineComments({
     <div className={styles.commentsSection}>
       {/* Comment Input */}
       <div className={styles.inputWrapper}>
+        <div className={styles.anonymousToggle}>
+          <ToggleSwitch
+            checked={commentAnonymously}
+            onChange={() => setCommentAnonymously(!commentAnonymously)}
+            label="Comment anonymously"
+            aria-label={commentAnonymously ? "Comment as yourself" : "Comment anonymously"}
+          />
+        </div>
         <MentionTextInput
           placeholder="Write a comment..."
           onSubmit={handleSubmit}
@@ -111,13 +122,15 @@ export default function InlineComments({
             </button>
           )}
 
-          {displayedComments.map((comment) => (
+          {displayedComments.map((comment) => {
+            const hideAuthorDetails = comment.anonymous === true && (currentUserId !== comment.user?.id);
+            return (
             <div className={styles.comment} key={comment.id}>
               <img
-                src={comment.user?.profile_image || '/assets/ProfileImage.jpg'}
-                alt={comment.user?.full_name}
+                src={!hideAuthorDetails && comment.user?.profile_image ? comment.user?.profile_image : '/assets/ProfileImage.jpg'}
+                alt={!hideAuthorDetails ? comment.user?.full_name : 'Anonymous'}
                 className={styles.avatar}
-                onClick={() => comment.user?.id && handleUserClick(comment.user.id)}
+                onClick={() => {(!hideAuthorDetails && comment.user?.id) && handleUserClick(comment.user.id)}}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = '/assets/ProfileImage.jpg';
@@ -127,9 +140,9 @@ export default function InlineComments({
                 <div className={styles.commentBubble}>
                   <span
                     className={styles.authorName}
-                    onClick={() => comment.user?.id && handleUserClick(comment.user.id)}
+                    onClick={() => {(!hideAuthorDetails && comment.user?.id) && handleUserClick(comment.user.id)}}
                   >
-                    {comment.user?.full_name}
+                    {!hideAuthorDetails ? comment.user?.full_name : 'Anonymous'}
                   </span>
                   <p className={styles.commentText}>{comment.content}</p>
                 </div>
@@ -139,6 +152,9 @@ export default function InlineComments({
                       ? formatDistance(new Date(comment.created_at), new Date(), { addSuffix: true })
                       : ''}
                   </span>
+                  {(comment.user?.id === currentUserId && comment.anonymous) ? (
+                      <span className={styles.anonymousText}>Anonymous post</span>
+                  ) : null}
                   {comment.user?.id === currentUserId && (
                     <button
                       className={styles.deleteBtn}
@@ -150,7 +166,8 @@ export default function InlineComments({
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
 
           {/* Show less button */}
           {showAllComments && hiddenCount > 0 && (

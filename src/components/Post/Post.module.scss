@@ -241,7 +241,9 @@
 
 .postFooterTop {
   display: flex;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  margin-bottom: $spacing-3;
 }
 
 .reactions {
