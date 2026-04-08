@@ -48,6 +48,15 @@ export default function ProfilePage() {
     }
   }, [id, router.isReady, BASE_URL]);
 
+      function parseSkills(value) {
+      if (!value) return [];
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+
   useEffect(() => {
     if (!toast) return;
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -228,7 +237,14 @@ export default function ProfilePage() {
           {profileData.skills_interests && (
             <div className={styles.detailSection}>
               <h3 className={styles.detailLabel}>Skills & Interests</h3>
-              <p className={styles.detailContent}>{profileData.skills_interests}</p>
+              {/* <p className={styles.detailContent}>{profileData.skills_interests}</p> */}
+              <div className={styles.skillsTags}>
+                {parseSkills(profileData.skills_interests).map((skill, index) => (
+                  <span key={`${skill}-${index}`} className={styles.skillTag}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
