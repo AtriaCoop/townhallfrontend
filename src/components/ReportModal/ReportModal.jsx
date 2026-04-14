@@ -7,7 +7,7 @@ export default function ReportModal({
     onClose,
  }) {
     const [text, setText] = useState('');
-    const MAX_POST_LEN = 250;
+    const MAX_POST_LEN = 1000;
     const [error, setError] = useState('');
     const handleSubmit = async () => {
       if (!text.trim()) {
