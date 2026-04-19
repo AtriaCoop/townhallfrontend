@@ -245,7 +245,8 @@ export default function ProfilePage() {
         {(profileData.linkedin_url ||
           profileData.x_url ||
           profileData.facebook_url ||
-          profileData.instagram_url) && (
+          profileData.instagram_url ||
+          profileData.bluesky_url) && (
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Social Links</h2>
             <SocialLinks
@@ -254,6 +255,7 @@ export default function ProfilePage() {
                 x_url: profileData.x_url,
                 facebook_url: profileData.facebook_url,
                 instagram_url: profileData.instagram_url,
+                bluesky_url: profileData.bluesky_url,
               }}
             />
           </div>

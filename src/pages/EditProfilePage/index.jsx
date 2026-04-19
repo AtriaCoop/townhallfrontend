@@ -28,6 +28,7 @@ export default function EditProfilePage() {
     x_url: "",
     instagram_url: "",
     facebook_url: "",
+    bluesky_url: "",
   });
   const [saveStatus, setSaveStatus] = useState(null);
   const [saveMessage, setSaveMessage] = useState("");
@@ -149,6 +150,7 @@ export default function EditProfilePage() {
     if (formData.x_url) getUrlError(errors, "x_url");
     if (formData.instagram_url) getUrlError(errors, "instagram_url");
     if (formData.facebook_url) getUrlError(errors, "facebook_url");
+    if (formData.bluesky_url) getUrlError(errors, "bluesky_url");
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -410,6 +412,15 @@ export default function EditProfilePage() {
               value={formData.instagram_url}
               onChange={handleInputChange}
               error={fieldErrors.instagram_url}
+            />
+            <FormInputText
+              name="bluesky_url"
+              label="Bluesky"
+              type="url"
+              placeholder="https://bsky.app/profile/username"
+              value={formData.bluesky_url}
+              onChange={handleInputChange}
+              error={fieldErrors.bluesky_url}
             />
           </div>
         </div>

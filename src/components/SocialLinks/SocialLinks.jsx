@@ -3,6 +3,7 @@ import {
   FaSquareXTwitter,
   FaSquareInstagram,
   FaSquareFacebook,
+  FaBluesky,
 } from "react-icons/fa6";
 import styles from "./SocialLinks.module.scss";
 
@@ -28,6 +29,11 @@ export default function SocialLinks({ socialLinks }) {
       icon: <FaSquareInstagram />,
       name: "Instagram",
     },
+    {
+      url: socialLinks.bluesky_url,
+      icon: <FaBluesky />,
+      name: "Bluesky",
+    }
   ];
 
   return (
