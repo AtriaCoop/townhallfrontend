@@ -48,13 +48,13 @@ export default function ProfilePage() {
     }
   }, [id, router.isReady, BASE_URL]);
 
-      function parseSkills(value) {
-      if (!value) return [];
-      return value
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-    }
+  function parseSkills(value) {
+    if (!value) return [];
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
 
 
   useEffect(() => {

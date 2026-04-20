@@ -89,7 +89,6 @@ export default function EditProfilePage() {
     const form = new FormData();
     for (const key in formData) {
       if (key !== "profile_image" && key !== "profile_header") {
-        // form.append(key, formData[key]);
         if (key === "skills_interests") {
           form.append("skills_interests", skillsTags.join(", "));
         } else {
@@ -100,9 +99,6 @@ export default function EditProfilePage() {
 
     if (formData.profile_image instanceof File) {
       form.append("profile_image", formData.profile_image);
-    }
-    if (formData.skills_interests) {
-      form.append("skills_interests", skillsTags.join(","));
     }
     if (removeBanner) {
       form.append("remove_profile_header", "true");
