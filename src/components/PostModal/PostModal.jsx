@@ -24,7 +24,7 @@ export default function Modal({
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
-  const MAX_POST_LEN = 250;
+  const MAX_POST_LEN = 1000;
 
   const postImageRef = useRef(null);
 
