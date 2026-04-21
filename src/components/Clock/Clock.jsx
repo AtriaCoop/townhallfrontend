@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react';
 import styles from './Clock.module.scss';
 
 export default function Clock() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState(null);
   const [showLocalTime, setShowLocalTime] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+    setTime(new Date());
+
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
@@ -21,20 +25,22 @@ export default function Clock() {
   const label = showLocalTime ? 'Local Time:' : 'Time in Vancouver:';
 
   // Format time for the current timezone
-  const formattedTime = time.toLocaleString('en-US', {
-    timeZone: currentTimezone,
-    hour12: true,
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-    month: 'short',
-    day: 'numeric'
-  });
+  const formattedTime = time
+    ? time.toLocaleString('en-US', {
+        timeZone: currentTimezone,
+        hour12: true,
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        month: 'short',
+        day: 'numeric'
+      })
+    : '--';
 
   return (
     <div className={styles.clock}>
       <span className={styles.timezone}>{label}</span>
-      <span className={styles.time}>{formattedTime}</span>
+      <span className={styles.time}>{isMounted ? formattedTime : '--'}</span>
       <button 
         className={styles.segmentedControl}
         onClick={() => setShowLocalTime(!showLocalTime)}
