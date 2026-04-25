@@ -33,10 +33,20 @@ export default function EditProfilePage() {
   const [saveStatus, setSaveStatus] = useState(null);
   const [saveMessage, setSaveMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [skillsTags, setSkillsTags] = useState([]);
+  const [skillsInput, setSkillsInput] = useState("");
 
   const dismissTimerRef = useRef(null);
 
   const [removeBanner, setRemoveBanner] = useState(false);
+
+  function parseSkills(value) {
+    if (!value) return [];
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
 
   useEffect(() => {
     async function fetchProfile() {
@@ -57,6 +67,7 @@ export default function EditProfilePage() {
                   : data.user[key] ?? "";
             }
           }
+          setSkillsTags(parseSkills(updated.skills_interests));
           return updated;
         });
       } catch (error) {
@@ -79,7 +90,11 @@ export default function EditProfilePage() {
     const form = new FormData();
     for (const key in formData) {
       if (key !== "profile_image" && key !== "profile_header") {
-        form.append(key, formData[key]);
+        if (key === "skills_interests") {
+          form.append("skills_interests", skillsTags.join(", "));
+        } else {
+          form.append(key, formData[key]);
+        }
       }
     }
 
@@ -170,6 +185,34 @@ export default function EditProfilePage() {
     }
   }
 
+  function clearSaveAlert() {
+    if (!saveStatus) return;
+    setSaveStatus(null);
+    setSaveMessage("");
+    if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+  }
+  function addSkillTag(rawValue) {
+    const nextTag = rawValue.trim().replace(/\s+/g, " ");
+    if (!nextTag) return;
+    if (skillsTags.some((tag) => tag.toLowerCase() === nextTag.toLowerCase())) return;
+    const updatedTags = [...skillsTags, nextTag];
+    setSkillsTags(updatedTags);
+    setFormData({ ...formData, skills_interests: updatedTags.join(", ") });
+    setSkillsInput("");
+    clearSaveAlert();
+  }
+  function handleSkillsKeyDown(e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    addSkillTag(skillsInput);
+  }
+  function handleRemoveSkill(indexToRemove) {
+    const updatedTags = skillsTags.filter((_, index) => index !== indexToRemove);
+    setSkillsTags(updatedTags);
+    setFormData({ ...formData, skills_interests: updatedTags.join(", ") });
+    clearSaveAlert();
+  }
+  
   function handleInputChange(e) {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -363,13 +406,43 @@ export default function EditProfilePage() {
               value={formData.about_me}
               onChange={handleInputChange}
             />
-            <FormInputText
+            {/* <FormInputText
               name="skills_interests"
               label="Skills & Interests"
               placeholder="Skills and interests that benefit the coalition"
               value={formData.skills_interests}
               onChange={handleInputChange}
-            />
+            /> */}
+            <div className={styles.skillsField}>
+              <label htmlFor="skills_interests" className={styles.skillsLabel}>
+                Skills & Interests
+              </label>
+              <div className={styles.skillsInputWrapper}>
+                {skillsTags.map((skill, index) => (
+                  <span key={`${skill}-${index}`} className={styles.skillTag}>
+                    {skill}
+                    <button
+                      type="button"
+                      className={styles.removeTagButton}
+                      onClick={() => handleRemoveSkill(index)}
+                      aria-label={`Remove ${skill}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <input
+                  id="skills_interests"
+                  type="text"
+                  className={styles.skillsInput}
+                  placeholder="Type a skill and press Enter"
+                  value={skillsInput}
+                  onChange={(e) => setSkillsInput(e.target.value)}
+                  onKeyDown={handleSkillsKeyDown}
+                  onBlur={() => addSkillTag(skillsInput)}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
