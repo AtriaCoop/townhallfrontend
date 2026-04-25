@@ -19,7 +19,7 @@ import styles from "./NewsfeedPage.module.scss";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
 const POSTS_PER_PAGE = 10;
-const MAX_POST_LEN = 250;
+const MAX_POST_LEN = 1000;
 
 export default function NewsfeedPage() {
   const router = useRouter();
