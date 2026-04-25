@@ -9,6 +9,7 @@ export function validateUrl(url, platform) {
       x_url: /^https?:\/\/(www\.)?(twitter\.com|x\.com)\//i,
       facebook_url: /^https?:\/\/(www\.)?facebook\.com\//i,
       instagram_url: /^https?:\/\/(www\.)?instagram\.com\//i,
+      bluesky_url: /^https?:\/\/(www\.)?bsky\.app\//i,
     };
 
     if (patterns[platform] && !patterns[platform].test(url)) {
@@ -17,6 +18,7 @@ export function validateUrl(url, platform) {
         x_url: "X/Twitter",
         facebook_url: "Facebook",
         instagram_url: "Instagram",
+        bluesky_url: "Bluesky",
       };
       return `Please enter a valid ${platformNames[platform]} URL`;
     }

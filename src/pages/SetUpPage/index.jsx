@@ -21,9 +21,10 @@ const INITIAL_FORM_DATA = {
   x_url: "",
   instagram_url: "",
   facebook_url: "",
+  bluesky_url: "",
 };
 
-const URL_FIELDS = ["linkedin_url", "x_url", "instagram_url", "facebook_url"];
+const URL_FIELDS = ["linkedin_url", "x_url", "instagram_url", "facebook_url", "bluesky_url"];
 
 const UploadIcon = () => (
   <svg
@@ -440,6 +441,15 @@ export default function SetUpPage() {
                 value={formData.instagram_url}
                 onChange={handleInputChange}
                 error={fieldErrors.instagram_url}
+              />
+              <FormInputText
+                name="bluesky_url"
+                label="Bluesky"
+                type="url"
+                placeholder="https://bsky.app/profile/username"
+                value={formData.bluesky_url}
+                onChange={handleInputChange}
+                error={fieldErrors.bluesky_url}
               />
             </div>
           </section>
