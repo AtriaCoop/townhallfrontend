@@ -26,6 +26,14 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2>{title}</h2>
+           <button
+            className={styles.createGroupButton}
+            onClick={() => {return null;}}
+            aria-label="create a group"
+           >
+            <Icon name="plus" size={20} />
+            <p>Create a group</p>
+          </button>
           <button className={styles.closeButton} onClick={onClose} aria-label="Close">
             <Icon name="close" size={20} />
           </button>
