@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Icon from '@/icons/Icon';
 import { formatGroupName } from '@/utils/formatGroupName';
 
-export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
+export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreatingAGroup }) {
   const [searchText, setSearchText] = useState('');
 
   const groups = [
@@ -28,7 +28,7 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup }) {
           <h2>{title}</h2>
            <button
             className={styles.createGroupButton}
-            onClick={() => {return null;}}
+            onClick={onCreatingAGroup}
             aria-label="create a group"
            >
             <Icon name="plus" size={20} />
