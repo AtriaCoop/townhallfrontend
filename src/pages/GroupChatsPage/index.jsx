@@ -265,6 +265,28 @@ export default function GroupChatsPage() {
     setActiveGroup("");
   };
 
+  const handleCreateGroup = async (groupName, selectedUsers) => {
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${groupName}`,
+          participants: [currentUserId, ...selectedUsers.map((user) => user.id)],
+        }),
+      });
+
+      const data = await res.json();
+      const chatData = data?.data;
+      if (!chatData?.id) return;
+      
+      handleJoinGroup(groupName);
+      setShowCreateGroupModal(false);
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+    }
+  }
+
   return (
     <div className={styles.container}>
       {/* Group Chats Sidebar */}
@@ -440,7 +462,7 @@ export default function GroupChatsPage() {
       {showCreateGroupModal && (
         <CreateGroupChatModal
           onClose={() => setShowCreateGroupModal(false)}
-          onCreateGroup={() => {return null;}}
+          onCreateGroup={handleCreateGroup}
           currUserId={currentUserId}
           title="New Group Chat"
         />

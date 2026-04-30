@@ -66,7 +66,7 @@ export default function Modal({
 
         <button 
           className={styles.createGroupButton} 
-          onClick={onCreateGroup}
+          onClick={() => onCreateGroup(groupName, selectedUsers)}
           disabled={selectedUsers.length === 0 || !groupName}
         >
           Create Group
