@@ -6,6 +6,7 @@ import { BASE_URL } from "@/constants/api";
 import Icon from "@/icons/Icon";
 import { validateUrl } from "@/utils/validateUrl";
 import FormInputText from "@/components/FormInputText/FormInputText";
+import TagifyInput from "@/components/TagifyInput/TagifyInput";
 import styles from "./EditProfilePage.module.scss";
 
 export default function EditProfilePage() {
@@ -363,12 +364,11 @@ export default function EditProfilePage() {
               value={formData.about_me}
               onChange={handleInputChange}
             />
-            <FormInputText
-              name="skills_interests"
+            <TagifyInput
               label="Skills & Interests"
-              placeholder="Skills and interests that benefit the coalition"
+              placeholder="Add a skill and press Enter..."
               value={formData.skills_interests}
-              onChange={handleInputChange}
+              onChange={(next) => handleFieldChange({ skills_interests: next })}
             />
           </div>
         </div>
