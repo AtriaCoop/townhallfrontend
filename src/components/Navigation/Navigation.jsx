@@ -67,7 +67,7 @@ export default function Navigation({ hasNewDm = false }) {
         <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Icon name="home" /><span className={styles.linkText}>Home</span></div>
         <div className={`${styles.link} ${pathname === '/NewsfeedPage' ? styles.active : ''}`} onClick={() => router.push('/NewsfeedPage')}><Icon name="dashboard" /><span className={styles.linkText}>Newsfeed</span></div>
         <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
-        <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
+        <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Working Groups</span></div>
         <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span>{hasNewDm && <span className={styles.badge}>●</span>}</div>
       </div>
 
@@ -107,7 +107,7 @@ export default function Navigation({ hasNewDm = false }) {
             <div className={`${styles.link} ${pathname === '/HomePage' ? styles.active : ''}`} onClick={() => router.push('/HomePage')}><Icon name="home" /><span className={styles.linkText}>Home</span></div>
             <div className={`${styles.link} ${pathname === '/NewsfeedPage' ? styles.active : ''}`} onClick={() => router.push('/NewsfeedPage')}><Icon name="dashboard" /><span className={styles.linkText}>Newsfeed</span></div>
             <div className={`${styles.link} ${pathname === '/MembersPage' ? styles.active : ''}`} onClick={() => router.push('/MembersPage')}><Icon name="user" /><span className={styles.linkText}>Members</span></div>
-            <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Group Chats</span></div>
+            <div className={`${styles.link} ${pathname === '/GroupChatsPage' ? styles.active : ''}`} onClick={() => router.push('/GroupChatsPage')}><Icon name="groupChats" /><span className={styles.linkText}>Working Groups</span></div>
             <div className={`${styles.link} ${pathname === '/DirectMessagesPage' ? styles.active : ''}`} onClick={() => router.push('/DirectMessagesPage')}><Icon name="message" /><span className={styles.linkText}>Direct Messages</span></div>
             <div className={`${styles.link} ${pathname === '/ReportModal' ? styles.active : ''}`} onClick={() => handleReportClick()}><CircleAlert /><span className={styles.linkText}>Report problem or request feature</span></div>
           </div >
