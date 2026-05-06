@@ -1,4 +1,4 @@
-import styles from "@/pages/GroupChatsPage/GroupChatsPage.module.scss";
+import styles from "@/pages/WorkingGroupsPage/WorkingGroupsPage.module.scss";
 import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal";
 import MessageModal from "@/components/MessageModal/MessageModal";
@@ -12,7 +12,7 @@ import { BASE_URL } from "@/constants/api";
 import { formatGroupName } from "@/utils/formatGroupName";
 import { formatRelativeTime, formatExactTime } from "@/utils/formateDatetime";
 
-export default function GroupChatsPage() {
+export default function WorkingGroupsPage() {
   const socketRef = useRef(null);
   const messageContainerRef = useRef(null);
 
@@ -265,10 +265,10 @@ export default function GroupChatsPage() {
 
   return (
     <div className={styles.container}>
-      {/* Group Chats Sidebar */}
-      <div className={`${styles.groupChatsSidebar} ${activeGroup ? styles.hideOnMobile : ''}`}>
+      {/* Working Groups Sidebar */}
+      <div className={`${styles.workingGroupsSidebar} ${activeGroup ? styles.hideOnMobile : ''}`}>
         <div className={styles.sidebarHeader}>
-          <h2>Group Chats</h2>
+          <h2>Working Groups</h2>
           <button
             className={styles.joinButton}
             onClick={handleChatClick}
@@ -416,7 +416,7 @@ export default function GroupChatsPage() {
         ) : (
           <div className={styles.noChatSelected}>
             <Icon name="message" size={64} />
-            <h2>Join a Group Chat</h2>
+            <h2>Join a Working Group</h2>
             <p>Select a group from the sidebar or join a new one to start chatting.</p>
           </div>
         )}
