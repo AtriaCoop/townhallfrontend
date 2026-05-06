@@ -4,7 +4,7 @@ import Header from "../Header/Header";
 import styles from "./Layout.module.scss";
 
 const noNavPages = ["/", "/LandingPage", "/SetUpPage", "/VerifyEmailPage", "/ForgotPasswordPage", "/ResetPasswordPage"];
-const fullBleedPages = ["/DirectMessagesPage", "/GroupChatsPage"];
+const fullBleedPages = ["/DirectMessagesPage", "/WorkingGroupsPage"];
 
 function Layout({ children }) {
   const router = useRouter();

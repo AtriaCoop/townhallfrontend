@@ -8,7 +8,7 @@ const navItems = [
   { name: 'Events', icon: 'calendar', path: '/EventsPage' },
   { name: 'Messages', icon: 'message', path: '/DirectMessagesPage' },
   { name: 'Members', icon: 'members', path: '/MembersPage' },
-  { name: 'Working Groups', icon: 'groupChats', path: '/GroupChatsPage' },
+  { name: 'Working Groups', icon: 'workingGroups', path: '/WorkingGroupsPage' },
 ];
 
 export default function Sidebar() {
