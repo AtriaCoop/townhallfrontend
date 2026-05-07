@@ -113,6 +113,13 @@ export default function TagifyInput({
     }
   }
 
+  function handleBlur() {
+    if (disabled) return;
+    // Only Enter commits a tag; abandon draft text when focus leaves.
+    setInputValue("");
+    setLocalError("");
+  }
+
   function handleInputChange(e) {
     if (disabled) return;
     setInputValue(e.target.value);
@@ -153,6 +160,7 @@ export default function TagifyInput({
                 disabled={disabled}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
+                onBlur={handleBlur}
                 autoComplete="off"
                 maxLength={maxTagLength}
               />
