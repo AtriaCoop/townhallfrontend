@@ -121,7 +121,13 @@ export default function ProfilePage() {
         {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
           <div className={styles.nameRow}>
-            <h1 className={styles.name}>{profileData.full_name}</h1>
+            <h1 className={styles.name}>{profileData.full_name}
+              {profileData.is_verified && (
+                <span className={styles.verifiedBadge} title="Verified user">
+                  ✓
+                </span>
+              )}
+            </h1>
             {profileData.pronouns && (
               <div className={styles.pronouns}>{profileData.pronouns}</div>
             )}

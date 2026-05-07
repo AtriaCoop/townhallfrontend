@@ -18,6 +18,7 @@ export default function Post({
   fullName,
   organization,
   date,
+  isVerified,
   content,
   postImage,
   links,
@@ -177,7 +178,14 @@ export default function Post({
           }}
         />
         <div className={styles.postInfo} onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}>
-          <div className={styles.fullName}>{hideAuthorDetails ? "Anonymous" : fullName}</div>
+          <div className={styles.fullName}>
+            {hideAuthorDetails ? "Anonymous" : fullName}
+            {isVerified && !hideAuthorDetails && (
+              <span className={styles.verifiedBadge} title="Verified user">
+                ✓
+              </span>
+            )}
+          </div>
           <div className={styles.organizationName}>{hideAuthorDetails ? "" : organization}</div>
           <div className={styles.date}>{date} {anonymous && isMyOwnPost ? "(anonymous)" : null}</div>
         </div>
