@@ -2,7 +2,9 @@ import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import { searchTagsByPrefix, createTag, updateUserTags } from "@/api/user";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import Tag from "@/components/Tag/Tag";
 import styles from "./ProfilePage.module.scss";
 
 export default function ProfilePage() {
@@ -15,6 +17,13 @@ export default function ProfilePage() {
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [tagSearchTerm, setTagSearchTerm] = useState("");
+  const [tagSearchResults, setTagSearchResults] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const [savingTag, setSavingTag] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -57,7 +66,98 @@ export default function ProfilePage() {
     };
   }, [toast]);
 
+  useEffect(() => {
+    if (!tagSearchTerm.trim()) {
+      setTagSearchResults([]);
+      setSearchError("");
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      if (tagSearchTerm.trim().length < 2) {
+        setTagSearchResults([]);
+        return;
+      }
+
+      setSearchLoading(true);
+      setSearchError("");
+
+      try {
+        const results = await searchTagsByPrefix(tagSearchTerm.trim());
+        setTagSearchResults(results || []);
+      } catch (error) {
+        console.error("Tag search failed:", error);
+        setSearchError("Unable to search tags right now.");
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [tagSearchTerm]);
+
   if (!profileData) return null;
+
+  const profileTags = Array.isArray(profileData?.tags)
+    ? profileData.tags.map((tag) => (typeof tag === "string" ? tag : tag.name))
+    : [];
+
+  const handleCloseModal = () => {
+    setShowTagModal(false);
+    setTagSearchTerm("");
+    setTagSearchResults([]);
+    setSelectedTag(null);
+    setSearchError("");
+  };
+
+  const handleSelectTag = (tag) => {
+    const tagName = typeof tag === "string" ? tag : tag.name;
+    setSelectedTag({ name: tagName });
+    setTagSearchTerm(tagName);
+    setTagSearchResults([]);
+    setSearchError("");
+  };
+
+  const handleAddTag = async () => {
+    const trimmedTag = tagSearchTerm.trim();
+    const tagName = selectedTag?.name || trimmedTag;
+
+    if (!tagName) {
+      setSearchError("Please enter or select a tag.");
+      return;
+    }
+
+    setSavingTag(true);
+    setSearchError("");
+
+    try {
+      let tagToSave = selectedTag;
+
+      if (!tagToSave) {
+        tagToSave = await createTag(tagName);
+      }
+
+      const finalTagName = typeof tagToSave === "string" ? tagToSave : tagToSave?.name || tagName;
+      const updatedTags = Array.from(new Set([...profileTags, finalTagName]));
+      const result = await updateUserTags(id, updatedTags);
+
+      if (result?.user) {
+        setProfileData(result.user);
+      } else if (Array.isArray(result?.tags)) {
+        setProfileData((prev) => ({ ...prev, tags: result.tags }));
+      } else {
+        setProfileData((prev) => ({ ...prev, tags: updatedTags }));
+      }
+
+      setToast({ type: "success", message: `Added ${finalTagName} to your tags.` });
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error saving tag:", error);
+      setSearchError(error?.message || "Unable to add tag at this time.");
+    } finally {
+      setSavingTag(false);
+    }
+  };
 
   return (
     <div className={styles.profilePage}>
@@ -128,12 +228,20 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profileActions}>
             {isCurrentUser ? (
-              <button
-                onClick={() => router.push("/EditProfilePage")}
-                className={styles.editButton}
-              >
-                Edit Profile
-              </button>
+              <>
+                <button
+                  onClick={() => setShowTagModal(true)}
+                  className={styles.addSkillButton}
+                >
+                  Add Skill
+                </button>
+                <button
+                  onClick={() => router.push("/EditProfilePage")}
+                  className={styles.editButton}
+                >
+                  Edit Profile
+                </button>
+              </>
             ) : (
               profileData.allow_dms !== false && (
                 <button
@@ -241,6 +349,17 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {profileTags.length > 0 && (
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>Profile Tags</h2>
+            <div className={styles.tagsContainer}>
+              {profileTags.map((tag) => (
+                <Tag key={tag} name={tag} removable={false} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Social Links Card */}
         {(profileData.linkedin_url ||
           profileData.x_url ||
@@ -262,6 +381,83 @@ export default function ProfilePage() {
         )}
 
       </div>
+
+      {showTagModal && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Add a Skill</h2>
+              <button
+                type="button"
+                className={styles.modalClose}
+                onClick={handleCloseModal}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.modalField}>
+              <label htmlFor="tag-search" className={styles.detailLabel}>
+                Search for an existing tag or type a new one.
+              </label>
+              <input
+                id="tag-search"
+                className={styles.searchInput}
+                value={tagSearchTerm}
+                onChange={(e) => {
+                  setTagSearchTerm(e.target.value);
+                  setSelectedTag(null);
+                }}
+                placeholder="e.g. project management, design thinking"
+              />
+            </div>
+
+            {searchError && <p className={styles.detailContent}>{searchError}</p>}
+
+            {searchLoading ? (
+              <p className={styles.detailContent}>Searching tags…</p>
+            ) : (
+              tagSearchResults.length > 0 && (
+                <div className={styles.searchResults}>
+                  {tagSearchResults.map((tag) => {
+                    const tagName = typeof tag === "string" ? tag : tag.name;
+                    const active = selectedTag?.name === tagName;
+                    return (
+                      <button
+                        key={tagName}
+                        type="button"
+                        className={`${styles.searchResultItem} ${active ? styles.activeResult : ""}`}
+                        onClick={() => handleSelectTag(tag)}
+                      >
+                        <span className={styles.searchResultName}>{tagName}</span>
+                        <span>{active ? "Selected" : "Select"}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleCloseModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.saveTagButton}
+                onClick={handleAddTag}
+                disabled={savingTag}
+              >
+                {savingTag ? "Saving…" : "Save Skill"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Image Modal */}
       {showImageModal && (

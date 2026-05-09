@@ -245,6 +245,125 @@
   gap: $spacing-2;
 }
 
+.addSkillButton {
+  @include button-secondary;
+  @include button-md;
+  flex: 1;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  margin-top: $spacing-2;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($black, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
+  padding: $spacing-4;
+}
+
+.modalContent {
+  width: min(100%, 520px);
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: var(--shadow-xl);
+  padding: $spacing-6;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+}
+
+.modalTitle {
+  margin: 0;
+  @include heading-4;
+}
+
+.modalClose {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.modalField {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.searchInput {
+  width: 100%;
+  padding: $spacing-3;
+  border-radius: $radius-lg;
+  border: 1px solid var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.searchResults {
+  display: grid;
+  gap: $spacing-2;
+  margin-top: $spacing-3;
+}
+
+.searchResultItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $spacing-3;
+  border-radius: $radius-lg;
+  border: 1px solid transparent;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 200ms $ease-out, background-color 200ms $ease-out;
+}
+
+.activeResult,
+.searchResultItem:hover {
+  border-color: var(--primary);
+  background-color: var(--bg-primary);
+}
+
+.searchResultName {
+  font-weight: 600;
+}
+
+.modalActions {
+  display: flex;
+  gap: $spacing-3;
+  flex-wrap: wrap;
+  margin-top: $spacing-4;
+}
+
+.cancelButton,
+.saveTagButton {
+  @include button-md;
+  flex: 1 1 120px;
+}
+
+.cancelButton {
+  @include button-secondary;
+}
+
+.saveTagButton {
+  @include button-primary;
+}
+
 .editButton {
   @include button-primary;
   @include button-md;
