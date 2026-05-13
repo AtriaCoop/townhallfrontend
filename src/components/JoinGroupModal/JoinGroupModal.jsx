@@ -2,24 +2,43 @@ import styles from './JoinGroupModal.module.scss';
 import { useState } from 'react';
 import Icon from '@/icons/Icon';
 import { formatGroupName } from '@/utils/formatGroupName';
+import { authenticatedFetch } from '@/utils/authHelpers';
+import { BASE_URL } from '@/constants/api';
+import { useEffect } from 'react';
 
 export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreatingAGroup }) {
   const [searchText, setSearchText] = useState('');
-
-  const groups = [
-    { name: "atria-questions-and-support" },
-    { name: "city-food-budget-city-meeting" },
-    { name: "living-wage-community-food-sector-analysis" },
-    { name: "wg-climate-resilient-local-food-systems" },
-    { name: "wg-decolonization-and-indigenous-food-sovereignty" },
-    { name: "wg-food-as-a-human-right" },
-    { name: "wg-food-justice-as-a-public-health-priority" },
-    { name: "wg-sustainable-resourcing-for-community-food-systems" },
-  ];
+  const [groups, setGroups] = useState([
+    { id: -1, name: "atria-questions-and-support" },
+    { id: -2, name: "city-food-budget-city-meeting" },
+    { id: -3, name: "living-wage-community-food-sector-analysis" },
+    { id: -4, name: "wg-climate-resilient-local-food-systems" },
+    { id: -5, name: "wg-decolonization-and-indigenous-food-sovereignty" },
+    { id: -6, name: "wg-food-as-a-human-right" },
+    { id: -7, name: "wg-food-justice-as-a-public-health-priority" },
+    { id: -8, name: "wg-sustainable-resourcing-for-community-food-systems" },
+  ]);
 
   const filteredGroups = groups.filter(group =>
     formatGroupName(group.name).toLowerCase().includes(searchText.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = Number(userData.id);
+      const res = await authenticatedFetch(
+        `${BASE_URL}/chats/?user_id=${userId}`,
+        { credentials: "include" }
+      );
+      const data = await res.json();
+      const chatsFromServer = data?.data || [];
+
+      const customGroups = chatsFromServer.flatMap((c) => (c.is_group ? [{ id: c.id, name: c.name }] : []));
+      setGroups(prev => [...prev, ...customGroups]);
+    }
+    fetchGroups();
+  }, [BASE_URL]);
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>

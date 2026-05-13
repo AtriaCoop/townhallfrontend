@@ -273,6 +273,7 @@ export default function GroupChatsPage() {
         body: JSON.stringify({
           name: `${groupName}`,
           participants: [currentUserId, ...selectedUsers.map((user) => user.id)],
+          is_group: true,
         }),
       });
 
