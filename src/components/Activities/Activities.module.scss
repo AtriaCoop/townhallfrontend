@@ -13,6 +13,11 @@
     color: #555;
     background-color: #F9F9F9;
     padding: 15px 0;
+
+    :global(body.dark) & {
+      background-color: #1a1a1a;
+      color: #aaa;
+    }
   }
   
   .timeline {
@@ -46,6 +51,12 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     margin-left: 50px; /* Space for horizontal line */
     margin-top: 10px;
+
+    :global(body.dark) & {
+      background-color: #2a2a2a;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      color: #e0e0e0;
+    }
   }
   
   .activityCard::before {

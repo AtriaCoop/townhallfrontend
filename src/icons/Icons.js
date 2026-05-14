@@ -38,6 +38,8 @@ import {
 	EyeOff,
 	Shield,
 	UserX,
+	History,
+	ScrollText
 } from 'lucide-react';
 
 // If you update an alias, you must also update it in each component that uses the icon!
@@ -82,4 +84,6 @@ export const Icons = {
 	eyeOff: EyeOff,
 	shield: Shield,
 	userX: UserX,
+	history: History,
+	logs: ScrollText,
 }
