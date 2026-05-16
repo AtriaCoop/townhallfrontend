@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { formatDistance } from 'date-fns';
 import { authenticatedFetch } from '@/utils/authHelpers';
@@ -8,6 +9,7 @@ import styles from './CommentModal.module.scss';
 export default function CommentModal({ onClose, comments = [], currentUserId, postId, BASE_URL, setPosts }) {
   const MAX_COMMENT_LEN = 250;
   const router = useRouter();
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   async function onSubmit(inputContent) {
     try {
@@ -36,6 +38,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
   }
 
   async function handleDeleteComment(commentId) {
+    setDeletingCommentId(commentId);
     try {
       const response = await authenticatedFetch(`${BASE_URL}/comment/${commentId}/`, {
         method: "DELETE",
@@ -58,6 +61,7 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
       );
     } catch (err) {
       console.error("Failed to delete comment:", err);
+      setDeletingCommentId(null);
     }
   }
 
@@ -129,8 +133,9 @@ export default function CommentModal({ onClose, comments = [], currentUserId, po
                     <button
                       className={styles.deleteButton}
                       onClick={() => handleDeleteComment(comment.id)}
+                      disabled={deletingCommentId === comment.id}
                     >
-                      Delete
+                      {deletingCommentId === comment.id ? "Deleting..." : "Delete"}
                     </button>
                   )}
                 </div>
