@@ -78,6 +78,8 @@ export default function Header() {
       console.error("Logout error:", error);
     }
     localStorage.removeItem("user");
+    localStorage.removeItem("joinedGroups");
+    localStorage.removeItem("activeGroup");
     router.push('/LandingPage');
   };
 
