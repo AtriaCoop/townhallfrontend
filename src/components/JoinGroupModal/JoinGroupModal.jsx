@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreatingAGroup }) {
   const [searchText, setSearchText] = useState('');
-  const [groups, setGroups] = useState([
+  const [groups, setGroups] = useState([  // negative IDs to avoid conflicts with user group chat IDs
     { id: -1, name: "atria-questions-and-support" },
     { id: -2, name: "city-food-budget-city-meeting" },
     { id: -3, name: "living-wage-community-food-sector-analysis" },
@@ -24,6 +24,7 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreating
   );
 
   useEffect(() => {
+    // Add user's group chats to list of default groups
     const fetchGroups = async () => {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       const userId = Number(userData.id);
