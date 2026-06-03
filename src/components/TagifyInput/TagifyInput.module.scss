@@ -1,0 +1,64 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  min-height: 28px;
+}
+
+.inlineInputWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: 3px $spacing-2;
+  border-radius: $radius-full;
+  border: 1px solid var(--primary);
+  background: var(--input-bg);
+  box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+  min-width: 180px;
+  max-width: 260px;
+}
+
+.inputHash {
+  color: var(--primary);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.inlineInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: $font-family-body;
+  font-size: $font-size-xs;
+  min-width: 60px;
+  padding: 0;
+  line-height: 1.4;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
