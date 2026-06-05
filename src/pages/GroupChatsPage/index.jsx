@@ -3,6 +3,7 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal";
 import MessageModal from "@/components/MessageModal/MessageModal";
 import UpdateMessageModal from "@/components/UpdateMessageModal/UpdateMessageModal";
+import CreateGroupChatModal from "@/components/CreateGroupChatModal/CreateGroupChatModal";
 import MessageInput from "@/components/MessageInput/MessageInput";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -17,6 +18,7 @@ export default function GroupChatsPage() {
   const messageContainerRef = useRef(null);
 
   const [showModal, setShowModal] = useState(false);
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [joinedGroups, setJoinedGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState("");
   const [groupMessages, setGroupMessages] = useState({});
@@ -427,7 +429,20 @@ export default function GroupChatsPage() {
         <JoinGroupModal
           onClose={() => setShowModal(false)}
           onJoinGroup={handleJoinGroup}
+          onCreatingAGroup={() => {
+            setShowModal(false);
+            setShowCreateGroupModal(true);
+          }}
           title="Join Groups"
+        />
+      )}
+
+      {showCreateGroupModal && (
+        <CreateGroupChatModal
+          onClose={() => setShowCreateGroupModal(false)}
+          onCreateGroup={() => {return null;}}
+          currUserId={currentUserId}
+          title="New Group Chat"
         />
       )}
 
