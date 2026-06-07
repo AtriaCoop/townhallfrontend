@@ -8,9 +8,12 @@ export default function ReactionPicker({
   currentReactions = {},
   currentUserId,
   postId,
+  messageId,
   BASE_URL,
   setPosts,
+  setMessages,
   onClose,
+  align = 'center',
 }) {
   const pickerRef = useRef(null);
 
@@ -27,7 +30,9 @@ export default function ReactionPicker({
 
   async function handleReactionClick(reactionType) {
     try {
-      const url = `${BASE_URL}/post/${postId}/reaction/`;
+      const url = messageId
+        ? `${BASE_URL}/chats/messages/${messageId}/reaction/`
+        : `${BASE_URL}/post/${postId}/reaction/`;
       const response = await authenticatedFetch(url, {
         method: "PATCH",
         headers: {
@@ -44,11 +49,21 @@ export default function ReactionPicker({
 
       const result = await response.json();
 
-      setPosts(prevPosts =>
-        prevPosts.map(post =>
-          post.id === postId ? { ...post, reactions: result.reactions } : post
-        )
-      );
+      if (setMessages && messageId) {
+        setMessages((prevMessages) =>
+          prevMessages.map((message) =>
+            message.id === messageId
+              ? { ...message, reactions: result.reactions }
+              : message
+          )
+        );
+      } else if (setPosts && postId) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId ? { ...post, reactions: result.reactions } : post
+          )
+        );
+      }
 
       if (onReactionSelect) {
         onReactionSelect(reactionType);
@@ -58,8 +73,15 @@ export default function ReactionPicker({
     }
   }
 
+  const alignClass =
+    align === 'start'
+      ? styles.alignStart
+      : align === 'end'
+        ? styles.alignEnd
+        : '';
+
   return (
-    <div className={styles.reactionPicker} ref={pickerRef}>
+    <div className={`${styles.reactionPicker} ${alignClass}`} ref={pickerRef}>
       {REACTIONS.map((reaction) => {
         const hasReacted = currentReactions[reaction.type]?.some(u => u.id === currentUserId);
 
