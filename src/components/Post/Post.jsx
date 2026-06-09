@@ -8,18 +8,20 @@ import Tag from "@/components/Tag/Tag";
 import { getCookie } from "@/utils/authHelpers";
 import InlineComments from "@/components/InlineComments/InlineComments";
 import ReactionPicker from "../ReactionPicker/ReactionPicker";
-import { updatePost } from "@/api/post";
+import { updatePost, addPostImages, deletePostImage } from "@/api/post";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
 import { getReactionEmoji } from "@/constants/reactions";
 import { BASE_URL } from "@/constants/api";
+
+const MAX_IMAGES = 10;
 
 export default function Post({
   fullName,
   organization,
   date,
   content,
-  postImage,
+  postImages = [],
   links,
   comments,
   userId,
@@ -41,8 +43,10 @@ export default function Post({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [editText, setEditText] = useState(content.join("\n"));
-  const [editImage, setEditImage] = useState(null);
+  const [keptImages, setKeptImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [reportResponse, setReportResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -55,30 +59,41 @@ export default function Post({
   const hideAuthorDetails = anonymous && !isMyOwnPost;
   // UPDATE POST
   async function handleUpdatePost() {
+    setIsUpdating(true);
     try {
-      const result = await updatePost(postId, {
-        content: editText,
-        image: editImage,
-        tags: editTags,
-      });
-      console.log("Post updated successfully:", result);
+      // updatePost only deal with text edits, not image edits (due to backend setting)
+      await updatePost(postId, { content: editText, tags: editTags });
+
+      // delete images
+      const keptIds = new Set(keptImages.map((img) => img.id));
+      const removedIds = postImages
+        .map((img) => img.id)
+        .filter((id) => !keptIds.has(id));
+
+      await Promise.all(removedIds.map((id) => deletePostImage(postId, id)));
+
+      // add images
+      let addedImages = [];
+      if (newImages.length > 0) {
+        const result = await addPostImages(postId, newImages);
+        addedImages = result.images || [];
+      }
+
+      const finalImages = [...keptImages, ...addedImages];
 
       setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId
-            ? {
-                ...post,
-                content: [editText],
-                tags: editTags,
-                postImage: result.post?.image || post.postImage, // updated image
-              }
-            : post,
+        prevPosts.map((prevPost) =>
+          prevPost.id === postId
+            ? { ...prevPost, content: [editText], tags: editTags, postImages: finalImages }
+            : prevPost,
         ),
       );
 
       setShowEditModal(false);
     } catch (error) {
       console.error("Error updating post:", error);
+    } finally {
+      setIsUpdating(false);
     }
   }
 
@@ -128,9 +143,14 @@ export default function Post({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showOptions]);
 
-  function isValidImage(img) {
-    return img && img !== "null" && img !== "";
-  }
+
+  // Reset image state each time the edit modal opens so stale edits don't persist across sessions.
+  useEffect(() => {
+    if (showEditModal) {
+      setKeptImages([...postImages]);
+      setNewImages([]);
+    }
+  }, [showEditModal]);
 
   // REPORT POST
   const handleReportPost = async () => {
@@ -256,24 +276,41 @@ export default function Post({
                   onChange={(e) => setEditText(e.target.value)}
                 />
 
-                {/* Image preview */}
-                {(editImage || isValidImage(postImage)) && (
-                  <div className={styles.editImagePreview}>
-                    <img
-                      src={
-                        editImage ? URL.createObjectURL(editImage) : postImage
-                      }
-                      alt="Preview"
-                      className={styles.editPreviewImg}
-                    />
-                    <button
-                      className={styles.editRemoveImage}
-                      onClick={() => setEditImage(null)}
-                      aria-label="Remove image"
-                    >
-                      <Icon name="close" size={14} />
-                    </button>
+                {/* Imge Preview in the Edit Post Modal */}
+                {/* keptImages: already saved in the database. newImages: selected locally in this session, not yet uploaded. */}
+                {(keptImages.length > 0 || newImages.length > 0) && (
+                  <div className={styles.editImageGrid}>
+                    {keptImages.map((img) => (
+                      <div key={img.id} className={styles.editImagePreview}>
+                        <img src={img.url} alt="Preview" className={styles.editPreviewImg} />
+                        <button
+                          className={styles.editRemoveImage}
+                          onClick={() => setKeptImages((prev) => prev.filter((e) => e.id !== img.id))}
+                          aria-label="Remove image"
+                        >
+                          <Icon name="close" size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {newImages.map((file, idx) => (
+                      <div key={`new-${idx}`} className={styles.editImagePreview}>
+                        <img src={URL.createObjectURL(file)} alt="New preview" className={styles.editPreviewImg} />
+                        <button
+                          className={styles.editRemoveImage}
+                          onClick={() => setNewImages((prev) => prev.filter((_, i) => i !== idx))}
+                          aria-label="Remove image"
+                        >
+                          <Icon name="close" size={14} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
+                )}
+
+                {keptImages.length + newImages.length >= MAX_IMAGES && (
+                  <p className={styles.editImageWarning}>
+                    You can upload a maximum of {MAX_IMAGES} images per post.
+                  </p>
                 )}
 
                 {/* Tags */}
@@ -295,6 +332,7 @@ export default function Post({
                       document.getElementById(`editImg-${postId}`).click()
                     }
                     aria-label="Add image"
+                    disabled={keptImages.length + newImages.length >= MAX_IMAGES}
                   >
                     <Icon name="image" size={20} />
                   </button>
@@ -303,11 +341,18 @@ export default function Post({
                     accept="image/*"
                     id={`editImg-${postId}`}
                     hidden
+                    multiple
                     onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file && file.type.startsWith("image/")) {
-                        setEditImage(file);
+                      const files = Array.from(e.target.files).filter((f) =>
+                        f.type.startsWith("image/")
+                      );
+                      if (files.length) {
+                        setNewImages((prev) => {
+                          const remaining = MAX_IMAGES - keptImages.length - prev.length;
+                          return [...prev, ...files.slice(0, remaining)];
+                        });
                       }
+                      e.target.value = "";
                     }}
                   />
                 </div>
@@ -316,8 +361,9 @@ export default function Post({
                   <button
                     className={styles.updateButton}
                     onClick={handleUpdatePost}
+                    disabled={isUpdating}
                   >
-                    Update
+                    {isUpdating ? "Updating..." : "Update"}
                   </button>
                 </div>
               </div>
@@ -448,12 +494,17 @@ export default function Post({
             {link.text}
           </a>
         ))}
-        {isValidImage(postImage) && (
-          <img
-            src={postImage}
-            alt="Post content"
-            className={styles.postImage}
-          />
+        {postImages.length > 0 && (
+          <div className={styles.postImagesGrid}>
+            {postImages.map((img) => (
+              <img
+                key={img.id}
+                src={img.url}
+                alt="Post content"
+                className={styles.postImage}
+              />
+            ))}
+          </div>
         )}
       </div>
 
