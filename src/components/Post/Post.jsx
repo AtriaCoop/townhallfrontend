@@ -1,18 +1,18 @@
-import styles from './Post.module.scss';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
-import CommentModal from '@/components/CommentModal/CommentModal'
-import LikeModal from '@/components/LikeModal/LikeModal';
-import TagCreationField from '@/components/TagCreationField/TagCreationField';
-import Tag from '@/components/Tag/Tag';
-import { getCookie } from '@/utils/authHelpers';
-import InlineComments from '@/components/InlineComments/InlineComments';
-import ReactionPicker from '../ReactionPicker/ReactionPicker';
-import { updatePost } from '@/api/post';
-import { authenticatedFetch } from '@/utils/authHelpers';
-import Icon from '@/icons/Icon';
-import { getReactionEmoji } from '@/constants/reactions';
-import { BASE_URL } from '@/constants/api';
+import styles from "./Post.module.scss";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router";
+import CommentModal from "@/components/CommentModal/CommentModal";
+import LikeModal from "@/components/LikeModal/LikeModal";
+import TagCreationField from "@/components/TagCreationField/TagCreationField";
+import Tag from "@/components/Tag/Tag";
+import { getCookie } from "@/utils/authHelpers";
+import InlineComments from "@/components/InlineComments/InlineComments";
+import ReactionPicker from "../ReactionPicker/ReactionPicker";
+import { updatePost } from "@/api/post";
+import { authenticatedFetch } from "@/utils/authHelpers";
+import Icon from "@/icons/Icon";
+import { getReactionEmoji } from "@/constants/reactions";
+import { BASE_URL } from "@/constants/api";
 
 export default function Post({
   fullName,
@@ -34,7 +34,6 @@ export default function Post({
   activeTagFilters = [],
   anonymous,
 }) {
-
   const optionsRef = useRef(null);
   const router = useRouter();
 
@@ -42,10 +41,11 @@ export default function Post({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [editText, setEditText] = useState(content.join('\n'));
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editText, setEditText] = useState(content.join("\n"));
   const [editImage, setEditImage] = useState(null);
   const [showComments, setShowComments] = useState(false);
-  const [reportResponse, setReportResponse] = useState('');
+  const [reportResponse, setReportResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [tag, setTag] = useState("");
@@ -57,20 +57,24 @@ export default function Post({
   // UPDATE POST
   async function handleUpdatePost() {
     try {
-      const result = await updatePost(postId, { content: editText, image: editImage, tags: editTags });
+      const result = await updatePost(postId, {
+        content: editText,
+        image: editImage,
+        tags: editTags,
+      });
       console.log("Post updated successfully:", result);
 
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
             ? {
-              ...post,
-              content: [editText],
-              tags: editTags,
-              postImage: result.post?.image || post.postImage, // updated image
-            }
-            : post
-        )
+                ...post,
+                content: [editText],
+                tags: editTags,
+                postImage: result.post?.image || post.postImage, // updated image
+              }
+            : post,
+        ),
       );
 
       setShowEditModal(false);
@@ -81,6 +85,7 @@ export default function Post({
 
   // DELETE POST
   async function handleDeletePost() {
+    setIsDeleting(true);
     try {
       const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/`, {
         method: "DELETE",
@@ -91,21 +96,22 @@ export default function Post({
       }
 
       // Update local posts state to remove the deleted post
-      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
 
       // Close the delete modal
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting post:", error);
+      setIsDeleting(false);
     }
   }
 
   const handleOptionsClick = () => {
-    setShowOptions(prev => !prev);
+    setShowOptions((prev) => !prev);
   };
 
   const handleCommentClick = () => {
-    setShowComments(prev => !prev);
+    setShowComments((prev) => !prev);
   };
 
   // Handle outside click to close edit/delete modal
@@ -116,68 +122,79 @@ export default function Post({
       }
     }
     if (showOptions) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showOptions]);
 
   function isValidImage(img) {
-    return img && img !== 'null' && img !== '';
+    return img && img !== "null" && img !== "";
   }
 
   // REPORT POST
   const handleReportPost = async () => {
-
     // User should not be able to report their own post
-    if (userId === currentUserId) return
+    if (userId === currentUserId) return;
 
     const reportData = {
-      post_id: postId
-    }
+      post_id: postId,
+    };
 
     try {
-      setIsLoading(true)
-      const response = await authenticatedFetch(`${BASE_URL}/post/${postId}/report`, {
-        method: 'POST',
-        body: JSON.stringify(reportData),
-        headers: {
-          "Content-type": 'application/json'
-        }
-      })
-      const result = await response.json()
+      setIsLoading(true);
+      const response = await authenticatedFetch(
+        `${BASE_URL}/post/${postId}/report`,
+        {
+          method: "POST",
+          body: JSON.stringify(reportData),
+          headers: {
+            "Content-type": "application/json",
+          },
+        },
+      );
+      const result = await response.json();
 
       // Set either success or error message
-      setReportResponse(result.message)
-
+      setReportResponse(result.message);
     } catch (err) {
-      console.error(err)
-      setReportResponse(err.message || "Something went wrong")
+      console.error(err);
+      setReportResponse(err.message || "Something went wrong");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleReactionClick = () => {
-    setShowReactionPicker(prev => !prev);
-  }
+    setShowReactionPicker((prev) => !prev);
+  };
 
   return (
     <div className={styles.post}>
-
       <div className={styles.postHeader}>
         <img
-          src={(userImage && !hideAuthorDetails) ? userImage : '/assets/ProfileImage.jpg'}
+          src={
+            userImage && !hideAuthorDetails
+              ? userImage
+              : "/assets/ProfileImage.jpg"
+          }
           alt="User profile"
           className={styles.profilePic}
-          onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}
+          onClick={() =>
+            !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)
+          }
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/assets/ProfileImage.jpg'
+            e.target.src = "/assets/ProfileImage.jpg";
           }}
         />
-        <div className={styles.postInfo} onClick={() => !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)}>
+        <div
+          className={styles.postInfo}
+          onClick={() =>
+            !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)
+          }
+        >
           <div className={styles.fullName}>
             {hideAuthorDetails ? "Anonymous" : fullName}
             {isVerified && !hideAuthorDetails && (
@@ -186,8 +203,14 @@ export default function Post({
               </span>
             )}
           </div>
-          <div className={styles.organizationName}>{hideAuthorDetails ? "" : organization}</div>
-          <div className={styles.date}>{date} {anonymous && isMyOwnPost ? "(anonymous)" : null}</div>
+
+          <div className={styles.organizationName}>
+            {hideAuthorDetails ? "" : organization}
+          </div>
+
+          <div className={styles.date}>
+            {date} {anonymous && isMyOwnPost ? "(anonymous)" : null}
+          </div>
         </div>
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
@@ -202,17 +225,33 @@ export default function Post({
                 <button onClick={() => setShowDeleteModal(true)}>Delete</button>
               </>
             ) : (
-              <button className={styles.reportText} disabled={userId === currentUserId} onClick={() => setShowReportModal(true)}>Report</button>
+              <button
+                className={styles.reportText}
+                disabled={userId === currentUserId}
+                onClick={() => setShowReportModal(true)}
+              >
+                Report
+              </button>
             )}
           </div>
         )}
         {/* Show Edit Modal */}
         {showEditModal && (
-          <div className={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
-            <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setShowEditModal(false)}
+          >
+            <div
+              className={styles.editModal}
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className={styles.editModalHeader}>
                 <h2 className={styles.editModalTitle}>Edit Post</h2>
-                <button className={styles.editCloseButton} onClick={() => setShowEditModal(false)} aria-label="Close">
+                <button
+                  className={styles.editCloseButton}
+                  onClick={() => setShowEditModal(false)}
+                  aria-label="Close"
+                >
                   <Icon name="close" size={20} />
                 </button>
               </div>
@@ -229,7 +268,9 @@ export default function Post({
                 {(editImage || isValidImage(postImage)) && (
                   <div className={styles.editImagePreview}>
                     <img
-                      src={editImage ? URL.createObjectURL(editImage) : postImage}
+                      src={
+                        editImage ? URL.createObjectURL(editImage) : postImage
+                      }
                       alt="Preview"
                       className={styles.editPreviewImg}
                     />
@@ -258,7 +299,9 @@ export default function Post({
                 <div className={styles.editActions}>
                   <button
                     className={styles.editIconButton}
-                    onClick={() => document.getElementById(`editImg-${postId}`).click()}
+                    onClick={() =>
+                      document.getElementById(`editImg-${postId}`).click()
+                    }
                     aria-label="Add image"
                   >
                     <Icon name="image" size={20} />
@@ -278,7 +321,12 @@ export default function Post({
                 </div>
 
                 <div className={styles.editSubmitRow}>
-                  <button className={styles.updateButton} onClick={handleUpdatePost}>Update</button>
+                  <button
+                    className={styles.updateButton}
+                    onClick={handleUpdatePost}
+                  >
+                    Update
+                  </button>
                 </div>
               </div>
             </div>
@@ -292,10 +340,25 @@ export default function Post({
                 <span>!</span>
               </div>
               <h3 className={styles.confirmTitle}>Delete Post</h3>
-              <p className={styles.confirmText}>Are you sure you want to delete this post? This action cannot be undone.</p>
+              <p className={styles.confirmText}>
+                Are you sure you want to delete this post? This action cannot be
+                undone.
+              </p>
               <div className={styles.confirmActions}>
-                <button className={styles.cancelButton} onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className={styles.deleteButton} onClick={handleDeletePost}>Delete</button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={styles.deleteButton}
+                  onClick={handleDeletePost}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </button>
               </div>
             </div>
           </div>
@@ -310,7 +373,9 @@ export default function Post({
                     <span>...</span>
                   </div>
                   <h3 className={styles.confirmTitle}>Reporting</h3>
-                  <p className={styles.confirmText}>Please wait while we process your report.</p>
+                  <p className={styles.confirmText}>
+                    Please wait while we process your report.
+                  </p>
                 </>
               ) : reportResponse ? (
                 <>
@@ -319,7 +384,15 @@ export default function Post({
                   </div>
                   <h3 className={styles.confirmTitle}>{reportResponse}</h3>
                   <div className={styles.confirmActions}>
-                    <button className={styles.cancelButton} onClick={() => { setReportResponse(''); setShowReportModal(false); }}>Close</button>
+                    <button
+                      className={styles.cancelButton}
+                      onClick={() => {
+                        setReportResponse("");
+                        setShowReportModal(false);
+                      }}
+                    >
+                      Close
+                    </button>
                   </div>
                 </>
               ) : (
@@ -328,10 +401,26 @@ export default function Post({
                     <span>!</span>
                   </div>
                   <h3 className={styles.confirmTitle}>Report Post</h3>
-                  <p className={styles.confirmText}>Are you sure you want to report this post? Our team will review it.</p>
+                  <p className={styles.confirmText}>
+                    Are you sure you want to report this post? Our team will
+                    review it.
+                  </p>
                   <div className={styles.confirmActions}>
-                    <button className={styles.cancelButton} onClick={() => { setReportResponse(''); setShowReportModal(false); }}>Cancel</button>
-                    <button className={styles.reportButton} onClick={handleReportPost}>Report</button>
+                    <button
+                      className={styles.cancelButton}
+                      onClick={() => {
+                        setReportResponse("");
+                        setShowReportModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className={styles.reportButton}
+                      onClick={handleReportPost}
+                    >
+                      Report
+                    </button>
                   </div>
                 </>
               )}
@@ -341,14 +430,18 @@ export default function Post({
       </div>
 
       <div className={styles.postContent}>
-
         {/* Detected links and hyperlinks it */}
         {content.map((p, i) => (
           <p key={i}>
             {p.split(/(\s+)/).map((part, j) => {
               const isLink = /^https?:\/\/\S+$/.test(part);
               return isLink ? (
-                <a key={j} href={part} target="_blank" rel="noopener noreferrer">
+                <a
+                  key={j}
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {part}
                 </a>
               ) : (
@@ -359,7 +452,9 @@ export default function Post({
         ))}
 
         {links.map((link, i) => (
-          <a href={link.href} target="_blank" key={i}>{link.text}</a>
+          <a href={link.href} target="_blank" key={i}>
+            {link.text}
+          </a>
         ))}
         {isValidImage(postImage) && (
           <img
@@ -372,19 +467,20 @@ export default function Post({
 
       {Object.keys(reactions).length > 0 && (
         <div className={styles.reactionsDisplay}>
-          {Object.entries(reactions).map(([reactionType, users]) => (
-            users.length > 0 && (
-              <div key={reactionType} className={styles.reactionGroup}>
-                <span className={styles.reactionEmoji}>
-                  {getReactionEmoji(reactionType)}
-                </span>
-                <span className={styles.reactionCount}>{users.length}</span>
-                <div className={styles.reactionTooltip}>
-                  {users.map(u => u.full_name || "Unknown").join(", ")}
+          {Object.entries(reactions).map(
+            ([reactionType, users]) =>
+              users.length > 0 && (
+                <div key={reactionType} className={styles.reactionGroup}>
+                  <span className={styles.reactionEmoji}>
+                    {getReactionEmoji(reactionType)}
+                  </span>
+                  <span className={styles.reactionCount}>{users.length}</span>
+                  <div className={styles.reactionTooltip}>
+                    {users.map((u) => u.full_name || "Unknown").join(", ")}
+                  </div>
                 </div>
-              </div>
-            )
-          ))}
+              ),
+          )}
         </div>
       )}
 
@@ -405,14 +501,18 @@ export default function Post({
 
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
-          <Icon name="message" className={`${styles.postIcon} ${showComments ? styles.active : ''}`} onClick={handleCommentClick} />
+          <Icon
+            name="message"
+            className={`${styles.postIcon} ${showComments ? styles.active : ""}`}
+            onClick={handleCommentClick}
+          />
           <div className={styles.likesComments} onClick={handleCommentClick}>
-            {comments?.length} Comment{comments?.length !== 1 ? 's' : ''}
+            {comments?.length} Comment{comments?.length !== 1 ? "s" : ""}
           </div>
           {/* Reaction Picker Wrapper */}
           <div className={styles.reactionWrapper}>
             <button
-              className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ''}`}
+              className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ""}`}
               onClick={handleReactionClick}
               onMouseDown={(e) => e.stopPropagation()}
               title="Add reaction"
@@ -441,7 +541,7 @@ export default function Post({
         BASE_URL={BASE_URL}
         setPosts={setPosts}
         isExpanded={showComments}
-        onToggle={() => setShowComments(prev => !prev)}
+        onToggle={() => setShowComments((prev) => !prev)}
       />
     </div>
   );
