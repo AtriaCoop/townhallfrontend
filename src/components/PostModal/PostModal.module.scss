@@ -193,6 +193,11 @@
     background-color: var(--bg-hover);
     color: var(--icon-hover);
   }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
 .pinned {

@@ -20,6 +20,7 @@ import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 1000;
+const MAX_IMAGES = 10;
 
 export default function NewsfeedPage() {
   const router = useRouter();
@@ -149,7 +150,7 @@ export default function NewsfeedPage() {
             date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
             created_at: p.created_at,
             content: [p.content],
-            postImage: p.image || null,
+            postImages: p.images || [],
             links: [],
             comments: p.comments || [],
             reactions: p.reactions || {},
@@ -192,7 +193,10 @@ export default function NewsfeedPage() {
     const files = Array.from(e.target.files);
     const validImages = files.filter(file => file.type.startsWith("image/"));
     if (validImages.length) {
-      setPostImages(prev => [...prev, ...validImages]);
+      setPostImages(prev => {
+        const remaining = MAX_IMAGES - prev.length;
+        return [...prev, ...validImages.slice(0, remaining)];
+      });
     }
     e.target.value = "";
   };
@@ -220,7 +224,7 @@ export default function NewsfeedPage() {
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         isVerified: data.post.user.is_verified,
         content: [data.post.content],
-        postImage: data.post.image,
+        postImages: data.post.images || [],
         tags: data.post.tags || [],
         links: [],
         comments: data.post.comments || [],
@@ -347,6 +351,10 @@ export default function NewsfeedPage() {
             </div>
           )}
 
+          {postImages.length >= MAX_IMAGES && (
+            <p className={styles.postErrorMessage}>You can upload a maximum of {MAX_IMAGES} images per post.</p>
+          )}
+
           {postError && <p className={styles.postErrorMessage}>{postError}</p>}
 
           {/* Tags — only shown when composing */}
@@ -369,6 +377,7 @@ export default function NewsfeedPage() {
                 className={styles.toolbarButton}
                 onClick={() => postImageRef.current.click()}
                 aria-label="Add image"
+                disabled={postImages.length >= MAX_IMAGES}
               >
                 <Icon name="image" size={20} />
               </button>
