@@ -336,6 +336,12 @@
   line-height: $line-height-relaxed;
 }
 
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+}
+
 // Image Modal
 .imageModalOverlay {
   position: fixed;
