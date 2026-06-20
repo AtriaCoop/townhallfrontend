@@ -222,6 +222,7 @@ export default function NewsfeedPage() {
         userImage: data.post.user.profile_image,
         created_at: data.post.created_at,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
+        isVerified: data.post.user.is_verified,
         content: [data.post.content],
         postImages: data.post.images || [],
         tags: data.post.tags || [],
@@ -467,7 +468,8 @@ export default function NewsfeedPage() {
                 organization={post.organization}
                 date={post.date}
                 content={post.content}
-                postImages={post.postImages}
+                isVerified={post.isVerified}
+                postImage={post.postImage}
                 links={post.links}
                 comments={post.comments}
                 reactions={post.reactions}

@@ -5,6 +5,7 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import { getStoredUser } from "@/utils/getStoredUser";
 import { BASE_URL } from "@/constants/api";
 import FormInputText from "@/components/FormInputText/FormInputText";
+import TagifyInput from "@/components/TagifyInput/TagifyInput";
 import { validateUrl } from "@/utils/validateUrl";
 
 const INITIAL_FORM_DATA = {
@@ -300,12 +301,13 @@ export default function SetUpPage() {
                 />
               </div>
               <div className={`${styles.formField} ${styles.fullWidth}`}>
-                <FormInputText
-                  name="skills_interests"
+                <TagifyInput
                   label="Skills & Interests"
-                  placeholder="How would you like to contribute to the coalition?"
+                  placeholder="Add a skill and press Enter..."
                   value={formData.skills_interests}
-                  onChange={handleInputChange}
+                  onChange={(next) =>
+                    setFormData((prev) => ({ ...prev, skills_interests: next }))
+                  }
                 />
               </div>
             </div>
