@@ -12,7 +12,7 @@
 
 .modalContent {
   width: 90%;
-  max-width: 520px;
+  max-width: 480px;
   max-height: 80vh;
   background-color: var(--modal-bg);
   border-radius: $radius-xl;
@@ -23,29 +23,16 @@
 }
 
 .modalHeader {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  padding: $spacing-5 $spacing-5 $spacing-3;
+  @include flex-between;
+  padding: $spacing-5 $spacing-5 $spacing-2;
 
   h2 {
     margin: 0;
-    flex-shrink: 0;
     @include heading-4;
   }
 }
 
-.createGroupButton {
-  @include button-primary;
-  margin-left: $spacing-3;
-  margin-bottom: $spacing-1;
-  padding: $spacing-1 $spacing-2;
-  flex-shrink: 0;
-}
-
 .closeButton {
-  margin-left: auto;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,10 +51,41 @@
   }
 }
 
+.subtitle {
+  margin: $spacing-5 $spacing-5 $spacing-1 $spacing-5;
+  color: var(--text-primary);
+  @include body-2;
+}
+
+.groupMemberCount {
+  margin: 0 $spacing-5 $spacing-1 $spacing-5;
+  color: var(--text-primary);
+  @include caption;
+}
+.groupNameWrapper {
+  position: relative;
+  padding: 0 $spacing-5;
+  margin-bottom: $spacing-3;
+}
+.inputField {
+  @include input-base;
+  @include input-md;
+  padding-left: $spacing-3;
+  border-radius: $radius-md;
+}
+
 .searchWrapper {
   position: relative;
   padding: 0 $spacing-5;
   margin-bottom: $spacing-3;
+}
+
+.createGroupButton {
+  @include button-primary;
+  margin: $spacing-1 $spacing-5;
+  padding: $spacing-1;
+  width: 40%;
+  flex-shrink: 0;
 }
 
 .searchIcon {
@@ -83,20 +101,20 @@
   @include input-base;
   @include input-md;
   padding-left: $spacing-10;
-  border-radius: $radius-full;
+  border-radius: $radius-md;
 }
 
-.groupList {
+.userList {
   flex: 1;
   overflow-y: auto;
   padding: 0 $spacing-3 $spacing-3;
   @include custom-scrollbar;
 }
 
-.groupItem {
+.userItem {
   @include flex-start;
   gap: $spacing-3;
-  padding: $spacing-3 $spacing-4;
+  padding: $spacing-3;
   cursor: pointer;
   border-radius: $radius-md;
   @include transition-colors;
@@ -106,24 +124,31 @@
   }
 }
 
-.groupIcon {
-  @include flex-center;
-  width: 36px;
-  height: 36px;
-  border-radius: $radius-md;
-  background-color: $primary-50;
-  color: $primary-500;
+.selectedUser {
+  background-color: var(--bg-hover);
+}
+
+.userAvatar {
+  @include avatar($avatar-md);
   flex-shrink: 0;
 }
 
-:global(body.dark) .groupIcon {
-  background-color: rgba($primary-500, 0.15);
-  color: $primary-300;
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.groupName {
+.userName {
   @include subheading-2;
   color: var(--text-primary);
+  @include truncate;
+}
+
+.userTitle {
+  @include caption;
+  color: var(--text-muted);
+  @include truncate;
 }
 
 .noResults {
