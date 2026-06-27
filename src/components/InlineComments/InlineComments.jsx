@@ -22,6 +22,7 @@ export default function InlineComments({
   const router = useRouter();
   const [showAllComments, setShowAllComments] = useState(false);
   const [commentAnonymously, setCommentAnonymously] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   const displayedComments = showAllComments
     ? comments
@@ -57,6 +58,7 @@ export default function InlineComments({
   }
 
   async function handleDeleteComment(commentId) {
+    setDeletingCommentId(commentId);
     try {
       const response = await authenticatedFetch(`${BASE_URL}/comment/${commentId}/`, {
         method: 'DELETE',
@@ -74,6 +76,7 @@ export default function InlineComments({
       );
     } catch (err) {
       console.error('Failed to delete comment:', err);
+      setDeletingCommentId(null);
     }
   }
 
@@ -159,8 +162,9 @@ export default function InlineComments({
                     <button
                       className={styles.deleteBtn}
                       onClick={() => handleDeleteComment(comment.id)}
+                      disabled={deletingCommentId === comment.id}
                     >
-                      Delete
+                      {deletingCommentId === comment.id ? "Deleting..." : "Delete"}
                     </button>
                   )}
                 </div>
