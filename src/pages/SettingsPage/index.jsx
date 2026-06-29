@@ -29,6 +29,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
   // Toast state
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
+  const [exportingFormat, setExportingFormat] = useState(null);
 
   // Modal state
   const [activeModal, setActiveModal] = useState(null); // "changePassword" | "deactivate" | "delete" | null
@@ -152,6 +153,36 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
     }
     localStorage.removeItem("user");
     router.push("/");
+  }
+
+  // --- Data export handler ---
+  async function handleExportData(format) {
+    setExportingFormat(format);
+
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/user/export/?format=${format}`);
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        showToast("error", data.error || "Failed to export data.");
+        return;
+      }
+
+      const blob = await res.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `townhall-user-data.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      showToast("success", `${format.toUpperCase()} export started.`);
+    } catch {
+      showToast("error", "Failed to export data.");
+    } finally {
+      setExportingFormat(null);
+    }
   }
 
   // --- Deactivate account handler ---
@@ -349,6 +380,34 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
           <Icon name="lock" size={20} />
           <span>Change Password</span>
         </button>
+      </div>
+
+      {/* ===== Data Export ===== */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>Data Export</h2>
+        <p className={styles.cardDescription}>
+          Download your profile, posts, comments, and messages.
+        </p>
+
+        <div className={styles.exportActions}>
+          <button
+            className={styles.exportButton}
+            onClick={() => handleExportData("json")}
+            disabled={Boolean(exportingFormat)}
+          >
+            <Icon name="download" size={20} />
+            <span>{exportingFormat === "json" ? "Preparing JSON..." : "Export JSON"}</span>
+          </button>
+
+          <button
+            className={styles.exportButton}
+            onClick={() => handleExportData("csv")}
+            disabled={Boolean(exportingFormat)}
+          >
+            <Icon name="download" size={20} />
+            <span>{exportingFormat === "csv" ? "Preparing CSV..." : "Export CSV"}</span>
+          </button>
+        </div>
       </div>
 
       {/* ===== Account ===== */}
