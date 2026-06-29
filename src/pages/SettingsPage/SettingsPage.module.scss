@@ -311,6 +311,37 @@
   }
 }
 
+// Data Export
+.exportActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-3;
+
+  @include sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.exportButton {
+  @include button-tertiary;
+  @include button-md;
+  justify-content: center;
+  gap: $spacing-2;
+  width: 100%;
+  min-width: 0;
+  color: var(--text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--hover-subtle, $neutral-100);
+    color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 // Account Buttons
 .logoutButton {
   @include button-tertiary;
