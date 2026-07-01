@@ -81,6 +81,11 @@ export default function MembersPage() {
               <div className={styles.memberInfo}>
                 <h3 className={styles.memberName}>
                   {member.full_name || "Unnamed"}
+                  {member.is_verified && (
+                    <span className={styles.verifiedBadge} title="Verified user">
+                      ✓
+                    </span>
+                  )}
                 </h3>
                 <p className={styles.memberMeta}>
                   {member.title || "VFJC Member"}

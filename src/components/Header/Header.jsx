@@ -204,6 +204,14 @@ export default function Header() {
                 <span>Settings</span>
               </button>
 
+              <button
+                className={styles.dropdownItem}
+                onClick={() => navigateTo('/ActivityLogsPage')}
+              >
+                <Icon name="logs" size={18} />
+                <span>Activity Logs</span>
+              </button>
+
               <div className={styles.dropdownDivider} />
 
               <button

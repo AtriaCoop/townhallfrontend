@@ -263,7 +263,7 @@ export default function DirectMessagesPage() {
         ) : (
           <div className={styles.noChatSelected}>
             <Icon name="message" size={64} />
-            <h2>Chat with your Volunteer Orgs!</h2>
+            <h2>Chat with our members</h2>
             <p>Select a conversation or start a new one to begin messaging.</p>
           </div>
         )}

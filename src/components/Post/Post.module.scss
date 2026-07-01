@@ -427,6 +427,13 @@
   }
 }
 
+.editImageGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+  margin-top: $spacing-2;
+}
+
 .editImagePreview {
   position: relative;
   display: inline-block;
@@ -475,6 +482,11 @@
   @include caption;
 }
 
+.editImageWarning {
+  color: $error-500;
+  @include caption;
+}
+
 .editModalFooter {
   display: flex;
   flex-direction: column;
@@ -512,6 +524,11 @@
   &:hover {
     background-color: var(--bg-hover);
     color: var(--icon-hover);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }
 
@@ -564,6 +581,11 @@
   @include button-primary;
   @include button-md;
   min-width: 100px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .cancelButton {
@@ -659,4 +681,19 @@
   &:active:not(:disabled) {
     background-color: $warning-700;
   }
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  width: 16px;
+  height: 16px;
+  background-color: #1d9bf0;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: bold;
+  vertical-align: middle;
 }
