@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import SocialLinks from "@/components/SocialLinks/SocialLinks";
+import Tag from "@/components/Tag/Tag";
+import { parseTagString } from "@/components/TagifyInput/TagifyInput";
 import styles from "./ProfilePage.module.scss";
 
 export default function ProfilePage() {
@@ -58,6 +60,8 @@ export default function ProfilePage() {
   }, [toast]);
 
   if (!profileData) return null;
+
+  const skillsInterestsTags = parseTagString(profileData.skills_interests);
 
   return (
     <div className={styles.profilePage}>
@@ -121,7 +125,13 @@ export default function ProfilePage() {
         {/* Name and Action Buttons */}
         <div className={styles.profileHeader}>
           <div className={styles.nameRow}>
-            <h1 className={styles.name}>{profileData.full_name}</h1>
+            <h1 className={styles.name}>{profileData.full_name}
+              {profileData.is_verified && (
+                <span className={styles.verifiedBadge} title="Verified user">
+                  ✓
+                </span>
+              )}
+            </h1>
             {profileData.pronouns && (
               <div className={styles.pronouns}>{profileData.pronouns}</div>
             )}
@@ -228,7 +238,15 @@ export default function ProfilePage() {
           {profileData.skills_interests && (
             <div className={styles.detailSection}>
               <h3 className={styles.detailLabel}>Skills & Interests</h3>
-              <p className={styles.detailContent}>{profileData.skills_interests}</p>
+              {skillsInterestsTags.length > 0 ? (
+                <div className={styles.tagList} aria-label="Skills and interests">
+                  {skillsInterestsTags.map((t, idx) => (
+                    <Tag key={`${t}-${idx}`} name={t} removable={false} />
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.detailContent}>{profileData.skills_interests}</p>
+              )}
             </div>
           )}
 

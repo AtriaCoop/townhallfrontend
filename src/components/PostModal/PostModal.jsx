@@ -18,13 +18,13 @@ export default function Modal({
 }) {
   const [text, setText] = useState('');
   const [pinned, setPinned] = useState(false);
-  const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [images, setImages] = useState([]);
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
   const MAX_POST_LEN = 1000;
+  const MAX_IMAGES = 10;
 
   const postImageRef = useRef(null);
 
@@ -33,7 +33,10 @@ export default function Modal({
     const validImages = files.filter(file => file.type.startsWith("image/"));
 
     if (validImages.length) {
-      setImages(prev => [...prev, ...validImages]);
+      setImages(prev => {
+        const remaining = MAX_IMAGES - prev.length;
+        return [...prev, ...validImages.slice(0, remaining)];
+      });
     } else {
       alert("Please upload valid image files.");
     }
@@ -62,7 +65,7 @@ export default function Modal({
         created_at: data.post.created_at,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
         content: [data.post.content],
-        postImage: data.post.image,
+        postImages: data.post.images || [],
         pinned: data.post.pinned || false,
         tags: data.post.tags || [],
         links: [],
@@ -82,7 +85,6 @@ export default function Modal({
       });
 
       setText('');
-      setImage(null);
       setImages([]);
       setTags([]);
       setTag('');
@@ -140,6 +142,10 @@ export default function Modal({
             </div>
           )}
 
+          {images.length >= MAX_IMAGES && (
+            <p className={styles.errorMessage}>You can upload a maximum of {MAX_IMAGES} images per post.</p>
+          )}
+
           {error && <p className={styles.errorMessage}>{error}</p>}
 
           <TagCreationField
@@ -159,6 +165,7 @@ export default function Modal({
               className={styles.iconButton}
               onClick={() => postImageRef.current.click()}
               aria-label="Add image"
+              disabled={images.length >= MAX_IMAGES}
             >
               <Icon name="image" size={20} />
             </button>
