@@ -469,7 +469,7 @@ export default function NewsfeedPage() {
                 date={post.date}
                 content={post.content}
                 isVerified={post.isVerified}
-                postImage={post.postImage}
+                postImages={post.postImages}
                 links={post.links}
                 comments={post.comments}
                 reactions={post.reactions}
