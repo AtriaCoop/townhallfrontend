@@ -490,14 +490,15 @@ export default function EventsPage() {
       <header className={styles.pageHeader}>
         <div className={styles.headerContent}>
           <h1 className={styles.pageTitle}>Events</h1>
-          {isStaff && (
-            <button
-              className={styles.createEventButton}
-              onClick={() => setShowCreateModal(true)}
-            >
-              + Create Event
-            </button>
-          )}
+          <button
+            className={styles.createEventButton}
+            disabled={!isStaff}
+            onClick={() => setShowCreateModal(true)}
+            title={!isStaff ? "You don't have permission to create events" : undefined}
+            aria-label={isStaff ? "Create event" : "Create event - staff only"}
+          >
+            + Create Event
+          </button>
         </div>
         <div className={styles.headerControls}>
           <div className={styles.tabBar} role="tablist" aria-label="Event filter">
