@@ -39,6 +39,11 @@
   @include button-primary;
   @include button-sm;
   white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .headerControls {

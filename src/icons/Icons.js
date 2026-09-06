@@ -48,7 +48,7 @@ export const Icons = {
 	dashboard: LayoutDashboard,
 	user: User,
 	members: Users,
-	groupChats: MessageCircle,
+	workingGroups: MessageCircle,
 	message: MessageSquare,
 	menu: Menu,
 	image: Image,

@@ -56,7 +56,7 @@ Ask Ryan, Gagenvir, or Ansel for help setting up the backend if needed.
 ## 📁 Project Structure
 
 /components         → Reusable UI components (Navigation, Post, MessageBubble, etc.)  
-/pages              → Route-based pages (Home, GroupChatsPage, ProfilePage, etc.)  
+/pages              → Route-based pages (Home, WorkingGroupsPage, ProfilePage, etc.)  
 /styles             → Global styles and SCSS modules  
 /public             → Static files (images, logos, icons)  
 

@@ -79,7 +79,7 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreating
                 onClick={() => onJoinGroup(group.name)}
               >
                 <div className={styles.groupIcon}>
-                  <Icon name="groupChats" size={18} />
+                  <Icon name="workingGroups" size={18} />
                 </div>
                 <span className={styles.groupName}>{formatGroupName(group.name)}</span>
               </div>

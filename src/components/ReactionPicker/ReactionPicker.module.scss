@@ -16,10 +16,23 @@
   box-shadow: var(--shadow-lg);
   margin-bottom: $spacing-2;
   z-index: $z-popover;
-  animation: popIn 150ms $ease-out;
+  animation: popInCenter 150ms $ease-out;
 }
 
-@keyframes popIn {
+.alignStart {
+  left: 0;
+  transform: none;
+  animation-name: popInStart;
+}
+
+.alignEnd {
+  left: auto;
+  right: 0;
+  transform: none;
+  animation-name: popInEnd;
+}
+
+@keyframes popInCenter {
   from {
     opacity: 0;
     transform: translateX(-50%) scale(0.9) translateY(8px);
@@ -27,6 +40,28 @@
   to {
     opacity: 1;
     transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+@keyframes popInStart {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes popInEnd {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
