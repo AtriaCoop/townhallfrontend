@@ -3,6 +3,7 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble";
 import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal";
 import MessageModal from "@/components/MessageModal/MessageModal";
 import UpdateMessageModal from "@/components/UpdateMessageModal/UpdateMessageModal";
+import CreateGroupChatModal from "@/components/CreateGroupChatModal/CreateGroupChatModal";
 import MessageInput from "@/components/MessageInput/MessageInput";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -17,8 +18,9 @@ export default function WorkingGroupsPage() {
   const messageContainerRef = useRef(null);
 
   const [showModal, setShowModal] = useState(false);
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [joinedGroups, setJoinedGroups] = useState([]);
-  const [activeGroup, setActiveGroup] = useState("");
+  const [activeGroup, setActiveGroup] = useState({id: null, name: null, participants: []});
   const [groupMessages, setGroupMessages] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
   const [searchMode, setSearchMode] = useState(false);
@@ -36,11 +38,11 @@ export default function WorkingGroupsPage() {
   }, []);
 
   useEffect(() => {
-    if (!activeGroup || !currentUserId) return;
+    if (!activeGroup?.name || !currentUserId) return;
 
     const fetchGroupMessages = async () => {
       const res = await authenticatedFetch(
-        `${BASE_URL}/groups/${activeGroup}/messages/`
+        `${BASE_URL}/groups/${activeGroup.name}/messages/`  // TODO: change endpoint in BE to use groupId
       );
       const data = await res.json();
 
@@ -55,16 +57,16 @@ export default function WorkingGroupsPage() {
         image: msg.image || null,
       }));
 
-      setGroupMessages((prev) => ({ ...prev, [activeGroup]: formatted }));
+      setGroupMessages((prev) => ({ ...prev, [activeGroup.name]: formatted }));
     };
 
     fetchGroupMessages();
   }, [activeGroup, currentUserId]);
 
   useEffect(() => {
-    if (!activeGroup || !currentUserId) return;
+    if (!activeGroup?.name || !currentUserId) return;
 
-    const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/groups/${activeGroup}/`;
+    const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/groups/${activeGroup.name}/`;
     socketRef.current = new WebSocket(socketUrl);
 
     socketRef.current.onmessage = (e) => {
@@ -84,14 +86,14 @@ export default function WorkingGroupsPage() {
 
       setGroupMessages((prev) => {
         const updated = { ...prev };
-        if (!updated[activeGroup]) updated[activeGroup] = [];
-        updated[activeGroup] = [...updated[activeGroup], newMsg];
+        if (!updated[activeGroup.name]) updated[activeGroup.name] = [];
+        updated[activeGroup.name] = [...updated[activeGroup.name], newMsg];
         return updated;
       });
     };
 
     socketRef.current.onclose = () => {
-      console.log(`WebSocket closed for group: ${activeGroup}`);
+      console.log(`WebSocket closed for group: ${activeGroup.name}`);
     };
 
     return () => {
@@ -122,11 +124,12 @@ export default function WorkingGroupsPage() {
     }
   }, [activeGroup]);
 
-  const handleJoinGroup = (groupName) => {
-    if (!joinedGroups.includes(groupName)) {
-      setJoinedGroups((prev) => [...prev, groupName]);
+  const handleJoinGroup = (group) => {
+    const participantIds = group.id > 0 ? group.participants : [];
+    if (!joinedGroups.some((joinedGroup) => joinedGroup.id === group.id)) {
+      setJoinedGroups((prev) => [...prev, {id: group.id, name: group.name, participants: participantIds}]);
     }
-    setActiveGroup(groupName);
+    setActiveGroup({id: group.id, name: group.name, participants: participantIds});
     setShowModal(false);
   };
 
@@ -134,19 +137,40 @@ export default function WorkingGroupsPage() {
     setShowModal(true);
   };
 
-  const handleLeaveGroup = () => {
+  const handleLeaveGroup = async () => {
     if (!activeGroup) return;
 
-    const updatedGroups = joinedGroups.filter((group) => group !== activeGroup);
+    if (activeGroup && activeGroup.id > 0) {
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      const newParticipants = activeGroup.participants.filter((participant) => participant !== Number(userData.id));
+      
+      const response = await authenticatedFetch(`${BASE_URL}/chats/${activeGroup.id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participant_ids:  newParticipants
+        }),
+      });
+
+      const data = await response.json();
+      if (
+        !response.ok &&
+        data.message?.includes("Chat must have at least two participants.")
+      ) {
+        alert("Cannot leave a group with only one participant. Group is hidden.");
+      }
+    }
+
+    const updatedGroups = joinedGroups.filter((group) => group.id !== activeGroup.id);
     setJoinedGroups(updatedGroups);
-    setActiveGroup(updatedGroups[0] || "");
+    setActiveGroup(updatedGroups[0] || {id: null, name: null, participants: []});
     localStorage.setItem("joinedGroups", JSON.stringify(updatedGroups));
     if (updatedGroups.length === 0) localStorage.removeItem("activeGroup");
   };
 
   // Derive unique participants from fetched messages
   const activeParticipants = useMemo(() => {
-    const msgs = groupMessages[activeGroup] || [];
+    const msgs = groupMessages[activeGroup.name] || [];
     const seen = new Map();
     msgs.forEach((msg) => {
       if (msg.sender_id && msg.sender !== "You") {
@@ -160,7 +184,7 @@ export default function WorkingGroupsPage() {
     if (!inputText.trim() && !selectedImage) return;
 
     const formData = new FormData();
-    formData.append("group_name", activeGroup);
+    formData.append("group_name", activeGroup.name);
     formData.append("content", inputText);
     if (selectedImage) formData.append("image", selectedImage);
 
@@ -188,7 +212,7 @@ export default function WorkingGroupsPage() {
 
       setGroupMessages((prev) => {
         const updated = { ...prev };
-        updated[activeGroup] = [...(updated[activeGroup] || []), newMsg];
+        updated[activeGroup.name] = [...(updated[activeGroup.name] || []), newMsg];
         return updated;
       });
 
@@ -225,7 +249,7 @@ export default function WorkingGroupsPage() {
       if (data.success) {
         setGroupMessages((prev) => {
           const updated = { ...prev };
-          updated[activeGroup] = (updated[activeGroup] || []).filter(
+          updated[activeGroup.name] = (updated[activeGroup.name] || []).filter(
             (m) => m.id !== selectedMessage.id
           );
           return updated;
@@ -241,7 +265,7 @@ export default function WorkingGroupsPage() {
   const handleUpdateMessage = (msgId, newText) => {
     setGroupMessages((prev) => {
       const updated = { ...prev };
-      updated[activeGroup] = (updated[activeGroup] || []).map((m) =>
+      updated[activeGroup.name] = (updated[activeGroup.name] || []).map((m) =>
         m.id === msgId ? { ...m, message: newText } : m
       );
       return updated;
@@ -260,13 +284,36 @@ export default function WorkingGroupsPage() {
   };
 
   const handleBackToGroups = () => {
-    setActiveGroup("");
+    setActiveGroup({id: null, name: null, participants: []});
   };
+
+  const handleCreateGroup = async (groupName, selectedUsers) => {
+    try {
+      const res = await authenticatedFetch(`${BASE_URL}/chats/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${groupName}`,
+          participants: [currentUserId, ...selectedUsers.map((user) => user.id)],
+          is_group: true,
+        }),
+      });
+
+      const data = await res.json();
+      const chatData = data?.data;
+      if (!chatData?.id) return;
+      
+      handleJoinGroup({id: chatData.id, name: chatData.name, participants: chatData.participants.map((participant) => participant.id)});
+      setShowCreateGroupModal(false);
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+    }
+  }
 
   return (
     <div className={styles.container}>
       {/* Working Groups Sidebar */}
-      <div className={`${styles.workingGroupsSidebar} ${activeGroup ? styles.hideOnMobile : ''}`}>
+      <div className={`${styles.workingGroupsSidebar} ${activeGroup?.name ? styles.hideOnMobile : ''}`}>
         <div className={styles.sidebarHeader}>
           <h2>Working Groups</h2>
           <button
@@ -285,18 +332,18 @@ export default function WorkingGroupsPage() {
             joinedGroups.map((group, idx) => (
               <button
                 key={idx}
-                className={`${styles.chatItem} ${group === activeGroup ? styles.chatItemActive : ''}`}
+                className={`${styles.chatItem} ${group.id === activeGroup.id ? styles.chatItemActive : ''}`}
                 onClick={() => handleGroupSelect(group)}
               >
-                {formatGroupName(group)}
+                {formatGroupName(group.name)}
               </button>
             ))
           )}
         </div>
       </div>
 
-      <div className={`${styles.chatWrapper} ${activeGroup ? styles.showChatOnMobile : ''}`}>
-        {activeGroup ? (
+      <div className={`${styles.chatWrapper} ${activeGroup?.id ? styles.showChatOnMobile : ''}`}>
+        {activeGroup?.id ? (
           <>
             {/* Chat Header */}
             <div className={styles.chatHeader}>
@@ -304,7 +351,7 @@ export default function WorkingGroupsPage() {
                 <Icon name="arrowleft" size={20} />
               </button>
               <div className={styles.headerLeft}>
-                <h2 className={styles.chatTitle}>{formatGroupName(activeGroup)}</h2>
+                <h2 className={styles.chatTitle}>{formatGroupName(activeGroup.name)}</h2>
                 {activeParticipants.length > 0 && (
                   <span className={styles.memberCount}>
                     {activeParticipants.length + 1} participants
@@ -341,7 +388,7 @@ export default function WorkingGroupsPage() {
 
             {/* Messages */}
             <div ref={messageContainerRef} className={styles.messageContainer}>
-              {(groupMessages[activeGroup] || [])
+              {(groupMessages[activeGroup.name] || [])
                 .filter((msg) =>
                   msg.message.toLowerCase().includes(searchQuery.toLowerCase())
                 )
@@ -427,7 +474,20 @@ export default function WorkingGroupsPage() {
         <JoinGroupModal
           onClose={() => setShowModal(false)}
           onJoinGroup={handleJoinGroup}
+          onCreatingAGroup={() => {
+            setShowModal(false);
+            setShowCreateGroupModal(true);
+          }}
           title="Join Groups"
+        />
+      )}
+
+      {showCreateGroupModal && (
+        <CreateGroupChatModal
+          onClose={() => setShowCreateGroupModal(false)}
+          onCreateGroup={handleCreateGroup}
+          currUserId={currentUserId}
+          title="New Working Group"
         />
       )}
 
