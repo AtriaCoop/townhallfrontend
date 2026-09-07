@@ -19,8 +19,8 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreating
     { id: -8, name: "wg-sustainable-resourcing-for-community-food-systems" },
   ]);
 
-  const filteredGroups = groups.filter(group =>
-    formatGroupName(group.name).toLowerCase().includes(searchText.toLowerCase())
+  const filteredGroups = groups.filter(group => 
+   formatGroupName(group.name).toLowerCase().includes(searchText.toLowerCase())
   );
 
   useEffect(() => {
@@ -35,8 +35,11 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreating
       const data = await res.json();
       const chatsFromServer = data?.data || [];
 
-      const customGroups = chatsFromServer.flatMap((c) => (c.is_group ? [{ id: c.id, name: c.name }] : []));
-      setGroups(prev => [...prev, ...customGroups]);
+      const customGroups = chatsFromServer.flatMap((c) => (c.is_group ? [{ id: c.id, name: c.name, participants: c.participants.map((p) => p.id) }] : []));
+      setGroups(prev => [
+        ...prev.filter(group => group.id < 0),
+        ...customGroups,
+      ]);
     }
     fetchGroups();
   }, [BASE_URL]);
@@ -76,7 +79,7 @@ export default function JoinGroupModal({ title, onClose, onJoinGroup, onCreating
               <div
                 key={idx}
                 className={styles.groupItem}
-                onClick={() => onJoinGroup(group.name)}
+                onClick={() => onJoinGroup(group)}
               >
                 <div className={styles.groupIcon}>
                   <Icon name="workingGroups" size={18} />
