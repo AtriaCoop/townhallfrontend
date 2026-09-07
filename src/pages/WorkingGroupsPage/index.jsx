@@ -4,6 +4,7 @@ import JoinGroupModal from "@/components/JoinGroupModal/JoinGroupModal";
 import MessageModal from "@/components/MessageModal/MessageModal";
 import UpdateMessageModal from "@/components/UpdateMessageModal/UpdateMessageModal";
 import CreateGroupChatModal from "@/components/CreateGroupChatModal/CreateGroupChatModal";
+import ListMembersModal from "@/components/ListMembersModal/ListMembersModal";
 import MessageInput from "@/components/MessageInput/MessageInput";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -28,6 +29,7 @@ export default function WorkingGroupsPage() {
 
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
@@ -109,6 +111,25 @@ export default function WorkingGroupsPage() {
     const storedActive = localStorage.getItem("activeGroup");
 
     setJoinedGroups(storedGroups);
+
+    const fetchGroups = async () => {
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = Number(userData.id);
+      const res = await authenticatedFetch(
+        `${BASE_URL}/chats/?user_id=${userId}`,
+        { credentials: "include" }
+      );
+      const data = await res.json();
+      const chatsFromServer = data?.data || [];
+
+      const customGroups = chatsFromServer.flatMap((c) => (c.is_group ? [{ id: c.id, name: c.name, participants: c.participants.map((p) => p.id) }] : []));
+      setJoinedGroups(prev => [
+        ...prev.filter(group => group.id < 0),
+        ...customGroups,
+      ]);
+    }
+    fetchGroups();
+
     if (storedActive) setActiveGroup(storedActive);
   }, []);
 
@@ -310,6 +331,10 @@ export default function WorkingGroupsPage() {
     }
   }
 
+  const showMembersList = () => {
+    setShowMembersModal(true);
+  };
+
   return (
     <div className={styles.container}>
       {/* Working Groups Sidebar */}
@@ -352,13 +377,17 @@ export default function WorkingGroupsPage() {
               </button>
               <div className={styles.headerLeft}>
                 <h2 className={styles.chatTitle}>{formatGroupName(activeGroup.name)}</h2>
-                {activeParticipants.length > 0 && (
+                {(activeGroup?.participants?.length > 0 || activeParticipants.length > 0) && (
                   <span className={styles.memberCount}>
-                    {activeParticipants.length + 1} participants
+                    {activeGroup.id > 0 ? activeGroup.participants.length : (activeParticipants.length + 1)} participants
                   </span>
                 )}
               </div>
               <div className={styles.chatIcons}>
+                {/* Members List */}
+                <button className={styles.iconButton} onClick={showMembersList} >
+                  <Icon name="members" />
+                </button>
                 {searchMode && (
                   <input
                     type="text"
@@ -511,6 +540,13 @@ export default function WorkingGroupsPage() {
           }}
           onUpdate={handleUpdateMessage}
           apiUrl={`${BASE_URL}/groups/messages/${selectedMessage.id}/`}
+        />
+      )}
+
+      {showMembersModal && (
+        <ListMembersModal
+          onClose={() => setShowMembersModal(false)}
+          memberIds={activeGroup?.participants || []}
         />
       )}
     </div>

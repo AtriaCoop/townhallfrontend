@@ -151,6 +151,8 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
       console.error("Logout error:", error);
     }
     localStorage.removeItem("user");
+    localStorage.removeItem("joinedGroups");
+    localStorage.removeItem("activeGroup");
     router.push("/");
   }
 
