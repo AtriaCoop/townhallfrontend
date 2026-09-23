@@ -100,9 +100,9 @@ export default function SetUpPage() {
     }
 
     // Profile picture required
-    if (!profilePicRef.current?.files[0]) {
-      errors.profile_image = "Profile picture is required";
-    }
+    // if (!profilePicRef.current?.files[0]) {
+    //   errors.profile_image = "Profile picture is required";
+    // }
 
     // URL validation
     URL_FIELDS.forEach((field) => {

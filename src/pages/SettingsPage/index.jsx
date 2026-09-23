@@ -15,6 +15,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
     show_email: true,
     show_in_directory: true,
     allow_dms: true,
+    enable_notifications: false,
   });
   const [privacyLoaded, setPrivacyLoaded] = useState(false);
 
@@ -49,6 +50,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
             show_email: data.user.show_email ?? true,
             show_in_directory: data.user.show_in_directory ?? true,
             allow_dms: data.user.allow_dms ?? true,
+            enable_notifications: data.user.enable_notifications ?? false,
           });
         }
       } catch (err) {
@@ -331,7 +333,28 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
                 <span className={styles.toggleSlider} />
               </button>
             </div>
+
+            {/* ===== Enable Notifications for direct messages ===== */}
+            <div className={styles.toggleRow}>
+              <div className={styles.toggleInfo}>
+                <span className={styles.toggleLabel}> Enable notifications </span>
+                <span className={styles.toggleDescription}>
+                Receive an email when another user sends you a direct message.
+                </span>
+              </div>
+              <button
+                className={`${styles.toggleSwitch} ${privacy.enable_notifications ? styles.toggleActive : ""}`}
+                onClick={() => handlePrivacyToggle("enable_notifications")}
+                role="switch"
+                aria-checked={privacy.enable_notifications}
+              >
+                <span className={styles.toggleSlider} />
+              </button>
+            </div>
           </div>
+             
+
+          
         )}
       </div>
 
