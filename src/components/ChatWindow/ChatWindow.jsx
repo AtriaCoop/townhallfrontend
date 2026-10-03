@@ -85,9 +85,33 @@ export default function ChatWindow({ chat, onClose }) {
       if (!chat?.id) return;
       clearUnreadDm(chat.id);
       // Mark chat as read on the backend so unread counts persist across refreshes
-      authenticatedFetch(`${BASE_URL}/chats/${chat.id}/read/`, {
-        method: "POST",
-      }).catch(() => {});
+
+      const markChatRead = async () => {
+        try {
+          const res = await authenticatedFetch(
+            `${BASE_URL}/chats/${chat.id}/read/`,
+            {
+              method: "POST",
+            }
+          );
+
+          const data = await res.json();
+
+          if (data.success) {
+            setMessages((prev) =>
+              prev.map((message) =>
+                data.message_ids.includes(message.id)
+                  ? { ...message, status: 3 }
+                  : message
+              )
+            );
+          }
+        } catch (error) {
+          console.error("Failed to mark chat as read:", error);
+        }
+      };
+
+      markChatRead();
     }, [chat?.id]);
 
     useEffect(() => {
@@ -101,9 +125,9 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(m.user?.id),
               id: m.id,
               timestamp: m.sent_at,
+              status: m.status,
               reactions: m.reactions || {},
             }));
-
             setMessages(formatted);
           } catch (err) {
             console.error("Failed to load past messages:", err);
@@ -118,16 +142,35 @@ export default function ChatWindow({ chat, onClose }) {
 
         socketRef.current = new WebSocket(socketUrl);
 
-        socketRef.current.onmessage = (e) => {
+        socketRef.current.onmessage = async (e) => {
           const data = JSON.parse(e.data);
-          // Skip own messages — already added optimistically in handleSend
+
+          // Skip own messages
           if (Number(data.sender_id) === currentUserId) return;
+
           setMessages((prev) => [...prev, {
             text: data.message,
             sender: Number(data.sender_id),
             id: data.id,
             timestamp: data.timestamp || new Date().toISOString(),
+            status: 2,
           }]);
+
+          // Mark message as delivered
+          try {
+            await authenticatedFetch(
+              `${BASE_URL}/chats/messages/${data.id}/status/`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status: 2 }),
+              }
+            );
+          } catch (error) {
+            console.error("Failed to mark message as delivered:", error);
+          }
         };
 
         socketRef.current.onerror = () => {
@@ -166,6 +209,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              status: data.data.status,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -185,6 +229,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              status: data.data.status,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -326,6 +371,20 @@ export default function ChatWindow({ chat, onClose }) {
                         </button>
                       )}
                     </div>
+
+                    {isOwnMessage && (
+                      <span
+                        className={
+                          msg.status === 3
+                            ? styles.messageStatusRead
+                            : styles.messageStatus
+                        }
+                      >
+                        {msg.status === 1 && '✓'}
+                        {msg.status === 2 && '✓✓'}
+                        {msg.status === 3 && '✓✓'}
+                      </span>
+                    )}
 
                     {msg.timestamp && (
                       <span
