@@ -49,7 +49,7 @@ export default function DirectMessagesPage() {
       const data = await res.json();
       const chatsFromServer = data?.data || [];
 
-      const processedChats = chatsFromServer.map((chat) => {
+      const processedChats = chatsFromServer.filter((chat) => !chat.is_group).map((chat) => {
         const otherUser = chat.participants.find((p) => p.id !== userId);
         return {
           ...chat,
