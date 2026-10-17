@@ -9,8 +9,6 @@ import styles from "./EventsPage.module.scss";
 import {EVENT_ICONS} from "@/icons/Icon";
 import {RSVP_COPY} from "@/constants/eventCopy";
 
-const ToastIcon = toast?.type === "error" ? EVENT_ICONS.error : EVENT_ICONS.success;
-
 export default function EventsPage() {
   const router = useRouter();
 
@@ -51,6 +49,7 @@ export default function EventsPage() {
   
   // Toast state
   const [toast, setToast] = useState(null);
+  const ToastIcon = toast?.type === "error" ? EVENT_ICONS.error : EVENT_ICONS.success;
   const [pendingEventId, setPendingEventId] = useState(null);
   const toastTimerRef = useRef(null);
 
