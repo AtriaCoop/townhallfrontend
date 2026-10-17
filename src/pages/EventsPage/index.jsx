@@ -6,17 +6,10 @@ import { getStoredUser } from "@/utils/getStoredUser";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { BASE_URL } from "@/constants/api";
 import styles from "./EventsPage.module.scss";
-import { CircleCheck, CircleAlert } from "lucide-react"; 
+import {EVENT_ICONS} from "@/icons/Icon";
+import {RSVP_COPY} from "@/constants/eventCopy";
 
-const RSVP_COPY = {
-  helperJoin: "You'll be added to the Upcoming Events.",
-  helperJoined: "You're going. This event is in My Events.",
-  toastJoined: (title) =>
-    `You're going to "${title}". It now appears under Upcoming Events.`,
-  toastLeft: (title) =>
-    `You've been removed from "${title}". It's no longer in the My Events.`,
-  toastError: "Something went wrong. Please try again.",
-};
+const ToastIcon = toast?.type === "error" ? EVENT_ICONS.error : EVENT_ICONS.success;
 
 export default function EventsPage() {
   const router = useRouter();
@@ -835,10 +828,12 @@ export default function EventsPage() {
         {toast && (
           <div
             key={toast.id}
-            className={`${styles.toast} ${toast.type === "error" ? styles.toastError : styles.toastSuccess}`}
+            className={`${styles.toast} ${
+              toast.type === "error" ? styles.toastError : styles.toastSuccess
+            }`}
             role={toast.type === "error" ? "alert" : undefined}
           >
-            {toast.type === "error" ? <CircleAlert size={18} /> : <CircleCheck size={18} />}
+            <ToastIcon size={18} />
             <span>{toast.message}</span>
           </div>
         )}
