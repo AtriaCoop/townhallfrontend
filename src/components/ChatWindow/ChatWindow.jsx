@@ -81,13 +81,50 @@ export default function ChatWindow({ chat, onClose }) {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = Number(userData.id);
 
+    // Fetch messages first, then immediately mark them as read
     useEffect(() => {
       if (!chat?.id) return;
       clearUnreadDm(chat.id);
-      // Mark chat as read on the backend so unread counts persist across refreshes
-      authenticatedFetch(`${BASE_URL}/chats/${chat.id}/read/`, {
-        method: "POST",
-      }).catch(() => {});
+
+      const loadMessagesAndMarkRead = async () => {
+        try {
+          // Fetch past messages
+          const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
+          const data = await res.json();
+
+          const formatted = data.messages.map((m) => ({
+            text: m.content,
+            sender: Number(m.user?.id),
+            id: m.id,
+            timestamp: m.sent_at,
+            status: m.status,
+            reactions: m.reactions || {},
+          }));
+          setMessages(formatted);
+
+          // Mark chat as read on the backend
+          const readRes = await authenticatedFetch(
+            `${BASE_URL}/chats/${chat.id}/read/`,
+            { method: "POST" }
+          );
+          const readData = await readRes.json();
+
+          // Update the freshly loaded messages to status 3 ('seen') instantly
+          if (readData.success && readData.message_ids) {
+            setMessages((prev) =>
+              prev.map((message) =>
+                readData.message_ids.includes(message.id)
+                  ? { ...message, status: 3 }
+                  : message
+              )
+            );
+          }
+        } catch (err) {
+          console.error("Failed to load messages or mark chat as read:", err);
+        }
+      };
+
+      loadMessagesAndMarkRead();
     }, [chat?.id]);
 
     useEffect(() => {
@@ -101,9 +138,9 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(m.user?.id),
               id: m.id,
               timestamp: m.sent_at,
+              status: m.status,
               reactions: m.reactions || {},
             }));
-
             setMessages(formatted);
           } catch (err) {
             console.error("Failed to load past messages:", err);
@@ -113,35 +150,109 @@ export default function ChatWindow({ chat, onClose }) {
         fetchMessages();
       }, [chat.id]);
 
-    useEffect(() => {
-        const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
 
-        socketRef.current = new WebSocket(socketUrl);
+      useEffect(() => {
+          if (!chat?.id) return;
 
-        socketRef.current.onmessage = (e) => {
-          const data = JSON.parse(e.data);
-          // Skip own messages — already added optimistically in handleSend
-          if (Number(data.sender_id) === currentUserId) return;
-          setMessages((prev) => [...prev, {
-            text: data.message,
-            sender: Number(data.sender_id),
-            id: data.id,
-            timestamp: data.timestamp || new Date().toISOString(),
-          }]);
-        };
+          const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
 
-        socketRef.current.onerror = () => {
-          console.log('WebSocket connection error');
-        };
+          const socket = new WebSocket(socketUrl);
+          socketRef.current = socket;
 
-        socketRef.current.onclose = () => {
-          console.log('WebSocket closed');
-        };
+          socket.onmessage = async (e) => {
 
-        return () => {
-          if (socketRef.current) socketRef.current.close();
-        };
-    }, [chat.id]);
+              try {
+                  const data = JSON.parse(e.data);
+
+                  if (data.type === "message_status") {
+
+                      setMessages((prev) => {
+                          const found = prev.some(
+                              (msg) => Number(msg.id) === Number(data.message_id)
+                          );
+
+                          return prev.map((msg) =>
+                              Number(msg.id) === Number(data.message_id)
+                                  ? { ...msg, status: Number(data.status) }
+                                  : msg
+                          );
+                      });
+
+                      return;
+                  }    
+
+                  // Skip own messages
+                  if (Number(data.sender_id) === Number(currentUserId)) {
+                      return;
+                  }
+
+                  setMessages((prev) => {
+                      // Avoid adding duplicate messages
+                      if (prev.some((msg) => msg.id === data.id)) {
+                          return prev;
+                      }
+
+                      return [
+                          ...prev,
+                          {
+                              text: data.message,
+                              sender: Number(data.sender_id),
+                              id: data.id,
+                              timestamp: data.timestamp || new Date().toISOString(),
+                              status: 2,
+                          },
+                      ];
+                  });
+
+                  // Mark message as delivered
+                  try {
+                    const response = await authenticatedFetch(
+                        `${BASE_URL}/chats/messages/${data.id}/status/`,
+                        {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ status: 2 }),
+                        }
+                    );
+
+                    if (!response.ok) {
+                        console.error(
+                            "Failed to mark message as delivered:",
+                            response.status,
+                            await response.text()
+                        );
+                    } else {
+                        setMessages((prev) =>
+                            prev.map((msg) =>
+                                msg.id === data.id
+                                    ? { ...msg, status: 2 }
+                                    : msg
+                            )
+                        );
+                    }
+                  } catch (error) {
+                      console.error("Failed to mark message as delivered:", error);
+                  }
+              } catch (error) {
+                  console.error("Failed to process WebSocket message:", error);
+              }
+          };
+
+          socket.onerror = (event) => {
+              console.error("WebSocket error:", event);
+          };
+
+          return () => {
+              socket.close();
+
+              if (socketRef.current === socket) {
+                  socketRef.current = null;
+              }
+          };
+      }, [chat?.id, currentUserId]);
+
 
     const handleSend = async (inputText, selectedImage) => {
       if (!inputText.trim() && !selectedImage) return;
@@ -166,6 +277,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              status: data.data.status,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -185,6 +297,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              status: data.data.status,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -326,6 +439,20 @@ export default function ChatWindow({ chat, onClose }) {
                         </button>
                       )}
                     </div>
+
+                    {isOwnMessage && (
+                      <span
+                        className={
+                          msg.status === 3
+                            ? styles.messageStatusRead
+                            : styles.messageStatus
+                        }
+                      >
+                        {msg.status === 1 && '✓'}
+                        {msg.status === 2 && '✓✓'}
+                        {msg.status === 3 && 'seen'}
+                      </span>
+                    )}
 
                     {msg.timestamp && (
                       <span
