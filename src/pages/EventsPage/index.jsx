@@ -18,6 +18,7 @@ export default function EventsPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateSuccess, setShowCreateSuccess] = useState(false);
   const [isStaff, setIsStaff] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [newEvent, setNewEvent] = useState({
@@ -82,7 +83,28 @@ export default function EventsPage() {
   };
 
   const isEventAdmin = (event) => {
-    return currentUserId && event.admin?.id === currentUserId;
+    return currentUserId && String(event.admin?.id) === String(currentUserId);
+  };
+
+  const getEventStartMinutes = (time) => {
+    const match = time?.match(/^\s*(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i);
+    if (!match) return Number.MAX_SAFE_INTEGER;
+
+    let hours = Number(match[1]);
+    const minutes = Number(match[2] || 0);
+    const period = match[3]?.toUpperCase();
+
+    if (minutes > 59 || (period && (hours < 1 || hours > 12)) || (!period && hours > 23)) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    if (period) hours = (hours % 12) + (period === "PM" ? 12 : 0);
+
+    return hours * 60 + minutes;
+  };
+
+  const compareEventDateTime = (a, b, dateDirection = 1) => {
+    const dateDifference = (new Date(a.date) - new Date(b.date)) * dateDirection;
+    return dateDifference || getEventStartMinutes(a.time) - getEventStartMinutes(b.time);
   };
 
   const getDateBadge = (dateString) => {
@@ -100,6 +122,13 @@ export default function EventsPage() {
     if (eventDate < today) return null;
     return null;
   };
+
+  const getTodayDateString = () => {
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${today.getFullYear()}-${month}-${day}`;
+};
 
   const formatFullDate = (dateString) => {
     const date = new Date(dateString + "T00:00:00");
@@ -128,15 +157,15 @@ export default function EventsPage() {
       case "upcoming":
         return filteredEvents
           .filter((event) => !isPastEvent(event.date))
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
+          .sort((a, b) => compareEventDateTime(a, b));
       case "my":
         return filteredEvents
-          .filter((event) => event.isEnrolled && !isPastEvent(event.date))
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
+          .filter((event) => isEventAdmin(event) && !isPastEvent(event.date))
+          .sort((a, b) => compareEventDateTime(a, b));
       case "past":
         return filteredEvents
           .filter((event) => isPastEvent(event.date))
-          .sort((a, b) => new Date(b.date) - new Date(a.date));
+          .sort((a, b) => compareEventDateTime(a, b, -1));
       default:
         return filteredEvents;
     }
@@ -199,6 +228,11 @@ export default function EventsPage() {
     e.preventDefault();
     setCreateError("");
 
+    if (newEvent.date < getTodayDateString()) {
+      setCreateError("You cannot create an event in the past.");
+      return;
+    }
+
     if (!newEvent.title || !newEvent.date || !newEvent.time || !newEvent.location) {
       setCreateError("Please fill in all required fields.");
       return;
@@ -209,6 +243,7 @@ export default function EventsPage() {
       setEvents((prev) => [...prev, created]);
       setShowCreateModal(false);
       setNewEvent({ title: "", description: "", date: "", time: "", location: "" });
+      setShowCreateSuccess(true);
     } catch (err) {
       setCreateError(err.message || "Failed to create event.");
       console.error("Error creating event:", err);
@@ -442,6 +477,7 @@ export default function EventsPage() {
         <label>Date *</label>
         <input
           type="date"
+          min={getTodayDateString()}
           value={formData.date}
           onChange={(e) => setFormData({ ...formData, date: e.target.value })}
           className={styles.createFormInput}
@@ -605,6 +641,28 @@ export default function EventsPage() {
                 </button>
                 <h3 className={styles.modalTitle}>Create Event</h3>
                 {renderEventForm(newEvent, setNewEvent, handleCreateEvent, createError, "Create Event")}
+              </div>
+            </div>
+          )}
+
+          {showCreateSuccess && (
+            <div className={styles.eventModal} onClick={() => setShowCreateSuccess(false)}>
+              <div
+                className={styles.eventModalContent}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="event-created-title"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 id="event-created-title" className={styles.modalTitle}>Event Created</h3>
+                <p className={styles.deleteConfirmText}>Your event has been created successfully.</p>
+                <button
+                  type="button"
+                  className={styles.participateButton}
+                  onClick={() => setShowCreateSuccess(false)}
+                >
+                  Done
+                </button>
               </div>
             </div>
           )}
