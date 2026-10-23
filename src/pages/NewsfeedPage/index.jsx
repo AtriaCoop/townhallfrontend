@@ -17,6 +17,12 @@ import SortBy from "@/components/SortBy/SortBy";
 import { SORT_VALUES } from "@/constants/sort";
 import styles from "./NewsfeedPage.module.scss";
 import PrivacyModal from '@/components/PrivacyModal/PrivacyModal';
+import dyanamic from "next/dynamic";
+
+const ReactQuillEditor = dyanamic(() => import('@/components/ReactQuillEditor/ReactQuillEditor'), { 
+  ssr: false,
+  loading: () => <p>Loading editor...</p>
+});
 
 const POSTS_PER_PAGE = 10;
 const MAX_POST_LEN = 1000;
@@ -327,6 +333,10 @@ export default function NewsfeedPage() {
               onFocus={handleTextareaFocus}
               rows={isComposing ? 3 : 1}
             />
+            {/* <ReactQuillEditor
+              postText={postText}
+              setPostText={setPostText}
+            /> */}
           </div>
 
           {/* Image Previews */}
