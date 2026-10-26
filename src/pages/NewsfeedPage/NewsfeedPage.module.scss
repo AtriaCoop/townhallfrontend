@@ -49,38 +49,6 @@
   margin-top: $spacing-1;
 }
 
-.createPostInput {
-  flex: 1;
-  min-height: 40px;
-  padding: $spacing-2 $spacing-3;
-  background-color: var(--input-bg, var(--bg-secondary));
-  border: 1px solid var(--border-default);
-  border-radius: $radius-md;
-  color: var(--text-primary);
-  font-family: $font-family-body;
-  font-size: $font-size-base;
-  resize: vertical;
-  @include transition-colors;
-
-  &::placeholder {
-    color: var(--text-muted);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
-  }
-}
-
-.createPostInputError {
-  border-color: $error-500;
-
-  &:focus {
-    box-shadow: 0 0 0 3px rgba($error-500, 0.1);
-  }
-}
-
 // Image Previews
 .imagePreviewRow {
   display: flex;

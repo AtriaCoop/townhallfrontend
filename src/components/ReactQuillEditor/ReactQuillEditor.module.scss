@@ -4,6 +4,7 @@
 
 .createPostInput {
   flex: 1;
+  min-width: 0;
   min-height: 40px;
   background-color: var(--input-bg, var(--bg-secondary));
   border: 1px solid var(--border-default);
@@ -36,6 +37,7 @@
     font-family: inherit;
     font-size: inherit;
     color: inherit;
+    min-height: 40px;
   }
 
   // Editable content
@@ -46,6 +48,7 @@
     font-family: inherit;
     font-size: inherit;
     line-height: normal;
+    overflow-wrap: anywhere;
 
     &.ql-blank::before {
       left: $spacing-3;
