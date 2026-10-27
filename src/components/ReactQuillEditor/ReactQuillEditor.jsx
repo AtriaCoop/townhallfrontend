@@ -2,35 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import ReactQuill from "react-quill-new";
-import Quill from "quill";
-
 import "react-quill-new/dist/quill.snow.css";
 import styles from "./ReactQuillEditor.module.scss";
+import { formats, modules } from "@/constants/reactQuill";
 
-// Register the font sizes available in the editor.
-const Size = Quill.import("attributors/style/size");
-Size.whitelist = [
-  "10px",
-  "12px",
-  "14px",
-  "16px",
-  "18px",
-  "20px",
-  "24px",
-  "28px",
-  "32px",
-];
-Quill.register(Size, true);
-
-// Define supported formatting options and toolbar buttons.
-const formats = ["size", "bold", "italic", "underline", "strike"];
-
-const modules = {
-  toolbar: [
-    [{ size: Size.whitelist }],
-    ["bold", "italic", "underline", "strike"],
-  ],
-};
 
 export default function ReactQuillEditor({
   className,

@@ -12,43 +12,10 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
 import { getReactionEmoji } from "@/constants/reactions";
 import { BASE_URL } from "@/constants/api";
+import { RICH_TEXT_DETECTOR, SANITIZE_OPTIONS } from "@/constants/richText";
 
 const MAX_IMAGES = 10;
 const DEFAULT_AVATAR = "/assets/ProfileImage.jpg";
-
-/* -------------------------------------------------------------------------- */
-/*  Rich text helpers                                                         */
-/* -------------------------------------------------------------------------- */
-
-const RICH_TEXT_TAGS = [
-  "p",
-  "br",
-  "strong",
-  "b",
-  "em",
-  "i",
-  "u",
-  "s",
-  "strike",
-  "span",
-  "ol",
-  "ul",
-  "li",
-  "blockquote",
-];
-
-// Matches the first opening rich-text tag, e.g. "<p", "<strong", "<br"
-const RICH_TEXT_DETECTOR = new RegExp(`<(?:${RICH_TEXT_TAGS.join("|")})\\b`, "i");
-
-const SANITIZE_OPTIONS = {
-  allowedTags: RICH_TEXT_TAGS,
-  allowedAttributes: { span: ["style"] },
-  allowedStyles: {
-    span: {
-      "font-size": [/^(10|12|14|16|18|20|24|28|32)px$/],
-    },
-  },
-};
 
 function isRichText(text) {
   return RICH_TEXT_DETECTOR.test(text);
