@@ -1,5 +1,6 @@
 import { RICH_TEXT_DETECTOR, SANITIZE_OPTIONS } from "@/constants/richText";
 import parse from "html-react-parser";
+import sanitizeHtml from "sanitize-html";
 
 export function isRichText(text) {
   return RICH_TEXT_DETECTOR.test(text);

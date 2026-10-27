@@ -167,8 +167,7 @@ export default function NewsfeedPage() {
             tags: p.tags || [],
             anonymous: !!p.anonymous,
           }));
-
-        console.log("Fetched posts:", formattedPosts);
+      
         setPosts(formattedPosts);
         setTotalPages(data.total_pages || 1);
         setLoading(false);
