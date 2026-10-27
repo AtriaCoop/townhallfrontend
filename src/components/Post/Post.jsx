@@ -1,8 +1,6 @@
 import styles from "./Post.module.scss";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import parse from "html-react-parser";
-import sanitizeHtml from "sanitize-html";
 import TagCreationField from "@/components/TagCreationField/TagCreationField";
 import Tag from "@/components/Tag/Tag";
 import InlineComments from "@/components/InlineComments/InlineComments";
@@ -12,37 +10,10 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
 import { getReactionEmoji } from "@/constants/reactions";
 import { BASE_URL } from "@/constants/api";
-import { RICH_TEXT_DETECTOR, SANITIZE_OPTIONS } from "@/constants/richText";
+import { isRichText, RichText, PlainText } from "@/utils/textSanitizer";
 
 const MAX_IMAGES = 10;
 const DEFAULT_AVATAR = "/assets/ProfileImage.jpg";
-
-function isRichText(text) {
-  return RICH_TEXT_DETECTOR.test(text);
-}
-
-// Sanitizes the HTML (allowlist only), then converts it to React elements.
-// Works on both the server and the client, so there is no flash on hydration.
-function RichText({ html }) {
-  return <>{parse(sanitizeHtml(html, SANITIZE_OPTIONS))}</>;
-}
-
-// Plain text paragraphs with auto-linked URLs
-function PlainText({ paragraphs }) {
-  return paragraphs.map((paragraph, i) => (
-    <p key={i}>
-      {paragraph.split(/(\s+)/).map((part, j) =>
-        /^https?:\/\/\S+$/.test(part) ? (
-          <a key={j} href={part} target="_blank" rel="noopener noreferrer">
-            {part}
-          </a>
-        ) : (
-          part
-        ),
-      )}
-    </p>
-  ));
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Post                                                                      */
