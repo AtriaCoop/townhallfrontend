@@ -69,9 +69,17 @@ export default function ChatWindow({ chat, onClose }) {
       setSelectedMessage(null);
     };
 
-    const handleUpdateMessage = (msgId, newText) => {
+    const handleUpdateMessage = (msgId, newText, isEdited) => {
       setMessages((prev) =>
-        prev.map((m) => (m.id === msgId ? { ...m, text: newText } : m))
+        prev.map((m) =>
+          m.id === msgId
+            ? {
+                ...m,
+                text: newText,
+                isEdited: typeof isEdited === 'boolean' ? isEdited : m.isEdited,
+              }
+            : m
+        )
       );
     };
 
@@ -101,6 +109,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(m.user?.id),
               id: m.id,
               timestamp: m.sent_at,
+              isEdited: m.is_edited === true,
               reactions: m.reactions || {},
             }));
 
@@ -127,6 +136,7 @@ export default function ChatWindow({ chat, onClose }) {
             sender: Number(data.sender_id),
             id: data.id,
             timestamp: data.timestamp || new Date().toISOString(),
+            isEdited: data.is_edited === true,
           }]);
         };
 
@@ -166,6 +176,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              isEdited: data.data.is_edited === true,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -185,6 +196,7 @@ export default function ChatWindow({ chat, onClose }) {
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              isEdited: data.data.is_edited === true,
             }]);
             if (socketRef.current?.readyState === WebSocket.OPEN) {
               socketRef.current.send(
@@ -327,13 +339,20 @@ export default function ChatWindow({ chat, onClose }) {
                       )}
                     </div>
 
-                    {msg.timestamp && (
-                      <span
-                        className={styles.messageTimestamp}
-                        title={formatExactTime(msg.timestamp)}
-                      >
-                        {formatRelativeTime(msg.timestamp)}
-                      </span>
+                    {(msg.isEdited || msg.timestamp) && (
+                      <div className={styles.messageMeta}>
+                        {msg.isEdited && (
+                          <span className={styles.messageEdited}>Edited</span>
+                        )}
+                        {msg.timestamp && (
+                          <span
+                            className={styles.messageTimestamp}
+                            title={formatExactTime(msg.timestamp)}
+                          >
+                            {formatRelativeTime(msg.timestamp)}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
