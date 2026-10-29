@@ -254,11 +254,22 @@
   color: var(--text-secondary);
 }
 
+.messageMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  margin-top: 2px;
+}
+
+.messageEdited {
+  font-size: $font-size-xs;
+  color: var(--text-muted);
+}
+
 .messageTimestamp {
   font-size: $font-size-xs;
   color: var(--text-muted);
-  margin-top: 2px;
-  display: block;
+  display: inline-block;
   transition: opacity $transition-fast;
 
   // Always show on mobile (no hover available)
@@ -275,6 +286,13 @@
 }
 
 .messageOutgoing .messageTimestamp {
-  text-align: right;
   color: rgba($white, 0.7);
+}
+
+.messageOutgoing .messageMeta {
+  justify-content: flex-end;
+}
+
+.messageOutgoing .messageEdited {
+  color: rgba($white, 0.8);
 }
