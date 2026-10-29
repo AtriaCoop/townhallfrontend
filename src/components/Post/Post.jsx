@@ -1,11 +1,8 @@
 import styles from "./Post.module.scss";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import CommentModal from "@/components/CommentModal/CommentModal";
-import LikeModal from "@/components/LikeModal/LikeModal";
 import TagCreationField from "@/components/TagCreationField/TagCreationField";
 import Tag from "@/components/Tag/Tag";
-import { getCookie } from "@/utils/authHelpers";
 import InlineComments from "@/components/InlineComments/InlineComments";
 import ReactionPicker from "../ReactionPicker/ReactionPicker";
 import { updatePost, addPostImages, deletePostImage } from "@/api/post";
@@ -13,8 +10,14 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
 import { getReactionEmoji } from "@/constants/reactions";
 import { BASE_URL } from "@/constants/api";
+import { isRichText, RichText, PlainText } from "@/utils/textSanitizer";
 
 const MAX_IMAGES = 10;
+const DEFAULT_AVATAR = "/assets/ProfileImage.jpg";
+
+/* -------------------------------------------------------------------------- */
+/*  Post                                                                      */
+/* -------------------------------------------------------------------------- */
 
 export default function Post({
   fullName,
@@ -23,7 +26,7 @@ export default function Post({
   isVerified,
   content,
   postImages = [],
-  links,
+  links = [],
   comments,
   userId,
   currentUserId,
@@ -58,22 +61,28 @@ export default function Post({
 
   const isMyOwnPost = userId === currentUserId;
   const hideAuthorDetails = anonymous && !isMyOwnPost;
-  // UPDATE POST
+  const postText = content.join("\n");
+
+  const goToProfile = () => {
+    if (!hideAuthorDetails) router.push(`/ProfilePage/${userId}`);
+  };
+
+  /* ------------------------------- Update post ------------------------------ */
+
   async function handleUpdatePost() {
     setIsUpdating(true);
     try {
-      // updatePost only deal with text edits, not image edits (due to backend setting)
+      // updatePost only handles text/tags; images are handled separately (backend setting)
       await updatePost(postId, { content: editText, tags: editTags });
 
-      // delete images
+      // Delete removed images
       const keptIds = new Set(keptImages.map((img) => img.id));
       const removedIds = postImages
         .map((img) => img.id)
         .filter((id) => !keptIds.has(id));
-
       await Promise.all(removedIds.map((id) => deletePostImage(postId, id)));
 
-      // add images
+      // Add new images
       let addedImages = [];
       if (newImages.length > 0) {
         const result = await addPostImages(postId, newImages);
@@ -98,7 +107,8 @@ export default function Post({
     }
   }
 
-  // DELETE POST
+  /* ------------------------------- Delete post ------------------------------ */
+
   async function handleDeletePost() {
     setIsDeleting(true);
     try {
@@ -110,10 +120,7 @@ export default function Post({
         throw new Error("Failed to delete post");
       }
 
-      // Update local posts state to remove the deleted post
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-
-      // Close the delete modal
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -121,46 +128,11 @@ export default function Post({
     }
   }
 
-  const handleOptionsClick = () => {
-    setShowOptions((prev) => !prev);
-  };
+  /* ------------------------------- Report post ------------------------------ */
 
-  const handleCommentClick = () => {
-    setShowComments((prev) => !prev);
-  };
-
-  // Handle outside click to close edit/delete modal
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-        setShowOptions(false);
-      }
-    }
-    if (showOptions) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showOptions]);
-
-
-  // Reset image state each time the edit modal opens so stale edits don't persist across sessions.
-  useEffect(() => {
-    if (showEditModal) {
-      setKeptImages([...postImages]);
-      setNewImages([]);
-    }
-  }, [showEditModal]);
-
-  // REPORT POST
   const handleReportPost = async () => {
-    // User should not be able to report their own post
-    if (userId === currentUserId) return;
-
-    const reportData = {
-      post_id: postId,
-    };
+    // Users cannot report their own post
+    if (isMyOwnPost) return;
 
     try {
       setIsLoading(true);
@@ -168,15 +140,11 @@ export default function Post({
         `${BASE_URL}/post/${postId}/report`,
         {
           method: "POST",
-          body: JSON.stringify(reportData),
-          headers: {
-            "Content-type": "application/json",
-          },
+          body: JSON.stringify({ post_id: postId }),
+          headers: { "Content-type": "application/json" },
         },
       );
       const result = await response.json();
-
-      // Set either success or error message
       setReportResponse(result.message);
     } catch (err) {
       console.error(err);
@@ -186,35 +154,58 @@ export default function Post({
     }
   };
 
-  const handleReactionClick = () => {
-    setShowReactionPicker((prev) => !prev);
+  const closeReportModal = () => {
+    setReportResponse("");
+    setShowReportModal(false);
   };
+
+  /* ---------------------------------- Misc ---------------------------------- */
+
+  const toggleOptions = () => setShowOptions((prev) => !prev);
+  const toggleComments = () => setShowComments((prev) => !prev);
+  const toggleReactionPicker = () => setShowReactionPicker((prev) => !prev);
+
+  // Close the options menu on outside click
+  useEffect(() => {
+    if (!showOptions) return;
+
+    function handleClickOutside(e) {
+      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
+        setShowOptions(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showOptions]);
+
+  // Reset image state each time the edit modal opens so stale edits don't persist
+  useEffect(() => {
+    if (showEditModal) {
+      setKeptImages([...postImages]);
+      setNewImages([]);
+    }
+  }, [showEditModal]);
+
+  const imageCount = keptImages.length + newImages.length;
+
+  /* --------------------------------- Render --------------------------------- */
 
   return (
     <div className={styles.post}>
       <div className={styles.postHeader}>
         <img
-          src={
-            userImage && !hideAuthorDetails
-              ? userImage
-              : "/assets/ProfileImage.jpg"
-          }
+          src={userImage && !hideAuthorDetails ? userImage : DEFAULT_AVATAR}
           alt="User profile"
           className={styles.profilePic}
-          onClick={() =>
-            !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)
-          }
+          onClick={goToProfile}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "/assets/ProfileImage.jpg";
+            e.target.src = DEFAULT_AVATAR;
           }}
         />
-        <div
-          className={styles.postInfo}
-          onClick={() =>
-            !hideAuthorDetails && router.push(`/ProfilePage/${userId}`)
-          }
-        >
+
+        <div className={styles.postInfo} onClick={goToProfile}>
           <div className={styles.fullName}>
             {hideAuthorDetails ? "Anonymous" : fullName}
             {isVerified && !hideAuthorDetails && (
@@ -232,11 +223,12 @@ export default function Post({
             {date} {anonymous && isMyOwnPost ? "(anonymous)" : null}
           </div>
         </div>
-        <div className={styles.moreOptions} onClick={handleOptionsClick}>
+
+        <div className={styles.moreOptions} onClick={toggleOptions}>
           ⋯
         </div>
 
-        {/* Edit Post Modal */}
+        {/* Options menu */}
         {showOptions && (
           <div className={styles.optionsMenu} ref={optionsRef}>
             {isMyOwnPost ? (
@@ -247,7 +239,6 @@ export default function Post({
             ) : (
               <button
                 className={styles.reportText}
-                disabled={userId === currentUserId}
                 onClick={() => setShowReportModal(true)}
               >
                 Report
@@ -255,7 +246,8 @@ export default function Post({
             )}
           </div>
         )}
-        {/* Show Edit Modal */}
+
+        {/* Edit modal */}
         {showEditModal && (
           <div
             className={styles.modalOverlay}
@@ -284,16 +276,23 @@ export default function Post({
                   onChange={(e) => setEditText(e.target.value)}
                 />
 
-                {/* Imge Preview in the Edit Post Modal */}
-                {/* keptImages: already saved in the database. newImages: selected locally in this session, not yet uploaded. */}
-                {(keptImages.length > 0 || newImages.length > 0) && (
+                {/* keptImages: already saved. newImages: selected locally, not yet uploaded. */}
+                {imageCount > 0 && (
                   <div className={styles.editImageGrid}>
                     {keptImages.map((img) => (
                       <div key={img.id} className={styles.editImagePreview}>
-                        <img src={img.url} alt="Preview" className={styles.editPreviewImg} />
+                        <img
+                          src={img.url}
+                          alt="Preview"
+                          className={styles.editPreviewImg}
+                        />
                         <button
                           className={styles.editRemoveImage}
-                          onClick={() => setKeptImages((prev) => prev.filter((e) => e.id !== img.id))}
+                          onClick={() =>
+                            setKeptImages((prev) =>
+                              prev.filter((e) => e.id !== img.id),
+                            )
+                          }
                           aria-label="Remove image"
                         >
                           <Icon name="close" size={14} />
@@ -302,10 +301,16 @@ export default function Post({
                     ))}
                     {newImages.map((file, idx) => (
                       <div key={`new-${idx}`} className={styles.editImagePreview}>
-                        <img src={URL.createObjectURL(file)} alt="New preview" className={styles.editPreviewImg} />
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="New preview"
+                          className={styles.editPreviewImg}
+                        />
                         <button
                           className={styles.editRemoveImage}
-                          onClick={() => setNewImages((prev) => prev.filter((_, i) => i !== idx))}
+                          onClick={() =>
+                            setNewImages((prev) => prev.filter((_, i) => i !== idx))
+                          }
                           aria-label="Remove image"
                         >
                           <Icon name="close" size={14} />
@@ -315,13 +320,12 @@ export default function Post({
                   </div>
                 )}
 
-                {keptImages.length + newImages.length >= MAX_IMAGES && (
+                {imageCount >= MAX_IMAGES && (
                   <p className={styles.editImageWarning}>
                     You can upload a maximum of {MAX_IMAGES} images per post.
                   </p>
                 )}
 
-                {/* Tags */}
                 <TagCreationField
                   tag={tag}
                   setTag={setTag}
@@ -340,7 +344,7 @@ export default function Post({
                       document.getElementById(`editImg-${postId}`).click()
                     }
                     aria-label="Add image"
-                    disabled={keptImages.length + newImages.length >= MAX_IMAGES}
+                    disabled={imageCount >= MAX_IMAGES}
                   >
                     <Icon name="image" size={20} />
                   </button>
@@ -352,11 +356,12 @@ export default function Post({
                     multiple
                     onChange={(e) => {
                       const files = Array.from(e.target.files).filter((f) =>
-                        f.type.startsWith("image/")
+                        f.type.startsWith("image/"),
                       );
                       if (files.length) {
                         setNewImages((prev) => {
-                          const remaining = MAX_IMAGES - keptImages.length - prev.length;
+                          const remaining =
+                            MAX_IMAGES - keptImages.length - prev.length;
                           return [...prev, ...files.slice(0, remaining)];
                         });
                       }
@@ -369,7 +374,7 @@ export default function Post({
                   <button
                     className={styles.updateButton}
                     onClick={handleUpdatePost}
-                    disabled={isUpdating}
+                    disabled={isUpdating || editText.trim() === ""}
                   >
                     {isUpdating ? "Updating..." : "Update"}
                   </button>
@@ -378,7 +383,8 @@ export default function Post({
             </div>
           </div>
         )}
-        {/* Show Delete Modal */}
+
+        {/* Delete modal */}
         {showDeleteModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.confirmModal}>
@@ -409,7 +415,8 @@ export default function Post({
             </div>
           </div>
         )}
-        {/* Show Report Modal */}
+
+        {/* Report modal */}
         {showReportModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.confirmModal}>
@@ -430,13 +437,7 @@ export default function Post({
                   </div>
                   <h3 className={styles.confirmTitle}>{reportResponse}</h3>
                   <div className={styles.confirmActions}>
-                    <button
-                      className={styles.cancelButton}
-                      onClick={() => {
-                        setReportResponse("");
-                        setShowReportModal(false);
-                      }}
-                    >
+                    <button className={styles.cancelButton} onClick={closeReportModal}>
                       Close
                     </button>
                   </div>
@@ -452,13 +453,7 @@ export default function Post({
                     review it.
                   </p>
                   <div className={styles.confirmActions}>
-                    <button
-                      className={styles.cancelButton}
-                      onClick={() => {
-                        setReportResponse("");
-                        setShowReportModal(false);
-                      }}
-                    >
+                    <button className={styles.cancelButton} onClick={closeReportModal}>
                       Cancel
                     </button>
                     <button
@@ -475,33 +470,20 @@ export default function Post({
         )}
       </div>
 
+      {/* Post body */}
       <div className={styles.postContent}>
-        {/* Detected links and hyperlinks it */}
-        {content.map((p, i) => (
-          <p key={i}>
-            {p.split(/(\s+)/).map((part, j) => {
-              const isLink = /^https?:\/\/\S+$/.test(part);
-              return isLink ? (
-                <a
-                  key={j}
-                  href={part}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {part}
-                </a>
-              ) : (
-                part
-              );
-            })}
-          </p>
-        ))}
+        {isRichText(postText) ? (
+          <RichText html={postText} />
+        ) : (
+          <PlainText paragraphs={content} />
+        )}
 
         {links.map((link, i) => (
-          <a href={link.href} target="_blank" key={i}>
+          <a href={link.href} target="_blank" rel="noopener noreferrer" key={i}>
             {link.text}
           </a>
         ))}
+
         {postImages.length > 0 && (
           <div className={styles.postImagesGrid}>
             {postImages.map((img) => (
@@ -516,6 +498,7 @@ export default function Post({
         )}
       </div>
 
+      {/* Reactions */}
       {Object.keys(reactions).length > 0 && (
         <div className={styles.reactionsDisplay}>
           {Object.entries(reactions).map(
@@ -535,36 +518,37 @@ export default function Post({
         </div>
       )}
 
-      {/* Post Tags */}
+      {/* Tags */}
       {tags?.length > 0 && (
         <div className={styles.postFooterTop}>
-          {tags.map((tag, index) => (
+          {tags.map((postTag, index) => (
             <Tag
               key={index}
               removable={false}
-              name={tag}
-              onClick={onTagClick ? () => onTagClick(tag) : undefined}
-              active={activeTagFilters.includes(tag)}
+              name={postTag}
+              onClick={onTagClick ? () => onTagClick(postTag) : undefined}
+              active={activeTagFilters.includes(postTag)}
             />
           ))}
         </div>
       )}
 
+      {/* Footer */}
       <div className={styles.postFooter}>
         <div className={styles.reactions}>
           <Icon
             name="message"
             className={`${styles.postIcon} ${showComments ? styles.active : ""}`}
-            onClick={handleCommentClick}
+            onClick={toggleComments}
           />
-          <div className={styles.likesComments} onClick={handleCommentClick}>
+          <div className={styles.likesComments} onClick={toggleComments}>
             {comments?.length} Comment{comments?.length !== 1 ? "s" : ""}
           </div>
-          {/* Reaction Picker Wrapper */}
+
           <div className={styles.reactionWrapper}>
             <button
               className={`${styles.reactionTrigger} ${showReactionPicker ? styles.active : ""}`}
-              onClick={handleReactionClick}
+              onClick={toggleReactionPicker}
               onMouseDown={(e) => e.stopPropagation()}
               title="Add reaction"
             >
@@ -584,7 +568,7 @@ export default function Post({
         </div>
       </div>
 
-      {/* Inline Comments Section */}
+      {/* Inline comments */}
       <InlineComments
         comments={comments}
         currentUserId={currentUserId}
@@ -592,7 +576,7 @@ export default function Post({
         BASE_URL={BASE_URL}
         setPosts={setPosts}
         isExpanded={showComments}
-        onToggle={() => setShowComments((prev) => !prev)}
+        onToggle={toggleComments}
       />
     </div>
   );
