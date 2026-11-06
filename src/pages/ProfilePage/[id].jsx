@@ -198,6 +198,17 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {(profileData.primary_organization || profileData.other_organizations) && (
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Organization:</span>
+              <span className={styles.infoValue}>
+                {profileData.primary_organization}
+                {profileData.primary_organization && profileData.other_organizations && ", "}
+                {profileData.other_organizations}
+              </span>
+            </div>
+          )}
+
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Joined:</span>
               <span className={styles.infoValue}>
@@ -221,18 +232,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Organizations Section */}
-          {profileData.primary_organization && (
-            <div className={styles.detailSection}>
-              <h3 className={styles.detailLabel}>Organizations</h3>
-              <p className={styles.detailContent}>
-                {profileData.primary_organization}
-                {profileData.other_organizations && (
-                  <>, {profileData.other_organizations}</>
-                )}
-              </p>
-            </div>
-          )}
 
           {/* Skills & Interests */}
           {profileData.skills_interests && (

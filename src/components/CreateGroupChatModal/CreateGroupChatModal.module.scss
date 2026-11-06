@@ -1,0 +1,159 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($black, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal-backdrop;
+  @include flex-center;
+}
+
+.modalContent {
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  background-color: var(--modal-bg);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-5 $spacing-5 $spacing-2;
+
+  h2 {
+    margin: 0;
+    @include heading-4;
+  }
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  color: var(--text-muted);
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.subtitle {
+  margin: $spacing-5 $spacing-5 $spacing-1 $spacing-5;
+  color: var(--text-primary);
+  @include body-2;
+}
+
+.groupMemberCount {
+  margin: 0 $spacing-5 $spacing-1 $spacing-5;
+  color: var(--text-primary);
+  @include caption;
+}
+.groupNameWrapper {
+  position: relative;
+  padding: 0 $spacing-5;
+  margin-bottom: $spacing-3;
+}
+.inputField {
+  @include input-base;
+  @include input-md;
+  padding-left: $spacing-3;
+  border-radius: $radius-md;
+}
+
+.searchWrapper {
+  position: relative;
+  padding: 0 $spacing-5;
+  margin-bottom: $spacing-3;
+}
+
+.createGroupButton {
+  @include button-primary;
+  margin: $spacing-1 $spacing-5;
+  padding: $spacing-1;
+  width: 40%;
+  flex-shrink: 0;
+}
+
+.searchIcon {
+  position: absolute;
+  left: calc(#{$spacing-5} + #{$spacing-3});
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  @include input-base;
+  @include input-md;
+  padding-left: $spacing-10;
+  border-radius: $radius-md;
+}
+
+.userList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 $spacing-3 $spacing-3;
+  @include custom-scrollbar;
+}
+
+.userItem {
+  @include flex-start;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  cursor: pointer;
+  border-radius: $radius-md;
+  @include transition-colors;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+}
+
+.selectedUser {
+  background-color: var(--bg-hover);
+}
+
+.userAvatar {
+  @include avatar($avatar-md);
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.userName {
+  @include subheading-2;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.userTitle {
+  @include caption;
+  color: var(--text-muted);
+  @include truncate;
+}
+
+.noResults {
+  text-align: center;
+  padding: $spacing-8 $spacing-4;
+  color: var(--text-muted);
+  @include body-2;
+}

@@ -116,7 +116,8 @@
     width: fit-content;
     max-width: 80%;
     padding: $spacing-3 $spacing-4;
-    margin-bottom: 2px;
+    padding-bottom: $spacing-4;
+    margin-bottom: $spacing-2;
     position: relative;
     border-radius: $radius-lg;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -158,32 +159,99 @@
   gap: $spacing-1;
 }
 
-.optionsButton {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: $font-size-lg;
-  padding: 2px $spacing-1;
-  color: inherit;
-  flex-shrink: 0;
-  transition: opacity $transition-fast;
-  line-height: 1;
+.messageHoverActions {
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  transform: translateY(50%);
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity $transition-fast, visibility $transition-fast;
+  z-index: $z-popover;
+  overflow: visible;
 
-  // Always show on touch devices (no hover)
-  opacity: 0.5;
-
-  @include md {
-    opacity: 0;
+  @include below-md {
+    opacity: 1;
+    visibility: visible;
   }
 }
 
-.messageIncoming:hover .optionsButton,
-.messageOutgoing:hover .optionsButton {
-  opacity: 0.6;
+.messageIncoming:hover .messageHoverActions,
+.messageOutgoing:hover .messageHoverActions,
+.messageHoverActionsVisible,
+.messageActionsPinned .messageHoverActions {
+  opacity: 1;
+  visibility: visible;
 }
 
-.optionsButton:hover {
-  opacity: 1 !important;
+.hoverActionButton {
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--icon-default);
+  border-radius: $radius-sm;
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--icon-hover);
+  }
+
+  &.active {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+  }
+}
+
+.reactionWrapper {
+  position: relative;
+}
+
+.reactionsDisplay {
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: $spacing-1;
+}
+
+.reactionGroup {
+  @include flex-center;
+  gap: 3px;
+  padding: 2px 8px;
+  background-color: rgba($white, 0.2);
+  border: 1px solid rgba($white, 0.25);
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+}
+
+.messageIncoming .reactionGroup {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-default);
+}
+
+.reactionEmoji {
+  font-size: $font-size-sm;
+  line-height: 1;
+}
+
+.reactionCount {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xs;
+  opacity: 0.85;
+}
+
+.messageIncoming .reactionCount {
+  color: var(--text-secondary);
 }
 
 .messageTimestamp {
