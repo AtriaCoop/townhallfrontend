@@ -155,6 +155,47 @@
   background-color: var(--bg-secondary);
 }
 
+.linkPreviewCard {
+  display: flex;
+  align-items: stretch;
+  gap: $spacing-3;
+  margin-top: $spacing-4;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.linkPreviewImage {
+  width: 96px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.linkPreviewBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $spacing-1;
+  padding: $spacing-3 0;
+}
+
+.linkPreviewDomain {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  @include caption;
+}
+
+.linkPreviewTitle {
+  color: var(--text-primary);
+  font-weight: $font-weight-bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // Reactions Display
 .reactionsDisplay {
   @include flex-start;
