@@ -11,6 +11,7 @@ import ReactionPicker from "../ReactionPicker/ReactionPicker";
 import { updatePost, addPostImages, deletePostImage } from "@/api/post";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
+import LinkifiedText from "@/components/LinkifiedText/LinkifiedText";
 import { getReactionEmoji } from "@/constants/reactions";
 import { BASE_URL } from "@/constants/api";
 
@@ -23,6 +24,7 @@ export default function Post({
   isVerified,
   content,
   postImages = [],
+  linkPreview,
   links,
   comments,
   userId,
@@ -476,24 +478,9 @@ export default function Post({
       </div>
 
       <div className={styles.postContent}>
-        {/* Detected links and hyperlinks it */}
         {content.map((p, i) => (
           <p key={i}>
-            {p.split(/(\s+)/).map((part, j) => {
-              const isLink = /^https?:\/\/\S+$/.test(part);
-              return isLink ? (
-                <a
-                  key={j}
-                  href={part}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {part}
-                </a>
-              ) : (
-                part
-              );
-            })}
+            <LinkifiedText text={p} />
           </p>
         ))}
 
@@ -512,6 +499,27 @@ export default function Post({
                 className={styles.postImage}
               />
             ))}
+          </div>
+        )}
+        {linkPreview && (
+          <div className={styles.linkPreviewCard}>
+            {linkPreview.image && (
+              <img
+                src={linkPreview.image}
+                alt=""
+                className={styles.linkPreviewImage}
+              />
+            )}
+            <div className={styles.linkPreviewBody}>
+              <span className={styles.linkPreviewDomain}>
+                {linkPreview.domain}
+              </span>
+              {linkPreview.title && (
+                <span className={styles.linkPreviewTitle}>
+                  {linkPreview.title}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>
