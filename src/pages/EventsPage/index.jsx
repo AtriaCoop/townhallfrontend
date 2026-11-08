@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Icon from "@/icons/Icon";
 import { fetchAllEvents, createEvent, participateInEvent, unenrollFromEvent, updateEvent, deleteEvent } from "@/api/event";
@@ -6,6 +6,8 @@ import { getStoredUser } from "@/utils/getStoredUser";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { BASE_URL } from "@/constants/api";
 import styles from "./EventsPage.module.scss";
+import {EVENT_ICONS} from "@/icons/Icon";
+import {RSVP_COPY} from "@/constants/eventCopy";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -44,6 +46,21 @@ export default function EventsPage() {
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
+  
+  // Toast state
+  const [toast, setToast] = useState(null);
+  const ToastIcon = toast?.type === "error" ? EVENT_ICONS.error : EVENT_ICONS.success;
+  const [pendingEventId, setPendingEventId] = useState(null);
+  const toastTimerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(toastTimerRef.current), []);
+
+  const showToast = (message, type = "success") => {
+    clearTimeout(toastTimerRef.current);
+    setToast({ id: Date.now(), message, type });
+    toastTimerRef.current = setTimeout(() => setToast(null), 4000);
+  };
+
 
   useEffect(() => {
     async function loadData() {
@@ -170,28 +187,38 @@ export default function EventsPage() {
 
   // Handlers
   const handleParticipate = async (eventId) => {
+    if (pendingEventId) return;
+    const title = events.find((e) => e.id === eventId)?.title || "this event";
+    setPendingEventId(eventId);
     try {
       const updatedEvent = await participateInEvent(eventId);
       setEvents((prev) =>
-        prev.map((event) =>
-          event.id === eventId ? { ...event, ...updatedEvent } : event
-        )
+        prev.map((event) => (event.id === eventId ? { ...event, ...updatedEvent } : event))
       );
+      showToast(RSVP_COPY.toastJoined(title));
     } catch (err) {
       console.error("Error participating:", err);
+      showToast(RSVP_COPY.toastError, "error");
+    } finally {
+      setPendingEventId(null);
     }
   };
 
   const handleUnenroll = async (eventId) => {
+    if (pendingEventId) return;
+    const title = events.find((e) => e.id === eventId)?.title || "this event";
+    setPendingEventId(eventId);
     try {
       const updatedEvent = await unenrollFromEvent(eventId);
       setEvents((prev) =>
-        prev.map((event) =>
-          event.id === eventId ? { ...event, ...updatedEvent } : event
-        )
+        prev.map((event) => (event.id === eventId ? { ...event, ...updatedEvent } : event))
       );
+      showToast(RSVP_COPY.toastLeft(title));
     } catch (err) {
       console.error("Error unenrolling:", err);
+      showToast(RSVP_COPY.toastError, "error");
+    } finally {
+      setPendingEventId(null);
     }
   };
 
@@ -405,21 +432,28 @@ export default function EventsPage() {
             </div>
           )}
           {!isPastEvent(event.date) && (
-            event.isEnrolled ? (
-              <button
-                className={styles.unenrollButton}
-                onClick={() => handleUnenroll(event.id)}
-              >
-                Unenroll
-              </button>
-            ) : (
-              <button
-                className={styles.participateButton}
-                onClick={() => handleParticipate(event.id)}
-              >
-                Participate
-              </button>
-            )
+            <div className={styles.rsvpBlock}>
+              {event.isEnrolled ? (
+                <button
+                  className={styles.unenrollButton}
+                  disabled={pendingEventId === event.id}
+                  onClick={() => handleUnenroll(event.id)}
+                >
+                  Unenroll
+                </button>
+              ) : (
+                <button
+                  className={styles.participateButton}
+                  disabled={pendingEventId === event.id}
+                  onClick={() => handleParticipate(event.id)}
+                >
+                  Participate
+                </button>
+              )}
+              <p className={styles.rsvpHelperText}>
+                {event.isEnrolled ? RSVP_COPY.helperJoined : RSVP_COPY.helperJoin}
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -754,27 +788,34 @@ export default function EventsPage() {
                     </>
                   )}
                   {!isPastEvent(selectedEvent.date) && (
-                    selectedEvent.isEnrolled ? (
-                      <button
-                        className={styles.unenrollButton}
-                        onClick={() => {
-                          handleUnenroll(selectedEvent.id);
-                          setSelectedEvent(null);
-                        }}
-                      >
-                        Unenroll
-                      </button>
-                    ) : (
-                      <button
-                        className={styles.participateButton}
-                        onClick={() => {
-                          handleParticipate(selectedEvent.id);
-                          setSelectedEvent(null);
-                        }}
-                      >
-                        Participate
-                      </button>
-                    )
+                    <div className={`${styles.rsvpBlock} ${styles.modalRsvp}`}>
+                      {selectedEvent.isEnrolled ? (
+                        <button
+                          className={styles.unenrollButton}
+                          disabled={pendingEventId === selectedEvent.id}
+                          onClick={() => {
+                            handleUnenroll(selectedEvent.id);
+                            setSelectedEvent(null);
+                          }}
+                        >
+                          Unenroll
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.participateButton}
+                          disabled={pendingEventId === selectedEvent.id}
+                          onClick={() => {
+                            handleParticipate(selectedEvent.id);
+                            setSelectedEvent(null);
+                          }}
+                        >
+                          Participate
+                        </button>
+                      )}
+                      <p className={styles.rsvpHelperText}>
+                        {selectedEvent.isEnrolled ? RSVP_COPY.helperJoined : RSVP_COPY.helperJoin}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -782,6 +823,20 @@ export default function EventsPage() {
           )}
         </>
       )}
+      <div className={styles.toastRegion} aria-live="polite">
+        {toast && (
+          <div
+            key={toast.id}
+            className={`${styles.toast} ${
+              toast.type === "error" ? styles.toastError : styles.toastSuccess
+            }`}
+            role={toast.type === "error" ? "alert" : undefined}
+          >
+            <ToastIcon size={18} />
+            <span>{toast.message}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
