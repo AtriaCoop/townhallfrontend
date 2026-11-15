@@ -20,7 +20,7 @@ export async function createEvent(eventData) {
 }
 
 export async function createEventPost(eventId, content) {
-  const response = await authenticatedFetch(`${BASE_URL}/event/${eventId}/create-event-post/`, {
+  const response = await authenticatedFetch(`${BASE_URL}/event/${eventId}/create_event_post/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ content }),
