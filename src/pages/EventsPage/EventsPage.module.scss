@@ -672,6 +672,69 @@
   }
 }
 
+.eventPostHelper {
+  margin: 0 0 $spacing-6;
+  color: var(--text-secondary);
+  @include body-2;
+  line-height: $line-height-relaxed;
+}
+
+.eventPostActions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.eventPostComposer {
+  max-width: 640px;
+}
+
+.eventPostLabel {
+  display: block;
+  margin-bottom: $spacing-1;
+  color: var(--text-secondary);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.eventPostTextarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  color: var(--text-primary);
+}
+
+.eventPostFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-3;
+
+  @include sm {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.eventPostCount,
+.eventPostCountError {
+  color: var(--text-muted);
+  @include caption;
+}
+
+.eventPostCountError {
+  color: $error-600;
+}
+
+.eventPostStatus {
+  align-self: flex-start;
+  color: var(--text-muted);
+  @include caption;
+}
+
 // Create Event Form
 .createEventForm {
   display: flex;
