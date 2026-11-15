@@ -20,6 +20,7 @@ export default function Post({
   fullName,
   organization,
   date,
+  status,
   isVerified,
   content,
   postImages = [],
@@ -58,6 +59,13 @@ export default function Post({
 
   const isMyOwnPost = userId === currentUserId;
   const hideAuthorDetails = anonymous && !isMyOwnPost;
+  const normalizedPostStatus = status?.toLowerCase();
+  const isEventPost = tags?.some((postTag) => postTag.toLowerCase() === "event");
+  const postStatusLabel =
+    ["published", "cancelled"].includes(normalizedPostStatus) &&
+    (isEventPost || normalizedPostStatus === "cancelled")
+      ? normalizedPostStatus
+      : null;
   // UPDATE POST
   async function handleUpdatePost() {
     setIsUpdating(true);
@@ -232,6 +240,18 @@ export default function Post({
             {date} {anonymous && isMyOwnPost ? "(anonymous)" : null}
           </div>
         </div>
+        {postStatusLabel && (
+          <span
+            className={`${styles.postStatus} ${
+              postStatusLabel === "cancelled"
+                ? styles.postStatusCancelled
+                : styles.postStatusPublished
+            }`}
+            aria-label={`Post status: ${postStatusLabel}`}
+          >
+            {postStatusLabel === "cancelled" ? "Cancelled" : "Published"}
+          </span>
+        )}
         <div className={styles.moreOptions} onClick={handleOptionsClick}>
           ⋯
         </div>

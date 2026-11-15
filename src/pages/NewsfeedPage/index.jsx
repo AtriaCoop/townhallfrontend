@@ -149,6 +149,7 @@ export default function NewsfeedPage() {
             userImage: p.user?.profile_image || null,
             date: formatDistance(new Date(p.created_at), new Date(), { addSuffix: true }),
             created_at: p.created_at,
+            status: p.status,
             content: [p.content],
             postImages: p.images || [],
             links: [],
@@ -222,6 +223,7 @@ export default function NewsfeedPage() {
         userImage: data.post.user.profile_image,
         created_at: data.post.created_at,
         date: formatDistance(new Date(data.post.created_at), new Date(), { addSuffix: true }),
+        status: data.post.status,
         isVerified: data.post.user.is_verified,
         content: [data.post.content],
         postImages: data.post.images || [],
@@ -467,6 +469,7 @@ export default function NewsfeedPage() {
                 fullName={post.fullName}
                 organization={post.organization}
                 date={post.date}
+                status={post.status}
                 content={post.content}
                 isVerified={post.isVerified}
                 postImages={post.postImages}
