@@ -729,12 +729,6 @@
   color: $error-600;
 }
 
-.eventPostStatus {
-  align-self: flex-start;
-  color: var(--text-muted);
-  @include caption;
-}
-
 // Create Event Form
 .createEventForm {
   display: flex;
@@ -785,6 +779,45 @@
 
 .eventTitleRow .eventTitle {
   margin-bottom: 0;
+}
+
+.eventPostBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px $spacing-2;
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.eventPostPublished {
+  background-color: $success-50;
+  color: $success-700;
+}
+
+.eventPostMissing {
+  background-color: var(--bg-secondary);
+  color: var(--text-muted);
+}
+
+.eventPostAction {
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    background-color: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 // Date Badges

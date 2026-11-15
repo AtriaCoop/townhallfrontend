@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Icon from "@/icons/Icon";
-import { fetchAllEvents, createEvent, createEventPost, participateInEvent, unenrollFromEvent, updateEvent, deleteEvent } from "@/api/event";
+import { fetchAllEvents, createEvent, createEventPost, updateEventPost, participateInEvent, unenrollFromEvent, updateEvent, deleteEvent } from "@/api/event";
 import { getStoredUser } from "@/utils/getStoredUser";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { BASE_URL } from "@/constants/api";
@@ -26,7 +26,7 @@ export default function EventsPage() {
   const [eventPostStep, setEventPostStep] = useState(null);
   const [eventPostContent, setEventPostContent] = useState("");
   const [eventPostError, setEventPostError] = useState("");
-  const [isCreatingEventPost, setIsCreatingEventPost] = useState(false);
+  const [isSavingEventPost, setIsSavingEventPost] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: "",
     description: "",
@@ -86,14 +86,14 @@ export default function EventsPage() {
   };
 
   const closeEventPost = () => {
-    if (isCreatingEventPost) return;
+    if (isSavingEventPost) return;
     setEventPostStep(null);
     setEventPostEvent(null);
     setEventPostError("");
   };
 
   useEffect(() => {
-    if (!eventPostStep || isCreatingEventPost) return undefined;
+    if (!eventPostStep || isSavingEventPost) return undefined;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -105,7 +105,7 @@ export default function EventsPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [eventPostStep, isCreatingEventPost]);
+  }, [eventPostStep, isSavingEventPost]);
 
 
   useEffect(() => {
@@ -289,9 +289,9 @@ export default function EventsPage() {
     }
   };
 
-  const handleCreateEventPost = async (e) => {
+  const handleSaveEventPost = async (e) => {
     e.preventDefault();
-    if (!eventPostEvent || isCreatingEventPost) return;
+    if (!eventPostEvent || isSavingEventPost) return;
 
     const content = eventPostContent.trim();
     if (!content) {
@@ -304,19 +304,21 @@ export default function EventsPage() {
     }
 
     setEventPostError("");
-    setIsCreatingEventPost(true);
+    setIsSavingEventPost(true);
     try {
-      const updatedEvent = await createEventPost(eventPostEvent.id, content);
+      const updatedEvent = eventPostEvent.hasPost
+        ? await updateEventPost(eventPostEvent.id, content)
+        : await createEventPost(eventPostEvent.id, content);
       setEvents((prev) =>
         prev.map((event) => (event.id === eventPostEvent.id ? { ...event, ...updatedEvent } : event))
       );
       setEventPostStep(null);
       setEventPostEvent(null);
-      showToast("Event post created.");
+      showToast(eventPostEvent.hasPost ? "Event post updated." : "Event post created.");
     } catch (err) {
-      setEventPostError(err.message || "Failed to create event post.");
+      setEventPostError(err.message || "Failed to save event post.");
     } finally {
-      setIsCreatingEventPost(false);
+      setIsSavingEventPost(false);
     }
   };
 
@@ -345,10 +347,20 @@ export default function EventsPage() {
 
     try {
       const updated = await updateEvent(editEventId, editEvent);
+      const updatedEventForPost = {
+        ...(events.find((event) => event.id === editEventId) || {}),
+        ...updated,
+      };
       setEvents((prev) =>
         prev.map((event) => (event.id === editEventId ? { ...event, ...updated } : event))
       );
       setShowEditModal(false);
+      setEditEventId(null);
+      if (updatedEventForPost.hasPost || isStaff) {
+        openEventPostPrompt(updatedEventForPost);
+      } else {
+        showToast("Event updated.");
+      }
     } catch (err) {
       setEditError(err.message || "Failed to update event.");
       console.error("Error updating event:", err);
@@ -458,6 +470,28 @@ export default function EventsPage() {
             )}
             {event.isEnrolled && (
               <span className={styles.enrolledBadge}>Enrolled</span>
+            )}
+            {event.hasPost ? (
+              <span className={`${styles.eventPostBadge} ${styles.eventPostPublished}`}>
+                Post published
+              </span>
+            ) : isStaff ? (
+              <button
+                type="button"
+                className={`${styles.eventPostBadge} ${styles.eventPostMissing} ${styles.eventPostAction}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEventPostPrompt(event);
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+                aria-label={`Create a post for ${event.title}`}
+              >
+                Not posted · Create post
+              </button>
+            ) : (
+              <span className={`${styles.eventPostBadge} ${styles.eventPostMissing}`}>
+                Not posted
+              </span>
             )}
           </div>
           <div className={styles.eventMeta}>
@@ -855,8 +889,13 @@ export default function EventsPage() {
                       Create post
                     </button>
                   )}
-                  {isStaff && selectedEvent.hasPost && (
-                    <span className={styles.eventPostStatus}>Post created</span>
+                  {isEventAdmin(selectedEvent) && selectedEvent.hasPost && (
+                    <button
+                      className={styles.editButton}
+                      onClick={() => openEventPostPrompt(selectedEvent)}
+                    >
+                      Update post
+                    </button>
                   )}
                   {isEventAdmin(selectedEvent) && (
                     <>
@@ -932,10 +971,14 @@ export default function EventsPage() {
                     <Icon name="close" size={20} />
                   </button>
                   <h3 className={styles.modalTitle} id="event-post-prompt-title">
-                    Create a post for this event?
+                    {eventPostEvent.hasPost
+                      ? "Update the post for this event?"
+                      : "Create a post for this event?"}
                   </h3>
                   <p className={styles.eventPostHelper}>
-                    Share “{eventPostEvent.title}” with the community. You can review and edit the post before it is created, or do this later from the event details.
+                    {eventPostEvent.hasPost
+                      ? `The event details changed. Review and edit the updated draft before updating the post for “${eventPostEvent.title}”.`
+                      : `Share “${eventPostEvent.title}” with the community. You can review and edit the post before it is created, or do this later from the event details.`}
                   </p>
                   <div className={styles.eventPostActions}>
                     <button
@@ -948,7 +991,7 @@ export default function EventsPage() {
                       className={styles.createEventButton}
                       onClick={() => setEventPostStep("compose")}
                     >
-                      Create post
+                      {eventPostEvent.hasPost ? "Update post" : "Create post"}
                     </button>
                   </div>
                 </section>
@@ -958,7 +1001,7 @@ export default function EventsPage() {
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby="event-post-composer-title"
-                  onSubmit={handleCreateEventPost}
+                  onSubmit={handleSaveEventPost}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -966,15 +1009,17 @@ export default function EventsPage() {
                     onClick={closeEventPost}
                     aria-label="Close"
                     type="button"
-                    disabled={isCreatingEventPost}
+                    disabled={isSavingEventPost}
                   >
                     <Icon name="close" size={20} />
                   </button>
                   <h3 className={styles.modalTitle} id="event-post-composer-title">
-                    Create event post
+                    {eventPostEvent.hasPost ? "Update event post" : "Create event post"}
                   </h3>
                   <p className={styles.eventPostHelper}>
-                    Edit the suggested post before sharing it with the community.
+                    {eventPostEvent.hasPost
+                      ? "The post content isn't loaded from the server, so this draft uses the latest event details. Edit it before updating the existing post."
+                      : "Edit the suggested post before sharing it with the community."}
                   </p>
                   <label className={styles.eventPostLabel} htmlFor="event-post-content">
                     Post content
@@ -986,7 +1031,7 @@ export default function EventsPage() {
                     onChange={(e) => setEventPostContent(e.target.value)}
                     aria-describedby="event-post-character-count"
                     autoFocus
-                    disabled={isCreatingEventPost}
+                    disabled={isSavingEventPost}
                   />
                   <div className={styles.eventPostFooter}>
                     <span
@@ -1001,7 +1046,7 @@ export default function EventsPage() {
                         className={styles.unenrollButton}
                         onClick={closeEventPost}
                         type="button"
-                        disabled={isCreatingEventPost}
+                        disabled={isSavingEventPost}
                       >
                         Cancel
                       </button>
@@ -1009,12 +1054,18 @@ export default function EventsPage() {
                         className={styles.createEventButton}
                         type="submit"
                         disabled={
-                          isCreatingEventPost ||
+                          isSavingEventPost ||
                           !eventPostContent.trim() ||
                           eventPostContent.trim().length > 1000
                         }
                       >
-                        {isCreatingEventPost ? "Creating..." : "Create post"}
+                        {isSavingEventPost
+                          ? eventPostEvent.hasPost
+                            ? "Updating..."
+                            : "Creating..."
+                          : eventPostEvent.hasPost
+                          ? "Update post"
+                          : "Create post"}
                       </button>
                     </div>
                   </div>
