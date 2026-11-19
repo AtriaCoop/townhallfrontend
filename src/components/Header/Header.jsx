@@ -78,6 +78,9 @@ export default function Header() {
       console.error("Logout error:", error);
     }
     localStorage.removeItem("user");
+    // Remove joined groups and active group as a temporary fix until backend handles fetching group chats per user
+    localStorage.removeItem("joinedGroups");
+    localStorage.removeItem("activeGroup");
     router.push('/LandingPage');
   };
 

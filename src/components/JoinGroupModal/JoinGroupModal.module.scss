@@ -23,16 +23,29 @@
 }
 
 .modalHeader {
-  @include flex-between;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   padding: $spacing-5 $spacing-5 $spacing-3;
 
   h2 {
     margin: 0;
+    flex-shrink: 0;
     @include heading-4;
   }
 }
 
+.createGroupButton {
+  @include button-primary;
+  margin-left: $spacing-3;
+  margin-bottom: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  flex-shrink: 0;
+}
+
 .closeButton {
+  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
