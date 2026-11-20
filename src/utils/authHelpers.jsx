@@ -69,7 +69,7 @@ export async function authenticatedFetch(url, options = {}) {
   if (response.status === 401 && typeof window !== 'undefined') {
     if (!PUBLIC_PAGES.includes(window.location.pathname)) {
       localStorage.removeItem("user");
-      window.location.href = "/";
+      window.location.replace("/");
     }
   }
 
