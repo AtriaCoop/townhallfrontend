@@ -4,13 +4,16 @@ import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
 import styles from "./MembersPage.module.scss";
 
+
 export default function MembersPage() {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE || "";
   const router = useRouter();
 
+
   const [members, setMembers] = useState([]);
   const [searchMember, setSearchMember] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
 
   const filteredMembers = members
     .filter((member) =>
@@ -18,20 +21,69 @@ export default function MembersPage() {
     )
     .sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
 
+
   useEffect(() => {
-    async function fetchMembers() {
+    let isActive = true;
+
+    async function loadMembersPage() {
       try {
-        const res = await authenticatedFetch(`${BASE_URL}/user`);
-        const data = await res.json();
-        setMembers(data.data || []);
+        const sessionRes = await authenticatedFetch(
+          `${BASE_URL}/auth/session/`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!sessionRes.ok) {
+          localStorage.removeItem("user");
+          router.replace("/");
+          return;
+        }
+
+        const sessionData = await sessionRes.json();
+
+        if (!sessionData.authenticated) {
+          localStorage.removeItem("user");
+          router.replace("/");
+          return;
+        }
+
+        const membersRes = await authenticatedFetch(`${BASE_URL}/user`, {
+          credentials: "include",
+        });
+
+        if (!membersRes.ok) {
+          localStorage.removeItem("user");
+          router.replace("/");
+          return;
+        }
+
+        const membersData = await membersRes.json();
+
+        if (isActive) {
+          setMembers(membersData.data || []);
+        }
       } catch (err) {
         console.error("Error fetching members", err);
+
+        if (isActive) {
+          localStorage.removeItem("user");
+          router.replace("/");
+        }
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     }
-    fetchMembers();
-  }, [BASE_URL]);
+
+    loadMembersPage();
+
+    return () => {
+      isActive = false;
+    };
+  }, [BASE_URL, router]);
+
 
   return (
     <div className={styles.membersPage}>
@@ -54,6 +106,7 @@ export default function MembersPage() {
           />
         </div>
       </header>
+
 
       {/* Members Grid */}
       <div className={styles.membersGrid}>

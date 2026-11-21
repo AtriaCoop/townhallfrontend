@@ -296,3 +296,11 @@
 .messageOutgoing .messageEdited {
   color: rgba($white, 0.8);
 }
+.messageStatus {
+  margin-right: 4px;
+}
+
+.messageStatusRead {
+  margin-right: 4px;
+  // add whatever visual styling you want for READ
+}
