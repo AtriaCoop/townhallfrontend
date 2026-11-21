@@ -154,7 +154,7 @@ export default function SettingsPage({ darkMode, setDarkMode }) {
     localStorage.removeItem("user");
     localStorage.removeItem("joinedGroups");
     localStorage.removeItem("activeGroup");
-    router.push("/");
+    router.replace("/");
   }
 
   // --- Data export handler ---
