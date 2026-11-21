@@ -81,7 +81,8 @@ export default function Header() {
     // Remove joined groups and active group as a temporary fix until backend handles fetching group chats per user
     localStorage.removeItem("joinedGroups");
     localStorage.removeItem("activeGroup");
-    router.push('/LandingPage');
+    router.replace('/LandingPage');
+
   };
 
   const navigateTo = (path) => {
