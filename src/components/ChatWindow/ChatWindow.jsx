@@ -12,7 +12,6 @@ import { getReactionEmoji } from '@/constants/reactions';
 import { formatRelativeTime, formatExactTime } from '@/utils/formateDatetime';
 import useNotificationStore from '@/stores/notificationStore';
 
-
 // Formats URLs in message text as clickable links
 function formatMessageWithLinks(text) {
   return (
@@ -30,463 +29,471 @@ function formatMessageWithLinks(text) {
   );
 }
 
+// Safely read the current user's id (localStorage is not available during SSR)
+function getCurrentUserId() {
+  if (typeof window === 'undefined') return NaN;
+  try {
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    return Number(userData.id);
+  } catch {
+    return NaN;
+  }
+}
+
 export default function ChatWindow({ chat, onClose }) {
-    const router = useRouter();
-    const clearUnreadDm = useNotificationStore((s) => s.clearUnreadDm);
+  const router = useRouter();
+  const clearUnreadDm = useNotificationStore((s) => s.clearUnreadDm);
 
-    const [messages, setMessages] = useState([]);
-    const [showMessageModal, setShowMessageModal] = useState(false);
-    const [showUpdateMessageModal, setShowUpdateMessageModal] = useState(false);
-    const [selectedMessage, setSelectedMessage] = useState(null);
-    const [activeReactionPickerId, setActiveReactionPickerId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [showUpdateMessageModal, setShowUpdateMessageModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [activeReactionPickerId, setActiveReactionPickerId] = useState(null);
+  const [currentUserId] = useState(getCurrentUserId);
 
-    const handleMessageClick = (msg) => {
-      setShowMessageModal(true);
-      setSelectedMessage(msg);
-    };
+  const socketRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
-    const handleEditClick = () => {
-      setShowMessageModal(false);
-      setShowUpdateMessageModal(true);
-    };
+  const handleMessageClick = (msg) => {
+    setShowMessageModal(true);
+    setSelectedMessage(msg);
+  };
 
-    const handleDeleteClick = async () => {
-      if (!selectedMessage) return;
+  const handleEditClick = () => {
+    setShowMessageModal(false);
+    setShowUpdateMessageModal(true);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!selectedMessage) return;
+    try {
+      const res = await authenticatedFetch(
+        `${BASE_URL}/chats/messages/${selectedMessage.id}/`,
+        { method: 'DELETE' }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setMessages((prev) => prev.filter((m) => m.id !== selectedMessage.id));
+      } else {
+        console.error('Delete failed:', data.message);
+      }
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+    setShowMessageModal(false);
+    setSelectedMessage(null);
+  };
+
+  const handleUpdateMessage = (msgId, newText, isEdited) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId
+          ? {
+              ...m,
+              text: newText,
+              isEdited: typeof isEdited === 'boolean' ? isEdited : m.isEdited,
+            }
+          : m
+      )
+    );
+  };
+
+  // Fetch messages first, then immediately mark them as read
+  useEffect(() => {
+    if (!chat?.id) return;
+    clearUnreadDm(chat.id);
+
+    let cancelled = false;
+
+    const loadMessagesAndMarkRead = async () => {
       try {
-        const res = await authenticatedFetch(`${BASE_URL}/chats/messages/${selectedMessage.id}/`, {
-          method: "DELETE",
-        });
+        // Fetch past messages
+        const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
         const data = await res.json();
-        if (data.success) {
-          setMessages((prev) => prev.filter((m) => m.id !== selectedMessage.id));
-        } else {
-          console.error("Delete failed:", data.message);
+        if (cancelled) return;
+
+        const formatted = data.messages.map((m) => ({
+          text: m.content,
+          sender: Number(m.user?.id),
+          id: m.id,
+          timestamp: m.sent_at,
+          isEdited: m.is_edited === true,
+          status: m.status,
+          reactions: m.reactions || {},
+        }));
+        setMessages(formatted);
+
+        // Mark chat as read on the backend
+        const readRes = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/read/`, {
+          method: 'POST',
+        });
+        const readData = await readRes.json();
+        if (cancelled) return;
+
+        // Update the freshly loaded messages to status 3 ('seen') instantly
+        if (readData.success && readData.message_ids) {
+          setMessages((prev) =>
+            prev.map((message) =>
+              readData.message_ids.includes(message.id)
+                ? { ...message, status: 3 }
+                : message
+            )
+          );
         }
       } catch (err) {
-        console.error("Delete failed:", err);
+        console.error('Failed to load messages or mark chat as read:', err);
       }
-      setShowMessageModal(false);
-      setSelectedMessage(null);
     };
 
-    const handleUpdateMessage = (msgId, newText) => {
-      setMessages((prev) =>
-        prev.map((m) => (m.id === msgId ? { ...m, text: newText } : m))
-      );
+    loadMessagesAndMarkRead();
+
+    return () => {
+      cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat?.id]);
 
-    const socketRef = useRef(null);
-    const messagesContainerRef = useRef(null);
+  // WebSocket connection
+  useEffect(() => {
+    if (!chat?.id) return;
 
-    const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    const currentUserId = Number(userData.id);
+    const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
 
-    // Fetch messages first, then immediately mark them as read
-    useEffect(() => {
-      if (!chat?.id) return;
-      clearUnreadDm(chat.id);
+    const socket = new WebSocket(socketUrl);
+    socketRef.current = socket;
 
-      const loadMessagesAndMarkRead = async () => {
-        try {
-          // Fetch past messages
-          const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
-          const data = await res.json();
-
-          const formatted = data.messages.map((m) => ({
-            text: m.content,
-            sender: Number(m.user?.id),
-            id: m.id,
-            timestamp: m.sent_at,
-            status: m.status,
-            reactions: m.reactions || {},
-          }));
-          setMessages(formatted);
-
-          // Mark chat as read on the backend
-          const readRes = await authenticatedFetch(
-            `${BASE_URL}/chats/${chat.id}/read/`,
-            { method: "POST" }
-          );
-          const readData = await readRes.json();
-
-          // Update the freshly loaded messages to status 3 ('seen') instantly
-          if (readData.success && readData.message_ids) {
-            setMessages((prev) =>
-              prev.map((message) =>
-                readData.message_ids.includes(message.id)
-                  ? { ...message, status: 3 }
-                  : message
-              )
-            );
-          }
-        } catch (err) {
-          console.error("Failed to load messages or mark chat as read:", err);
-        }
-      };
-
-      loadMessagesAndMarkRead();
-    }, [chat?.id]);
-
-    useEffect(() => {
-        const fetchMessages = async () => {
-          try {
-            const res = await authenticatedFetch(`${BASE_URL}/chats/${chat.id}/messages/`);
-            const data = await res.json();
-
-            const formatted = data.messages.map((m) => ({
-              text: m.content,
-              sender: Number(m.user?.id),
-              id: m.id,
-              timestamp: m.sent_at,
-              status: m.status,
-              reactions: m.reactions || {},
-            }));
-            setMessages(formatted);
-          } catch (err) {
-            console.error("Failed to load past messages:", err);
-          }
-        };
-
-        fetchMessages();
-      }, [chat.id]);
-
-
-      useEffect(() => {
-          if (!chat?.id) return;
-
-          const socketUrl = `${process.env.NEXT_PUBLIC_WS_BASE}/ws/chats/${chat.id}/`;
-
-          const socket = new WebSocket(socketUrl);
-          socketRef.current = socket;
-
-          socket.onmessage = async (e) => {
-
-              try {
-                  const data = JSON.parse(e.data);
-
-                  if (data.type === "message_status") {
-
-                      setMessages((prev) => {
-                          const found = prev.some(
-                              (msg) => Number(msg.id) === Number(data.message_id)
-                          );
-
-                          return prev.map((msg) =>
-                              Number(msg.id) === Number(data.message_id)
-                                  ? { ...msg, status: Number(data.status) }
-                                  : msg
-                          );
-                      });
-
-                      return;
-                  }    
-
-                  // Skip own messages
-                  if (Number(data.sender_id) === Number(currentUserId)) {
-                      return;
-                  }
-
-                  setMessages((prev) => {
-                      // Avoid adding duplicate messages
-                      if (prev.some((msg) => msg.id === data.id)) {
-                          return prev;
-                      }
-
-                      return [
-                          ...prev,
-                          {
-                              text: data.message,
-                              sender: Number(data.sender_id),
-                              id: data.id,
-                              timestamp: data.timestamp || new Date().toISOString(),
-                              status: 2,
-                          },
-                      ];
-                  });
-
-                  // Mark message as delivered
-                  try {
-                    const response = await authenticatedFetch(
-                        `${BASE_URL}/chats/messages/${data.id}/status/`,
-                        {
-                            method: "PATCH",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ status: 2 }),
-                        }
-                    );
-
-                    if (!response.ok) {
-                        console.error(
-                            "Failed to mark message as delivered:",
-                            response.status,
-                            await response.text()
-                        );
-                    } else {
-                        setMessages((prev) =>
-                            prev.map((msg) =>
-                                msg.id === data.id
-                                    ? { ...msg, status: 2 }
-                                    : msg
-                            )
-                        );
-                    }
-                  } catch (error) {
-                      console.error("Failed to mark message as delivered:", error);
-                  }
-              } catch (error) {
-                  console.error("Failed to process WebSocket message:", error);
-              }
-          };
-
-          socket.onerror = (event) => {
-              console.error("WebSocket error:", event);
-          };
-
-          return () => {
-              socket.close();
-
-              if (socketRef.current === socket) {
-                  socketRef.current = null;
-              }
-          };
-      }, [chat?.id, currentUserId]);
-
-
-    const handleSend = async (inputText, selectedImage) => {
-      if (!inputText.trim() && !selectedImage) return;
-
+    socket.onmessage = async (e) => {
       try {
-        const formData = new FormData();
-        formData.append("chat_id", chat.id);
-        formData.append("content", inputText);
-        if (selectedImage) formData.append("image_content", selectedImage);
+        const data = JSON.parse(e.data);
 
-        const res = await authenticatedFetch(`${BASE_URL}/chats/send/`, {
-          method: "POST",
-          body: formData,
+        // Status updates (sent / delivered / seen)
+        if (data.type === 'message_status') {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              Number(msg.id) === Number(data.message_id)
+                ? { ...msg, status: Number(data.status) }
+                : msg
+            )
+          );
+          return;
+        }
+
+        // Skip own messages — already added optimistically in handleSend
+        if (Number(data.sender_id) === Number(currentUserId)) {
+          return;
+        }
+
+        setMessages((prev) => {
+          // Avoid adding duplicate messages
+          if (prev.some((msg) => msg.id === data.id)) {
+            return prev;
+          }
+
+          return [
+            ...prev,
+            {
+              text: data.message,
+              sender: Number(data.sender_id),
+              id: data.id,
+              timestamp: data.timestamp || new Date().toISOString(),
+              isEdited: data.is_edited === true,
+              status: 2,
+              reactions: {},
+            },
+          ];
         });
 
-        const data = await res.json();
+        // Mark message as delivered
+        try {
+          const response = await authenticatedFetch(
+            `${BASE_URL}/chats/messages/${data.id}/status/`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ status: 2 }),
+            }
+          );
 
-        if (data.success) {
-          if (data.data.content?.trim()) {
-            setMessages((prev) => [...prev, {
+          if (!response.ok) {
+            console.error(
+              'Failed to mark message as delivered:',
+              response.status,
+              await response.text()
+            );
+          }
+        } catch (error) {
+          console.error('Failed to mark message as delivered:', error);
+        }
+      } catch (error) {
+        console.error('Failed to process WebSocket message:', error);
+      }
+    };
+
+    socket.onerror = (event) => {
+      console.error('WebSocket error:', event);
+    };
+
+    return () => {
+      socket.close();
+
+      if (socketRef.current === socket) {
+        socketRef.current = null;
+      }
+    };
+  }, [chat?.id, currentUserId]);
+
+  const handleSend = async (inputText, selectedImage) => {
+    if (!inputText.trim() && !selectedImage) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('chat_id', chat.id);
+      formData.append('content', inputText);
+      if (selectedImage) formData.append('image_content', selectedImage);
+
+      const res = await authenticatedFetch(`${BASE_URL}/chats/send/`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (data.data.content?.trim()) {
+          setMessages((prev) => [
+            ...prev,
+            {
               text: data.data.content,
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              isEdited: data.data.is_edited === true,
               status: data.data.status,
-            }]);
-            if (socketRef.current?.readyState === WebSocket.OPEN) {
-              socketRef.current.send(
-                JSON.stringify({
-                  message: data.data.content,
-                  sender: data.data.sender,
-                  id: data.data.id,
-                })
-              );
-            }
+              reactions: {},
+            },
+          ]);
+          if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(
+              JSON.stringify({
+                message: data.data.content,
+                sender: data.data.sender,
+                id: data.data.id,
+              })
+            );
           }
+        }
 
-          if (data.data.image) {
-            const imgText = `<img src="${data.data.image}" alt="image" />`;
-            setMessages((prev) => [...prev, {
+        if (data.data.image) {
+          const imgText = `<img src="${data.data.image}" alt="image" />`;
+          setMessages((prev) => [
+            ...prev,
+            {
               text: imgText,
               sender: Number(data.data.sender),
               id: data.data.id,
               timestamp: data.data.timestamp,
+              isEdited: data.data.is_edited === true,
               status: data.data.status,
-            }]);
-            if (socketRef.current?.readyState === WebSocket.OPEN) {
-              socketRef.current.send(
-                JSON.stringify({
-                  message: imgText,
-                  sender: data.data.sender,
-                  id: data.data.id,
-                })
-              );
-            }
+              reactions: {},
+            },
+          ]);
+          if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(
+              JSON.stringify({
+                message: imgText,
+                sender: data.data.sender,
+                id: data.data.id,
+              })
+            );
           }
-        } else {
-          console.error("Message send failed:", data.error);
         }
-      } catch (err) {
-        console.error("Failed to send message:", err);
+      } else {
+        console.error('Message send failed:', data.error);
       }
-    };
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
+  };
 
-    useEffect(() => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
-    }, [messages]);
+  // Keep the view scrolled to the newest message
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-    const otherUser = chat.participants?.find(
-        (p) => (typeof p === 'object' ? p.id : p) !== currentUserId
-    );
-    const otherUserId = typeof otherUser === 'object' ? otherUser?.id : otherUser;
-    const goToProfile = () => {
-        if (otherUserId) router.push(`/ProfilePage/${otherUserId}`);
-    };
+  const otherUser = chat.participants?.find(
+    (p) => (typeof p === 'object' ? p.id : p) !== currentUserId
+  );
+  const otherUserId = typeof otherUser === 'object' ? otherUser?.id : otherUser;
+  const goToProfile = () => {
+    if (otherUserId) router.push(`/ProfilePage/${otherUserId}`);
+  };
 
-    return (
-        <div className={styles.chatWindow}>
-            <div className={styles.header}>
-                <button className={styles.closeButton} onClick={onClose} aria-label="Back to conversations">
-                    <Icon name="arrowleft" size={20} />
-                </button>
-                <img
-                    src={chat.imageSrc}
-                    alt={chat.name}
-                    className={`${styles.avatar} ${styles.clickable}`}
-                    onClick={goToProfile}
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/assets/ProfileImage.jpg";
-                    }}
-                />
-                <div className={`${styles.headerInfo} ${styles.clickable}`} onClick={goToProfile}>
-                    <h2>{chat.name}</h2>
-                    <p>{chat.title}</p>
-                </div>
-            </div>
-
-            <div className={styles.messages} ref={messagesContainerRef}>
-              {messages.map((msg, idx) => {
-                const isOwnMessage = Number(msg.sender) === currentUserId;
-                const showReactionPicker = activeReactionPickerId === msg.id;
-
-                return (
-                  <div
-                    key={msg.id || idx}
-                    className={[
-                      isOwnMessage ? styles.messageOutgoing : styles.messageIncoming,
-                      showReactionPicker ? styles.messageActionsPinned : '',
-                    ].join(' ')}
-                  >
-                    <div className={styles.messageContent}>
-                      {msg.text.startsWith("<img") ? (
-                        <div dangerouslySetInnerHTML={{ __html: msg.text }} />
-                      ) : (
-                        formatMessageWithLinks(msg.text)
-                      )}
-                    </div>
-
-                    {Object.keys(msg.reactions || {}).length > 0 && (
-                      <div className={styles.reactionsDisplay}>
-                        {Object.entries(msg.reactions).map(
-                          ([reactionType, users]) =>
-                            users.length > 0 && (
-                              <div key={reactionType} className={styles.reactionGroup}>
-                                <span className={styles.reactionEmoji}>
-                                  {getReactionEmoji(reactionType)}
-                                </span>
-                                <span className={styles.reactionCount}>{users.length}</span>
-                              </div>
-                            )
-                        )}
-                      </div>
-                    )}
-
-                    <div
-                      className={[
-                        styles.messageHoverActions,
-                        showReactionPicker ? styles.messageHoverActionsVisible : '',
-                      ].join(' ')}
-                    >
-                      <div className={styles.reactionWrapper}>
-                        <button
-                          type="button"
-                          className={`${styles.hoverActionButton} ${showReactionPicker ? styles.active : ''}`}
-                          onClick={() =>
-                            setActiveReactionPickerId((prev) =>
-                              prev === msg.id ? null : msg.id
-                            )
-                          }
-                          onMouseDown={(e) => e.stopPropagation()}
-                          title="Add reaction"
-                          aria-label="Add reaction"
-                        >
-                          <Icon name="smile" size={16} />
-                        </button>
-                        {showReactionPicker && (
-                          <ReactionPicker
-                            currentReactions={msg.reactions || {}}
-                            currentUserId={currentUserId}
-                            messageId={msg.id}
-                            BASE_URL={BASE_URL}
-                            setMessages={setMessages}
-                            onClose={() => setActiveReactionPickerId(null)}
-                            align={isOwnMessage ? 'end' : 'start'}
-                          />
-                        )}
-                      </div>
-
-                      {isOwnMessage && (
-                        <button
-                          type="button"
-                          className={styles.hoverActionButton}
-                          onClick={() => {
-                            setActiveReactionPickerId(null);
-                            handleMessageClick(msg);
-                          }}
-                          title="Message options"
-                          aria-label="Message options"
-                        >
-                          <Icon name="more" size={16} />
-                        </button>
-                      )}
-                    </div>
-
-                    {isOwnMessage && (
-                      <span
-                        className={
-                          msg.status === 3
-                            ? styles.messageStatusRead
-                            : styles.messageStatus
-                        }
-                      >
-                        {msg.status === 1 && '✓'}
-                        {msg.status === 2 && '✓✓'}
-                        {msg.status === 3 && 'seen'}
-                      </span>
-                    )}
-
-                    {msg.timestamp && (
-                      <span
-                        className={styles.messageTimestamp}
-                        title={formatExactTime(msg.timestamp)}
-                      >
-                        {formatRelativeTime(msg.timestamp)}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {showMessageModal && (
-              <MessageModal
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onClose={() => setShowMessageModal(false)}
-              />
-            )}
-
-            {showUpdateMessageModal && (
-              <UpdateMessageModal
-                msg={selectedMessage}
-                onCancel={() => setShowUpdateMessageModal(false)}
-                onUpdate={handleUpdateMessage}
-              />
-            )}
-
-            <MessageInput
-              onSend={handleSend}
-              placeholder="Type your message..."
-            />
+  return (
+    <div className={styles.chatWindow}>
+      <div className={styles.header}>
+        <button
+          className={styles.closeButton}
+          onClick={onClose}
+          aria-label="Back to conversations"
+        >
+          <Icon name="arrowleft" size={20} />
+        </button>
+        <img
+          src={chat.imageSrc}
+          alt={chat.name}
+          className={`${styles.avatar} ${styles.clickable}`}
+          onClick={goToProfile}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/assets/ProfileImage.jpg';
+          }}
+        />
+        <div className={`${styles.headerInfo} ${styles.clickable}`} onClick={goToProfile}>
+          <h2>{chat.name}</h2>
+          <p>{chat.title}</p>
         </div>
-    );
+      </div>
+
+      <div className={styles.messages} ref={messagesContainerRef}>
+        {messages.map((msg, idx) => {
+          const isOwnMessage = Number(msg.sender) === currentUserId;
+          const showReactionPicker = activeReactionPickerId === msg.id;
+
+          return (
+            <div
+              key={msg.id || idx}
+              className={[
+                isOwnMessage ? styles.messageOutgoing : styles.messageIncoming,
+                showReactionPicker ? styles.messageActionsPinned : '',
+              ].join(' ')}
+            >
+              <div className={styles.messageContent}>
+                {msg.text.startsWith('<img') ? (
+                  <div dangerouslySetInnerHTML={{ __html: msg.text }} />
+                ) : (
+                  formatMessageWithLinks(msg.text)
+                )}
+              </div>
+
+              {Object.keys(msg.reactions || {}).length > 0 && (
+                <div className={styles.reactionsDisplay}>
+                  {Object.entries(msg.reactions).map(
+                    ([reactionType, users]) =>
+                      users.length > 0 && (
+                        <div key={reactionType} className={styles.reactionGroup}>
+                          <span className={styles.reactionEmoji}>
+                            {getReactionEmoji(reactionType)}
+                          </span>
+                          <span className={styles.reactionCount}>{users.length}</span>
+                        </div>
+                      )
+                  )}
+                </div>
+              )}
+
+              <div
+                className={[
+                  styles.messageHoverActions,
+                  showReactionPicker ? styles.messageHoverActionsVisible : '',
+                ].join(' ')}
+              >
+                <div className={styles.reactionWrapper}>
+                  <button
+                    type="button"
+                    className={`${styles.hoverActionButton} ${
+                      showReactionPicker ? styles.active : ''
+                    }`}
+                    onClick={() =>
+                      setActiveReactionPickerId((prev) =>
+                        prev === msg.id ? null : msg.id
+                      )
+                    }
+                    onMouseDown={(e) => e.stopPropagation()}
+                    title="Add reaction"
+                    aria-label="Add reaction"
+                  >
+                    <Icon name="smile" size={16} />
+                  </button>
+                  {showReactionPicker && (
+                    <ReactionPicker
+                      currentReactions={msg.reactions || {}}
+                      currentUserId={currentUserId}
+                      messageId={msg.id}
+                      BASE_URL={BASE_URL}
+                      setMessages={setMessages}
+                      onClose={() => setActiveReactionPickerId(null)}
+                      align={isOwnMessage ? 'end' : 'start'}
+                    />
+                  )}
+                </div>
+
+                {isOwnMessage && (
+                  <button
+                    type="button"
+                    className={styles.hoverActionButton}
+                    onClick={() => {
+                      setActiveReactionPickerId(null);
+                      handleMessageClick(msg);
+                    }}
+                    title="Message options"
+                    aria-label="Message options"
+                  >
+                    <Icon name="more" size={16} />
+                  </button>
+                )}
+              </div>
+
+              {(msg.isEdited || msg.timestamp) && (
+                <div className={styles.messageMeta}>
+                  {msg.isEdited && <span className={styles.messageEdited}>Edited</span>}
+                  {msg.timestamp && (
+                    <span
+                      className={styles.messageTimestamp}
+                      title={formatExactTime(msg.timestamp)}
+                    >
+                      {formatRelativeTime(msg.timestamp)}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {isOwnMessage && (
+                <span
+                  className={
+                    msg.status === 3 ? styles.messageStatusRead : styles.messageStatus
+                  }
+                >
+                  {msg.status === 1 && '✓'}
+                  {msg.status === 2 && '✓✓'}
+                  {msg.status === 3 && 'seen'}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {showMessageModal && (
+        <MessageModal
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onClose={() => setShowMessageModal(false)}
+        />
+      )}
+
+      {showUpdateMessageModal && (
+        <UpdateMessageModal
+          msg={selectedMessage}
+          onCancel={() => setShowUpdateMessageModal(false)}
+          onUpdate={handleUpdateMessage}
+        />
+      )}
+
+      <MessageInput onSend={handleSend} placeholder="Type your message..." />
+    </div>
+  );
 }

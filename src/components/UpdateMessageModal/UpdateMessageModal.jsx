@@ -23,7 +23,7 @@ export default function UpdateMessageModal({ msg, onCancel, onUpdate, apiUrl }) 
     const data = await res.json();
 
     if (data.success) {
-      if (onUpdate) onUpdate(id, inputText);
+      if (onUpdate) onUpdate(id, inputText, data.is_edited);
       onCancel();
     } else {
       console.error("Message update failed:", data.error);
