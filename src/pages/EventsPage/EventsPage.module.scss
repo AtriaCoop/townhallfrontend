@@ -672,6 +672,63 @@
   }
 }
 
+.eventPostHelper {
+  margin: 0 0 $spacing-6;
+  color: var(--text-secondary);
+  @include body-2;
+  line-height: $line-height-relaxed;
+}
+
+.eventPostActions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.eventPostComposer {
+  max-width: 640px;
+}
+
+.eventPostLabel {
+  display: block;
+  margin-bottom: $spacing-1;
+  color: var(--text-secondary);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.eventPostTextarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  color: var(--text-primary);
+}
+
+.eventPostFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-3;
+
+  @include sm {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.eventPostCount,
+.eventPostCountError {
+  color: var(--text-muted);
+  @include caption;
+}
+
+.eventPostCountError {
+  color: $error-600;
+}
+
 // Create Event Form
 .createEventForm {
   display: flex;
@@ -722,6 +779,45 @@
 
 .eventTitleRow .eventTitle {
   margin-bottom: 0;
+}
+
+.eventPostBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px $spacing-2;
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.eventPostPublished {
+  background-color: $success-50;
+  color: $success-700;
+}
+
+.eventPostMissing {
+  background-color: var(--bg-secondary);
+  color: var(--text-muted);
+}
+
+.eventPostAction {
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    background-color: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 // Date Badges

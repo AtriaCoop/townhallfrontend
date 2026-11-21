@@ -69,6 +69,59 @@
   color: var(--text-muted);
 }
 
+.postStatus {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: $spacing-2;
+  min-height: 30px;
+  margin: 2px 40px 0 auto;
+  padding: 0 $spacing-3;
+  border: 1px solid;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1.2;
+  letter-spacing: $letter-spacing-wide;
+  text-transform: uppercase;
+
+  &::before {
+    width: 7px;
+    height: 7px;
+    border-radius: $radius-full;
+    content: "";
+  }
+}
+
+.postStatusPublished {
+  border-color: $success-500;
+  background-color: $success-50;
+  color: $success-700;
+
+  &::before {
+    background-color: $success-500;
+  }
+}
+
+.postStatusCancelled {
+  border-color: $error-500;
+  background-color: $error-50;
+  color: $error-700;
+
+  &::before {
+    background-color: $error-500;
+  }
+}
+
+@media (max-width: 480px) {
+  .postStatus {
+    min-height: 26px;
+    margin-right: 36px;
+    padding: 0 $spacing-2;
+    font-size: 0.625rem;
+  }
+}
+
 // More Options Menu
 .moreOptions {
   position: absolute;
