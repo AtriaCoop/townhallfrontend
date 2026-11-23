@@ -6,7 +6,8 @@
     "dev": "cross-env HOST=127.0.0.1 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -28,6 +29,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "vitest": "^4.1.12"
   }
 }
