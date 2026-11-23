@@ -77,3 +77,16 @@ export async function deletePostImage(postId, imageId) {
 
 	return await response.json();
 }
+
+export async function fetchLinkPreview(url) {
+	const response = await authenticatedFetch(`${BASE_URL}/post/link-preview/?url=${encodeURIComponent(url)}`, {
+		method: "GET",
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		throw new Error(`Failed to fetch link preview: ${errorText}`);
+	}
+
+	return await response.json();
+}

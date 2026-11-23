@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { formatDistance } from "date-fns";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { getStoredUser } from "@/utils/getStoredUser";
 import { BASE_URL } from "@/constants/api";
-import { createPost } from "@/api/post";
+import { createPost, fetchLinkPreview } from "@/api/post";
 import { fetchAllEvents } from "@/api/event";
 import Post from "@/components/Post/Post";
+import HighlightedTextarea from "@/components/HighlightedTextarea/HighlightedTextarea";
+import { linkifyText } from "@/utils/linkify";
 import PostSkeleton from "@/components/PostSkeleton/PostSkeleton";
 import EmojiPickerButton from "@/components/EmojiPickerButton/EmojiPickerButton";
 import TagCreationField from '@/components/TagCreationField/TagCreationField';
@@ -46,8 +48,44 @@ export default function NewsfeedPage() {
   const [tags, setTags] = useState([]);
   const [tagErrorText, setTagErrorText] = useState("");
   const [postAnonymously, setPostAnonymously] = useState(false);
+  const [linkPreviewData, setLinkPreviewData] = useState(null);
+  const [dismissedPreviewUrl, setDismissedPreviewUrl] = useState(null);
   const postImageRef = useRef(null);
   const textareaRef = useRef(null);
+  const detectedPostLink = useMemo(() => {
+    const linkSegment = linkifyText(postText).find(
+      (segment) => segment.type === "link"
+    );
+    return linkSegment ? linkSegment.href : null;
+  }, [postText]);
+
+  useEffect(() => {
+    setDismissedPreviewUrl(null);
+
+    if (!detectedPostLink) {
+      setLinkPreviewData(null);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const data = await fetchLinkPreview(detectedPostLink);
+        if (!cancelled) {
+          setLinkPreviewData({ url: detectedPostLink, ...data });
+        }
+      } catch {
+        if (!cancelled) {
+          setLinkPreviewData(null);
+        }
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [detectedPostLink]);
   const loadTrendingTags = async () => {
     try {
       const res = await authenticatedFetch(`${BASE_URL}/post/tags/trending/?limit=10`);
@@ -151,6 +189,7 @@ export default function NewsfeedPage() {
             created_at: p.created_at,
             content: [p.content],
             postImages: p.images || [],
+            linkPreview: p.link_preview || null,
             links: [],
             comments: p.comments || [],
             reactions: p.reactions || {},
@@ -225,6 +264,7 @@ export default function NewsfeedPage() {
         isVerified: data.post.user.is_verified,
         content: [data.post.content],
         postImages: data.post.images || [],
+        linkPreview: data.post.link_preview || null,
         tags: data.post.tags || [],
         links: [],
         comments: data.post.comments || [],
@@ -318,16 +358,46 @@ export default function NewsfeedPage() {
                 e.target.src = '/assets/ProfileImage.jpg';
               }}
             />
-            <textarea
+            <HighlightedTextarea
               ref={textareaRef}
-              className={`${styles.createPostInput} ${postText.length > MAX_POST_LEN ? styles.createPostInputError : ""}`}
+              className={styles.createPostInputWrapper}
               placeholder="What's on your mind?"
               value={postText}
               onChange={(e) => setPostText(e.target.value)}
               onFocus={handleTextareaFocus}
               rows={isComposing ? 3 : 1}
+              error={postText.length > MAX_POST_LEN}
             />
           </div>
+
+          {linkPreviewData && linkPreviewData.url !== dismissedPreviewUrl && (
+            <div className={styles.linkPreviewCard}>
+              {linkPreviewData.image && (
+                <img
+                  src={linkPreviewData.image}
+                  alt=""
+                  className={styles.linkPreviewImage}
+                />
+              )}
+              <div className={styles.linkPreviewBody}>
+                <span className={styles.linkPreviewDomain}>
+                  {linkPreviewData.domain}
+                </span>
+                {linkPreviewData.title && (
+                  <span className={styles.linkPreviewTitle}>
+                    {linkPreviewData.title}
+                  </span>
+                )}
+              </div>
+              <button
+                className={styles.linkPreviewDismiss}
+                onClick={() => setDismissedPreviewUrl(linkPreviewData.url)}
+                aria-label="Dismiss link preview"
+              >
+                <Icon name="close" size={14} />
+              </button>
+            </div>
+          )}
 
           {/* Image Previews */}
           {postImages.length > 0 && (
@@ -470,6 +540,7 @@ export default function NewsfeedPage() {
                 content={post.content}
                 isVerified={post.isVerified}
                 postImages={post.postImages}
+                linkPreview={post.linkPreview}
                 links={post.links}
                 comments={post.comments}
                 reactions={post.reactions}
