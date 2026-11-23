@@ -21,3 +21,8 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # Building on Linux also catches a package-lock.json that is missing
+      # Linux versions of native packages (e.g. lightningcss, Tailwind's oxide).
+      - name: Build
+        run: npm run build
