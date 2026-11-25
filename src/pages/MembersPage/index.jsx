@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import Icon from "@/icons/Icon";
+// import MemberFilter from "@/components/MemberFilter/MemberFilter";
 import styles from "./MembersPage.module.scss";
 
 
@@ -105,6 +106,9 @@ export default function MembersPage() {
             onChange={(e) => setSearchMember(e.target.value)}
           />
         </div>
+        {/* <MemberFilter
+          tags={tags}
+        /> */}
       </header>
 
 
