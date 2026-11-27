@@ -203,3 +203,22 @@
   font-weight: bold;
   vertical-align: middle;
 }
+
+.searchControls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 35px;
+}
+
+@media (max-width: 600px) {
+    .searchControls {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .searchWrapper {
+        flex: 1;
+        min-width: 0;
+    }
+}

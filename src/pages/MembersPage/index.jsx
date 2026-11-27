@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
 import { fetchAllTags } from "@/api/tag";
 import Icon from "@/icons/Icon";
-// import MemberFilter from "@/components/MemberFilter/MemberFilter";
+import MemberFilter from "@/components/MemberFilterModal/MemberFilterModal";
+import useMemberFilters from '@/hooks/useMemberFilters';
 import styles from "./MembersPage.module.scss";
 
 
@@ -15,14 +16,14 @@ export default function MembersPage() {
   const [members, setMembers] = useState([]);
   const [searchMember, setSearchMember] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
 
-
-  const filteredMembers = members
-    .filter((member) =>
-      member.full_name?.toLowerCase().includes(searchMember.toLowerCase())
-    )
-    .sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
-
+  const { filteredMembers, tagCounts } = useMemberFilters(
+      members,
+      searchMember,
+      selectedTags
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -86,6 +87,31 @@ export default function MembersPage() {
     };
   }, [BASE_URL, router]);
 
+  useEffect(() => {
+      const fetchTags = async () => {
+          try {
+              const data = await fetchAllTags();
+              setTags(data);
+          } catch (error) {
+              console.error('Failed to load tags:', error);
+          }
+      };
+
+      fetchTags();
+  }, []);
+
+  const handleToggleTag = (tagId) => {
+      setSelectedTags(prev =>
+          prev.includes(tagId)
+              ? prev.filter(id => id !== tagId)
+              : [...prev, tagId]
+      );
+  };
+
+  const handleClearFilters = () => {
+      setSelectedTags([]);
+  };  
+
 
   return (
     <div className={styles.membersPage}>
@@ -107,9 +133,13 @@ export default function MembersPage() {
             onChange={(e) => setSearchMember(e.target.value)}
           />
         </div>
-        {/* <MemberFilter
-          tags={tags}
-        /> */}
+        <MemberFilter
+            tags={tags}
+            selectedTags={selectedTags}
+            onToggleTag={handleToggleTag}
+            onClearFilters={handleClearFilters}
+            tagCounts={tagCounts}
+        />        
       </header>
 
 
