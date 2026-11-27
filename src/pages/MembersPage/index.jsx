@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { authenticatedFetch } from "@/utils/authHelpers";
+import { fetchAllTags } from "@/api/tag";
 import Icon from "@/icons/Icon";
 import styles from "./MembersPage.module.scss";
 
