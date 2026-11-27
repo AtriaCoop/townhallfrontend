@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import styles from './MemberFilter.module.scss';
+import styles from './MemberFilterModal.module.scss';
 
 
 const MemberFilter = ({
