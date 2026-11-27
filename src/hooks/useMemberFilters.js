@@ -10,7 +10,7 @@ const useMemberFilters = (members, searchMember, selectedTags) => {
             const search = searchMember.toLowerCase();
 
             result = result.filter(member =>
-                member.name.toLowerCase().includes(search)
+                member.full_name.toLowerCase().includes(search)
             );
         }
 
