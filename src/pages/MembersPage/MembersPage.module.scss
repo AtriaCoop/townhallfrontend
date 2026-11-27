@@ -9,6 +9,7 @@
 
 // Page Header
 .pageHeader {
+  --search-height: 42px;
   display: flex;
   flex-direction: column;
   gap: $spacing-4;

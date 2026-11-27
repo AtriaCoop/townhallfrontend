@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './MemberFilterModal.module.scss';
+import { Filter } from 'lucide-react';
 
 
 const MemberFilter = ({
@@ -59,6 +60,7 @@ const MemberFilter = ({
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
+                <Filter size={22} strokeWidth={2} />
                 <span>Filter</span>
 
                 {selectedTags.length > 0 && (

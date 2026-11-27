@@ -1,15 +1,16 @@
 .filterContainer {
-    position: relative;
-    flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .filterButton {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    height: 64px;
+    height: var(--search-height);
     padding: 0 24px;
     background: white;
     border: 1.5px solid #d1d5db;
