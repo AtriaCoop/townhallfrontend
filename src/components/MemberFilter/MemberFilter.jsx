@@ -1,20 +1,20 @@
-
 import { useEffect, useRef, useState } from 'react';
 import styles from './MemberFilter.module.scss';
 
+
 const MemberFilter = ({
-    tags = [],
-    selectedTags = [],
-    onSelectionChange
+    tags,
+    selectedTags,
+    onToggleTag,
+    onClearFilters,
+    tagCounts = {}
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [search, setSearch] = useState('');
-
     const filterRef = useRef(null);
 
-    // Close dropdown when clicking outside.
+    // Close dropdown when clicking outside
     useEffect(() => {
-        const handleOutsideClick = (event) => {
+        const handleClickOutside = (event) => {
             if (
                 filterRef.current &&
                 !filterRef.current.contains(event.target)
@@ -23,113 +23,106 @@ const MemberFilter = ({
             }
         };
 
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+        };
+    }, []);
+
+    // Close dropdown with Escape
+    useEffect(() => {
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
                 setIsOpen(false);
             }
         };
 
-        document.addEventListener('mousedown', handleOutsideClick);
         document.addEventListener('keydown', handleEscape);
 
         return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
             document.removeEventListener('keydown', handleEscape);
         };
     }, []);
 
-    const toggleTag = (tagId) => {
-        const isSelected = selectedTags.includes(tagId);
-
-        const updatedTags = isSelected
-            ? selectedTags.filter(id => id !== tagId)
-            : [...selectedTags, tagId];
-
-        onSelectionChange(updatedTags);
-    };
-
-    const clearFilters = () => {
-        onSelectionChange([]);
-    };
-
-    const filteredTags = tags.filter(tag =>
-        tag.name.toLowerCase().includes(search.toLowerCase())
-    );
-
     return (
-        <div className={styles.member-filter} ref={filterRef}>
+        <div className={styles.filterContainer} ref={filterRef}>
             <button
-                className={styles.member-filter-button `${isOpen ? 'active' : ''}`}
+                type="button"
+                className={`${styles.filterButton} ${
+                    isOpen ? styles.active : ''
+                }`}
                 onClick={() => setIsOpen(prev => !prev)}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <i className="fas fa-sliders-h" />
                 <span>Filter</span>
 
                 {selectedTags.length > 0 && (
-                    <span className={styles.member-filter-count}>
+                    <span className={styles.filterCount}>
                         {selectedTags.length}
                     </span>
                 )}
-
-                <i className={`fas fa-chevron-down filter-chevron ${
-                    isOpen ? 'rotated' : ''
-                }`} />
             </button>
 
             {isOpen && (
-                <div className={styles.member-filter-dropdown}>
-                    <div className={styles.member-filter-header}>
-                        <span>Filter by tags</span>
-                        <span className={styles.filter-selected-count}>
-                            {selectedTags.length} selected
-                        </span>
-                    </div>
-
-                    <div className={styles.member-filter-search}>
-                        <i className="fas fa-search" />
-                        <input
-                            type="text"
-                            placeholder="Search tags..."
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                        />
-                    </div>
-
-                    <div className={styles.member-filter-options}>
-                        {filteredTags.length > 0 ? (
-                            filteredTags.map(tag => (
-                                <label
-                                    key={tag.id}
-                                    className={styles.member-filter-option}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedTags.includes(tag.id)}
-                                        onChange={() => toggleTag(tag.id)}
-                                    />
-                                    <span>{tag.name}</span>
-                                </label>
-                            ))
-                        ) : (
-                            <div className={styles.member-filter-empty}>
-                                No tags found.
-                            </div>
-                        )}
-                    </div>
-
-                    <div className={styles.member-filter-footer}>
-                        <span>
-                            {selectedTags.length} tags selected
-                        </span>
+                <div className={styles.dropdown}>
+                    <div className={styles.dropdownHeader}>
+                        <h3>Filter by skill</h3>
 
                         <button
-                            onClick={clearFilters}
+                            type="button"
+                            className={styles.clearButton}
+                            onClick={onClearFilters}
                             disabled={selectedTags.length === 0}
                         >
                             Clear filters
                         </button>
+                    </div>
+
+                    <div className={styles.tagList}>
+                        {tags.map(tag => {
+                            const isSelected =
+                                selectedTags.includes(tag.id);
+
+                            return (
+                                <label
+                                    key={tag.id}
+                                    className={`${styles.tagOption} ${
+                                        isSelected
+                                            ? styles.selected
+                                            : ''
+                                    }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() =>
+                                            onToggleTag(tag.id)
+                                        }
+                                    />
+
+                                    <span className={styles.checkbox} />
+
+                                    <span className={styles.tagName}>
+                                        {tag.name}
+                                    </span>
+
+                                    <span className={styles.tagCount}>
+                                        {tagCounts[tag.id] ?? 0}
+                                    </span>
+                                </label>
+                            );
+                        })}
+
+                        {tags.length === 0 && (
+                            <p className={styles.emptyMessage}>
+                                No skills available.
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
